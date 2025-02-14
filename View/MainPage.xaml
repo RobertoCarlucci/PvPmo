@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PvPmo.View.MainPage"
+             xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
+             x:DataType="viewmodel:MainViewModel"
+             Title="{Binding Title}">     
+
+    <RefreshView>
+        
+        <Grid
+            ColumnDefinitions="*,*,*"             
+            RowDefinitions="*,*,*"
+            RowSpacing="0">
+            
+            <Image x:Name="backgroundImage"
+                   Source="wallpaper_dl.png"
+                   Grid.RowSpan="3"
+                   Grid.ColumnSpan="3"
+                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="CenterAndExpand"
+                   Aspect="AspectFill"/>
+
+            <Button Text="Aggiorna Data Base."
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnAgDbCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Margin="40"/>
+
+            <Button Text="Aggiorna Data."
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnAgDataCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="40"/>
+
+            <Button Text="Chiudi ed Esci."
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnEndCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Margin="40"/>
+
+
+            <ActivityIndicator IsVisible="{Binding IsBusy}"
+                               IsRunning="{Binding IsBusy}"
+                               HorizontalOptions="FillAndExpand"
+                               VerticalOptions="CenterAndExpand"
+                               
+                               Grid.RowSpan="2"
+                               Grid.ColumnSpan="2"/>
+        </Grid>
+    </RefreshView>
+
+</ContentPage>
