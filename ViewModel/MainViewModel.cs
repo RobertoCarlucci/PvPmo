@@ -1,4 +1,6 @@
-﻿namespace PvPmo.ViewModel
+﻿using PvPmo.Service;
+
+namespace PvPmo.ViewModel
 {
     public partial class MainViewModel : BaseViewModel
     {        
@@ -15,9 +17,13 @@
 
             IsBusy = true;
 
+            await Res10Service.ListaRes10();            
+
             await Shell.Current.DisplayAlert
                 ("Hai premuto BtnAgDb !", $"Non ci posso credere.", "Ok");
-            
+
+            IsBusy = false;
+            return;
         }
 
         [RelayCommand]
@@ -27,10 +33,13 @@
                 return;
 
             IsBusy = true;
-
+            
+            
             await Shell.Current.DisplayAlert
                 ("Hai premuto BtnAgData !", $"Non ci posso credere.", "Ok");
 
+            IsBusy = false;
+            return;
         }
 
         [RelayCommand]
