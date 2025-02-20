@@ -9,8 +9,7 @@
                 var _connSql = new MySqlConnection(StrConn);
                 await _connSql.OpenAsync();
                 var _cmdSql = new MySqlCommand(Qry, _connSql);                
-                var _adapter = new MySqlDataAdapter(_cmdSql);
-                //var _tabella = new DataTable();
+                var _adapter = new MySqlDataAdapter(_cmdSql);                
                 await Task.Run(() => _adapter.Fill(_tabella));                
                 int ContaRecord = _tabella.Rows.Count;
                 return _tabella;

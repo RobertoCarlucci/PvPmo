@@ -17,7 +17,8 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            await Res10Service.ListaRes10();            
+            await Res10Service.ListaRes10();
+            
 
             await Shell.Current.DisplayAlert
                 ("Hai premuto BtnAgDb !", $"Non ci posso credere.", "Ok");
