@@ -29,11 +29,20 @@
                     Grid.Column="0"
                     Margin="40"/>
 
+
+            <Button Text="Importa Dati Access."
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnImpAcsCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="40"/>
+
             <Button Text="Aggiorna Data."
                     Style="{StaticResource MyButton}"
                     Command="{Binding BtnAgDataCommand}"
                     IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="1"
+                    Grid.Row="2"
                     Grid.Column="0"
                     Margin="40"/>
 

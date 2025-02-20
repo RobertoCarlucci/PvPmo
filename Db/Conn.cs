@@ -11,5 +11,16 @@
             string StrConn = NomeHost + UserName + nomeDb + ";";
             return StrConn;
         }
+        public static string AcsDbConn(string nomeDb)
+        {
+            string StrConn = "Provider=Microsoft.ACE.OLEDB.16.0; Data Source=C:\\Appo\\" + nomeDb + ".accdb;";
+            return StrConn;
+        }
+        public static string ExFlConn(string fileImp)
+        {
+            string StrConn = "Provider=Microsoft.ACE.OLEDB.16.0;Data Source=C:\\TestDb\\GesDb\\Aggiorna\\Timesheet\\"
+                + fileImp + ".xlsx;Extended Properties=Excel 12.0 Xml;";
+            return StrConn;
+        }
     }
 }

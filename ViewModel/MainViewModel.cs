@@ -28,6 +28,24 @@ namespace PvPmo.ViewModel
         }
 
         [RelayCommand]
+        async Task BtnImpAcs()
+        {
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+
+            await AcsToSql.CopiaAcstoSql();
+
+
+            await Shell.Current.DisplayAlert
+                ("Hai premuto BtnImpAcs !", $"Non ci posso credere.", "Ok");
+
+            IsBusy = false;
+            return;
+        }
+
+        [RelayCommand]
         async Task BtnAgData()
         {
             if (IsBusy)
