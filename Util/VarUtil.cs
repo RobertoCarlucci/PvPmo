@@ -26,6 +26,9 @@
                 }
                 switch (Name)
                 {
+                    case "id":
+                        Type = ("INT auto_increment");
+                        break;
                     case "Disapproved Timesheets":
                         Type = ("INT(10) ZEROFILL NOT NULL");
                         break;
@@ -42,15 +45,15 @@
 
                 if (x < i)
                 {
-                    Qry = Qry + "`" + Name + "` " + Type + ", ";
+                    Qry = Qry + " " + Name + " " + Type + ", ";
                 }
                 else
                 {
-                    Qry = Qry + "`" + Name + "` " + Type;
+                    Qry = Qry + " " + Name + " " + Type;
                 }
                 x++;
             }
-            Qry += ");";
+            Qry += "primary key(id));";
             return Qry;
         }
         // Leggo le intestazioni colonna della tabella temp_ e quelle della tabella di riferimento se il numero non
