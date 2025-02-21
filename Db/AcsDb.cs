@@ -2,10 +2,8 @@
 {
     public class AcsDb
     {
-        public static async Task<DataTable> EseguiQry(string Qry, string StrConn, DataTable _tabella)
+        public static async Task<DataTable> AcsQryTab(string Qry, string StrConn, DataTable _tabella)
         {
-            //var _tabella = new DataTable();
-
             try
             {
                 var _connAcs = new OleDbConnection(StrConn);

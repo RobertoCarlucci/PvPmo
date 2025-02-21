@@ -10,10 +10,10 @@ namespace PvPmo.Service
             string StrConn = Conn.AcsDbConn(nomeDb);
             DataTable _tabella = new DataTable();
             string Qry = "SELECT * FROM GlobalTimesheetExtract;";
-            await AcsDb.EseguiQry(Qry, StrConn, _tabella);
+            await AcsDb.AcsQryTab(Qry, StrConn, _tabella);
             nomeDb = "timesheet";
             StrConn = Conn.MysqlConn(nomeDb);
-            await SqlDb.EseguiBulk("GlobalTimesheetExtract", StrConn, _tabella);
+            await SqlDb.SqlBulkCopy("GlobalTimesheetExtract", StrConn, _tabella);
         }
     }
 }
