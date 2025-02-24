@@ -67,8 +67,4 @@
 		<PackageReference Include="System.Data.OleDb" Version="9.0.2" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Model\" />
-	</ItemGroup>
-
 </Project>

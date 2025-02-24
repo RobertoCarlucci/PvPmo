@@ -35,7 +35,7 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            await AcsToSql.CopiaAcstoSql();
+            await AcsToSql.NewDb();
 
 
             await Shell.Current.DisplayAlert

@@ -11,6 +11,30 @@ namespace PvPmo.Db
             var NewParam = new MySqlParameter(nome, vale);
             Params.Add(NewParam);
         }
+
+        public static DataTable SqlQrySyn(string StrConn, string Qry, DataTable _tabella)
+        {
+            try
+            {
+                var _connSql = new MySqlConnection(StrConn);
+                _connSql.Open();
+                var _cmdSql = new MySqlCommand(Qry, _connSql);
+                var _adapter = new MySqlDataAdapter(_cmdSql);
+                int ContaRecord = _adapter.Fill(_tabella);
+                //int ContaRecord = _tabella.Rows.Count;
+                return _tabella;
+            }
+            catch (MySqlException ex)
+            {
+                Shell.Current.DisplayAlert
+                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
+                return _tabella;
+            }
+            finally
+            {
+                if (ConnectionState.Open != ConnectionState.Closed) { };
+            }
+        }
         public static async Task<DataTable> SqlQry(string StrConn, string Qry, DataTable _tabella)
         {
             try

@@ -4,7 +4,7 @@
     {
         //Vengono lette le intestazioni delle colonne del foglio Excel attraverso (CreaTabDb) per
         //scrivere la query che crea le intestazioni della tabella nel db
-        public static string CreaTabDb(string nomeTabDb, DataTable tabData)
+        public static string NormInp(string nomeTabDb, DataTable tabData)
         {
             int x = 0;
             string Qry = nomeTabDb + " (";
