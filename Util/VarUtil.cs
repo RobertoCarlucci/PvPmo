@@ -7,7 +7,7 @@
         public static string CreaTabDb(string nomeTabDb, DataTable tabData)
         {
             int x = 0;
-            string Qry = "CREATE TABLE " + nomeTabDb + " (";
+            string Qry = nomeTabDb + " (";
             int i = tabData.Columns.Count - 1;
 
             foreach (DataColumn col in tabData.Columns)
@@ -20,14 +20,18 @@
                     case "String":
                         Type = ("nvarchar(50)");
                         break;
-                        //case "Double":
-                        //    Type = ("INT");
-                        //    break;
+                    case "Double":
+                        Type = ("DECIMAL(2) UNSIGNED ZEROFILL");
+                        break;
                 }
                 switch (Name)
                 {
-                    case "id":
-                        Type = ("INT auto_increment");
+                    case "ID":
+                        Type = ("INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT");
+                        Name = "id";
+                        break;
+                    case "Date":
+                        Name = ("DateId");
                         break;
                     case "Disapproved Timesheets":
                         Type = ("INT(10) ZEROFILL NOT NULL");
@@ -42,18 +46,21 @@
                         Type = ("INT(10) ZEROFILL NOT NULL");
                         break;
                 }
-
+                var RemSpazi = Name.Replace(" ", "_");
+                var RemTondeIn = RemSpazi.Replace("(", "_");
+                var RemTondeFn = RemTondeIn.Replace(")", "_");
+                var RemEmail = RemTondeFn.Replace("E-Mail", "EMail");
                 if (x < i)
                 {
-                    Qry = Qry + " " + Name + " " + Type + ", ";
+                    Qry = Qry + "" + RemEmail + " " + Type + ", ";
                 }
                 else
                 {
-                    Qry = Qry + " " + Name + " " + Type;
+                    Qry = Qry + "" + RemEmail + " " + Type;
                 }
                 x++;
             }
-            Qry += "primary key(id));";
+            Qry += ");";
             return Qry;
         }
         // Leggo le intestazioni colonna della tabella temp_ e quelle della tabella di riferimento se il numero non
