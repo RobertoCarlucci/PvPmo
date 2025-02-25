@@ -1,5 +1,4 @@
-﻿using PvPmo.Model;
-using PvPmo.Db;
+﻿using PvPmo.Db;
 
 namespace PvPmo.Service
 {
@@ -18,21 +17,15 @@ namespace PvPmo.Service
             }
         }
         public static async Task CopiaAcstoSql(string nomeDb, string nomeTb, string destinazione)
-        {
-            
+        {            
             string StrConn = Conn.AcsDbConn(nomeDb);
             DataTable _tabella = new DataTable();
             string Qry = "SELECT * FROM [" + nomeTb + "] WHERE 1=0";
             await AcsDb.AcsQryTab(Qry, StrConn, _tabella);
             Qry = VarUtil.NormInp(nomeTb, _tabella);
-            Qry = "CREATE OR REPLACE TABLE " +  Qry;
-            //nomeDb = "timesheet";
+            Qry = "CREATE OR REPLACE TABLE " +  Qry;            
             StrConn = Conn.MysqlConn(destinazione);
-            bool Bol = SqlDb.SqlNoQry(Qry, StrConn);
-
-            //nomeDb = "timesheet";
-            //StrConn = Conn.MysqlConn(nomeDb);
-            //await SqlDb.SqlBulkCopy("GlobalTimesheetExtract", StrConn, _tabella);
+            bool Bol = SqlDb.SqlNoQry(Qry, StrConn);            
         }
     }
 }

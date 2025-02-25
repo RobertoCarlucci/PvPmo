@@ -6,6 +6,8 @@
         //scrivere la query che crea le intestazioni della tabella nel db
         public static string NormInp(string nomeTabDb, DataTable tabData)
         {
+            nomeTabDb = NormNomeTab(nomeTabDb);
+
             int x = 0;
             string Qry = nomeTabDb + " (";
             int i = tabData.Columns.Count - 1;
@@ -23,6 +25,9 @@
                     case "Double":
                         Type = ("DECIMAL(2) UNSIGNED ZEROFILL");
                         break;
+                    case "Int16":
+                        Type = ("DECIMAL(2) UNSIGNED ZEROFILL");
+                        break;
                 }
                 switch (Name)
                 {
@@ -30,38 +35,86 @@
                         Type = ("INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT");
                         Name = "id";
                         break;
+                    case "Action Items, Completed (#)":                        
+                        Name = "action_items_completed_val";
+                        break;
+                    case "Action Items, Completed (%)":
+                        Name = "action_items_completed_perc";
+                        break;
                     case "Date":
-                        Name = ("DateId");
+                        Name = "dateid";
                         break;
-                    case "Disapproved Timesheets":
-                        Type = ("INT(10) ZEROFILL NOT NULL");
+                    case "Key":
+                        Name = "keyid";
                         break;
-                    case "Overdue Timesheets":
-                        Type = ("INT(10) ZEROFILL NOT NULL");
+                    case "ID&Month&Year":
+                        Name = "id_month_year";
                         break;
-                    case "Timesheets Submitted":
-                        Type = ("INT(10) ZEROFILL NOT NULL");
-                        break;
-                    case "Timesheets To Approve":
-                        Type = ("INT(10) ZEROFILL NOT NULL");
-                        break;
+                    case "Work ID #":
+                        Name = "work_id";
+                        break;                        
                 }
-                var RemSpazi = Name.Replace(" ", "_");
+                var RemVirgola = Name.Replace(",", "");
+                var RemTrattino = RemVirgola.Replace("-", "_");
+                var RemSpazi = RemTrattino.Replace(" ", "_");
                 var RemTondeIn = RemSpazi.Replace("(", "_");
-                var RemTondeFn = RemTondeIn.Replace(")", "_");
-                var RemEmail = RemTondeFn.Replace("E-Mail", "EMail");
+                var RemTondeFn = RemTondeIn.Replace(")", "_");                
                 if (x < i)
                 {
-                    Qry = Qry + "" + RemEmail + " " + Type + ", ";
+                    Qry = Qry + "`" + RemTondeFn + "` " + Type + ", ";
                 }
                 else
                 {
-                    Qry = Qry + "" + RemEmail + " " + Type;
+                    Qry = Qry + "`" + RemTondeFn + "` " + Type;
                 }
                 x++;
             }
             Qry += ");";
             return Qry;
+        }
+
+        public static string NormNomeTab(string nomeTab)
+        {
+            switch (nomeTab)
+            {
+                case "All Project Mapped - Power BI Column Set":
+                    nomeTab = "all_project_mapped_power_bi_column_set";
+                    break;
+                case "PBX_ AllProjectMappedPowerBIColumnSet":
+                    nomeTab = "pbx_all_project_mapped_power_bi_column_set";
+                    break;
+                case "Resource Type":
+                    nomeTab = "resource_type";
+                    break;
+                case "ScenarioRestoAnno":
+                    nomeTab = "scenario_resto_anno";
+                    break;
+                case "Standard Activities":
+                    nomeTab = "standard_activities";
+                    break;
+                case "Timesheet Information By Month":
+                    nomeTab = "timesheet_information_by_month";
+                    break;
+                case "Working Hours by Day":
+                    nomeTab = "working_hours_by_day";
+                    break;
+                case "GlobalTimesheetExtract":
+                    nomeTab = "global_timesheet_extract";
+                    break;
+                case "Key":
+                    nomeTab = "key_global";
+                    break;
+                case "PBX_TimesheetInformationByMonth":
+                    nomeTab = "pbx_timesheet_information_by_month";
+                    break;
+                case "01_tabelladata":
+                    nomeTab = "01_tabella_data";
+                    break;
+                case "pv_total_outsoremese":
+                    nomeTab = "pv_total_outs_ore_mese";
+                    break;
+            }
+            return nomeTab;
         }
         // Leggo le intestazioni colonna della tabella temp_ e quelle della tabella di riferimento se il numero non
         // corrisponde esco con errore altrimenti passo le liste.

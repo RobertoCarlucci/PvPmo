@@ -16,7 +16,7 @@
             }
             catch (OleDbException ex)
             {
-                Shell.Current.DisplayAlert
+                await Shell.Current.DisplayAlert
                     ("Errore MariaDb", $"Codice: {ex}", "Ok");
                 return _tabella;
             }
