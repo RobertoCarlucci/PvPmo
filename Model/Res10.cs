@@ -1,7 +1,7 @@
 ﻿namespace PvPmo.Model
 {
     public class Res10
-    {        
+    {
         public string? Resource_Name { get; set; }
         public DateTime Start_Date { get; set; }
         public DateTime Term_Date { get; set; }
@@ -48,5 +48,34 @@
         public string? User_Phone_2 { get; set; }
         public string? Work_Location { get; set; }
         public DateTime? DateId { get; set; }
+    }
+    public interface IRes10Service
+    {
+        IList<Res10> InpRes10 { get; }
+    }
+    public class Res10Service : IRes10Service
+    {
+        private List<Res10> _inpres10 = null;
+
+        public Res10Service()
+        {
+        //    DataTable _elencoInp = new DataTable();
+            _inpres10 = new List<Res10>();
+
+        //    string StrConn = Db.Conn.MysqlConn("pvpmo_origine");
+        //    string Qry = "SELECT * From origine_acs;";
+        //    Db.SqlDb.SqlQrySyn(StrConn, Qry, _elencoInp);
+        //    DataRow[] temp = _elencoInp.Select();
+        //    foreach (DataRow v in temp)
+        //    {
+        //        _inpres10.Add(new Res10()
+        //        {
+        //            db_inp = v["db_inp"].ToString(),
+        //            tabella = v["tabella"].ToString(),
+        //            db_dest = v["db_dest"].ToString(),
+        //        });
+        //    }
+        }
+        public IList<Res10> InpRes10 => _inpres10;
     }
 }

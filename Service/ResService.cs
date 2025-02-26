@@ -2,7 +2,7 @@
 
 namespace PvPmo.Service
 {
-    public class Res10Service
+    public class ResService
     {
         public static async Task ListaRes10()
         {

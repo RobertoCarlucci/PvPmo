@@ -2,14 +2,15 @@
 {
     public class VarUtil
     {
-        //Vengono lette le intestazioni delle colonne del foglio Excel attraverso (CreaTabDb) per
-        //scrivere la query che crea le intestazioni della tabella nel db
+        //Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
+        //Si procede anche alla normalizzazione dei nomi colonna.
         public static string NormInp(string nomeTabDb, DataTable tabData)
         {
+            // Chiamata alla funzione di normalizzazione nome tabella.
             nomeTabDb = NormNomeTab(nomeTabDb);
-
-            int x = 0;
+                       
             string Qry = nomeTabDb + " (";
+            int x = 0;
             int i = tabData.Columns.Count - 1;
 
             foreach (DataColumn col in tabData.Columns)
@@ -17,6 +18,14 @@
                 string Name = col.ColumnName;
                 string Type = col.DataType.ToString();
                 Type = Type.Remove(0, 7);
+                // Aggiungo colonna id se non presente.
+                if( x == 0 && Name != "ID")
+                {
+                    string idType = ("INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT");
+                    string idName = "id";
+                    Qry = Qry + "`" + idName + "` " + idType + ", ";
+                }
+                // Select tipo dati colonne.
                 switch (Type)
                 {
                     case "String":
@@ -29,13 +38,14 @@
                         Type = ("DECIMAL(2) UNSIGNED ZEROFILL");
                         break;
                 }
+                // Select nomi colonne e creazione chiave primaria dove necessaria.
                 switch (Name)
                 {
                     case "ID":
                         Type = ("INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT");
                         Name = "id";
                         break;
-                    case "Action Items, Completed (#)":                        
+                    case "Action Items, Completed (#)":
                         Name = "action_items_completed_val";
                         break;
                     case "Action Items, Completed (%)":
@@ -52,13 +62,17 @@
                         break;
                     case "Work ID #":
                         Name = "work_id";
-                        break;                        
+                        break;
                 }
-                var RemVirgola = Name.Replace(",", "");
-                var RemTrattino = RemVirgola.Replace("-", "_");
-                var RemSpazi = RemTrattino.Replace(" ", "_");
-                var RemTondeIn = RemSpazi.Replace("(", "_");
-                var RemTondeFn = RemTondeIn.Replace(")", "_");                
+                // Eliminazione dei caratteri speciali possibili in access.
+                string RemVirgola = Name.Replace(",", "");
+                string RemTrattino = RemVirgola.Replace("-", "_");
+                string RemSpazi = RemTrattino.Replace(" ", "_");
+                string RemTondeIn = RemSpazi.Replace("(", "_");
+                string RemTondeFn = RemTondeIn.Replace(")", "_");
+                // Accodamento nella query dei nomi campi.
+                // Viene usato il carattere ` (Alt + 96) per indicare tipo stringa nel
+                // nome colonna.
                 if (x < i)
                 {
                     Qry = Qry + "`" + RemTondeFn + "` " + Type + ", ";
@@ -116,8 +130,8 @@
             }
             return nomeTab;
         }
-        // Leggo le intestazioni colonna della tabella temp_ e quelle della tabella di riferimento se il numero non
-        // corrisponde esco con errore altrimenti passo le liste.
+        // Leggo le intestazioni colonna della tabella temp_ e quelle della tabella di
+        // riferimento se il numero non corrisponde esco con errore altrimenti passo le liste.
         public static string ComparaNomeColonna(string db, string nomeTabella)
         {
             DataTable TabTemp = new DataTable();

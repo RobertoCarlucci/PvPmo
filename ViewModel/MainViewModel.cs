@@ -17,7 +17,7 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            await Res10Service.ListaRes10();
+            // Res10Service.ListaRes10();
             
 
             await Shell.Current.DisplayAlert
