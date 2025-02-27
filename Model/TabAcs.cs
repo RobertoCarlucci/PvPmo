@@ -2,9 +2,10 @@
 {
     public class TabAcs
     {
-        public required string db_inp { get; set; }
-        public required string tabella { get; set; }
-        public required string db_dest { get; set; }
+        public string? db_inp { get; set; }
+        public string? tabella { get; set; }
+        public string? db_dest { get; set; }
+        public string? tabella_sql { get; set; }
     }
     public interface ITabAcsService
     {
@@ -30,7 +31,8 @@
                 {
                     db_inp = v["db_inp"].ToString(),
                     tabella = v["tabella"].ToString(),
-                    db_dest = v["db_dest"].ToString()
+                    db_dest = v["db_dest"].ToString(),
+                    tabella_sql = v["tabella_sql"].ToString()
                 });
             }
         }

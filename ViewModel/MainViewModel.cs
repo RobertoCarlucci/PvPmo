@@ -52,8 +52,14 @@ namespace PvPmo.ViewModel
                 return;
 
             IsBusy = true;
-            
-            
+
+             Db.SqlDb.AddMapping(1, "Test00");
+            Db.SqlDb.AddMapping(1, "Test01");
+            Db.SqlDb.AddMapping(1, "Test02");
+            string StrConn = Db.Conn.MysqlConn("timesheet");
+            DataTable tab = new DataTable();
+            await Db.SqlDb.SqlBulkCopy("test", StrConn, tab);
+
             await Shell.Current.DisplayAlert
                 ("Hai premuto BtnAgData !", $"Non ci posso credere.", "Ok");
 

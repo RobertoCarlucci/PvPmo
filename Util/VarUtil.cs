@@ -4,17 +4,17 @@
     {
         //Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
         //Si procede anche alla normalizzazione dei nomi colonna.
-        public static string NormInp(string nomeTabDb, DataTable tabData)
+        public static string NormInp(string nomeTabDb, string nomeTabNorm, DataTable tabData)
         {
             // Chiamata alla funzione di normalizzazione nome tabella.
-            nomeTabDb = NormNomeTab(nomeTabDb);
-                       
-            string Qry = nomeTabDb + " (";
+            nomeTabDb = nomeTabNorm;            
+            
+            string Qry = nomeTabDb + " (";            
             int x = 0;
             int i = tabData.Columns.Count - 1;
 
             foreach (DataColumn col in tabData.Columns)
-            {
+            {                
                 string Name = col.ColumnName;
                 string Type = col.DataType.ToString();
                 Type = Type.Remove(0, 7);
@@ -69,7 +69,7 @@
                 string RemTrattino = RemVirgola.Replace("-", "_");
                 string RemSpazi = RemTrattino.Replace(" ", "_");
                 string RemTondeIn = RemSpazi.Replace("(", "_");
-                string RemTondeFn = RemTondeIn.Replace(")", "_");
+                string RemTondeFn = RemTondeIn.Replace(")", "_");                
                 // Accodamento nella query dei nomi campi.
                 // Viene usato il carattere ` (Alt + 96) per indicare tipo stringa nel
                 // nome colonna.
@@ -83,7 +83,7 @@
                 }
                 x++;
             }
-            Qry += ");";
+            Qry += ");";            
             return Qry;
         }
 
@@ -167,13 +167,13 @@
             {
                 ListaRif.Add(rif[j]["Field"].ToString());
             }
-            string Qqry = AggiornaTabellaDb(nomeTabella, ListaTemp, ListaRif);
+            string Qqry = AggTabSql(nomeTabella, ListaTemp, ListaRif);
             return Qqry;
         }
         // Creo la Qry per aggiornare la tabella presente nel Db con la tabella Excel temporanea importata nel Db
         // controllo se l'intestazione colonna corrispondono e più precisamente se la temporanea contiene
         // il nome di quella di riferimento.
-        public static string AggiornaTabellaDb(string nomeTab, List<string> temp, List<string> rif)
+        public static string AggTabSql(string nomeTab, List<string> temp, List<string> rif)
         {
             string Qry = "INSERT INTO `" + nomeTab + "` (";
             string QryTabRif = "";
