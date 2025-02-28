@@ -2,7 +2,7 @@
 {
     public class AcsDb
     {
-        public static async Task<DataTable> AcsQryTab(string Qry, string StrConn, DataTable _tabella)
+        public static async Task<DataTable> AcsQryTab(string StrConn, string Qry, DataTable _tabella)
         {
             try
             {

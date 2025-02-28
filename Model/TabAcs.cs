@@ -2,7 +2,7 @@
 {
     public class TabAcs
     {
-        public string? db_inp { get; set; }
+        public string db_inp { get; set; }
         public string? tabella { get; set; }
         public string? db_dest { get; set; }
         public string? tabella_sql { get; set; }

@@ -94,7 +94,7 @@ namespace PvPmo.Db
                 if (ConnectionState.Open != ConnectionState.Closed) { };
             }
         }
-        public static async Task<Boolean> SqlBulkCopy(string tabMod, string StrConn, DataTable tabellain)
+        public static async Task<Boolean> SqlBulkCopy(string StrConn, string tabMod, DataTable tabellain)
         {            
             try
             {
@@ -119,7 +119,7 @@ namespace PvPmo.Db
                 if (ConnectionState.Open != ConnectionState.Closed) { };
             }
         }
-        public static Boolean SqlNoQry(string Qry, string strConn)
+        public static Boolean SqlNoQry(string strConn, string Qry)
         {            
             try
             {

@@ -4,7 +4,7 @@ namespace PvPmo.Db
 {
     public class ExlFl
     {
-        public static int ExcQry(string Qry, string StrConn)
+        public static int ExcQry(string StrConn, string Qry)
         {            
             try
             {
@@ -27,7 +27,7 @@ namespace PvPmo.Db
                 if (ConnectionState.Open != ConnectionState.Closed) { };
             }
         }
-        public static Boolean ExcQry(string Qry, string StrConn, DataTable tabellain)
+        public static Boolean ExcQry(string StrConn, string Qry, DataTable tabellain)
         {           
             try
             {

@@ -1,7 +1,28 @@
-﻿namespace PvPmo.Util
+﻿using Microsoft.Maui.ApplicationModel.DataTransfer;
+using Microsoft.Maui.Controls;
+
+namespace PvPmo.Util
 {
     public class VarUtil
     {
+        public static async Task<bool> CreaMappingAcsSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql)
+        {
+            DataTable _tabAcs = new DataTable();
+            DataTable _tabSql = new DataTable();
+            string QryAcs = "SELECT * FROM [" + nomeTbAcs + "] WHERE 1=0;";
+            string QrySql = "SELECT * FROM `information_schema`.`COLUMNS` " +
+                "WHERE TABLE_SCHEMA = '" + nomeDbSql + "' AND TABLE_NAME = " +
+                "'" + nomeTbSql + "' ORDER BY ORDINAL_POSITION;";
+
+
+            string StrConnAcs = Db.Conn.AcsDbConn(nomeDbAcs);
+            string StrConnSql = Db.Conn.MysqlConn(nomeDbSql);
+
+            await Db.AcsDb.AcsQryTab(StrConnAcs, QryAcs, _tabAcs);
+            await Db.SqlDb.SqlQry(StrConnSql, QrySql, _tabSql);
+
+            return true;
+        }
         //Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
         //Si procede anche alla normalizzazione dei nomi colonna.
         public static string NormInp(string nomeTabDb, string nomeTabNorm, DataTable tabData)
@@ -86,11 +107,14 @@
             Qry += ");";            
             return Qry;
         }
-
+        //Vengono normalizzati i nomi delle Tabelle Sql.
         public static string NormNomeTab(string nomeTab)
         {
             switch (nomeTab)
             {
+                case "01_TabellaData":
+                    nomeTab = "01_tabella_data";
+                    break;
                 case "All Project Mapped - Power BI Column Set":
                     nomeTab = "all_project_mapped_power_bi_column_set";
                     break;
