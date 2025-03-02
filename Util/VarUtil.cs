@@ -1,5 +1,4 @@
-﻿using Microsoft.Maui.ApplicationModel.DataTransfer;
-using Microsoft.Maui.Controls;
+﻿using System;
 
 namespace PvPmo.Util
 {
@@ -19,7 +18,7 @@ namespace PvPmo.Util
             string StrConnSql = Db.Conn.MysqlConn(nomeDbSql);
 
             await Db.AcsDb.AcsQryTab(StrConnAcs, QryAcs, _tabAcs);
-            await Db.SqlDb.SqlQry(StrConnSql, QrySql, _tabSql);
+            Db.SqlSync.SqlQryDataReader(StrConnSql, QrySql, _tabSql);
 
             return true;
         }
@@ -56,6 +55,9 @@ namespace PvPmo.Util
                         Type = ("DECIMAL(2) UNSIGNED ZEROFILL");
                         break;
                     case "Int16":
+                        Type = ("DECIMAL(2) UNSIGNED ZEROFILL");
+                        break;
+                    case "Single":
                         Type = ("DECIMAL(2) UNSIGNED ZEROFILL");
                         break;
                 }

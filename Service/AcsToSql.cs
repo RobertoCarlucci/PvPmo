@@ -17,7 +17,7 @@ namespace PvPmo.Service
                 string tab = await TabAcstoTabSql(nomeDbAcs, nomeTbAcs, nomeDbSql);                
                 string StrConn = Conn.MysqlConn("pvpmo_origine");
                 string Qry = "UPDATE  origine_acs set tabella_sql = '" + tab + "' WHERE id = " + x + ";";
-                SqlDb.SqlQrySyn(StrConn, Qry);
+                SqlSync.SqlQry(StrConn, Qry);
                 x++;
             }
             TabAcsService _inpacsdati = new TabAcsService();
@@ -45,7 +45,7 @@ namespace PvPmo.Service
             Qry = VarUtil.NormInp(nomeTbAcs, nomeTbNorm, _tabella);
             Qry = "CREATE OR REPLACE TABLE " +  Qry;            
             StrConn = Conn.MysqlConn(nomeDbSql);
-            bool Bol = SqlDb.SqlNoQry(StrConn, Qry);            
+            bool Bol = SqlSync.SqlNoQry(StrConn, Qry);            
             return nomeTbNorm;
         }
         public static async Task InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql)

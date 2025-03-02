@@ -10,7 +10,7 @@ namespace PvPmo.Service
             string StrConn = Conn.MysqlConn(nomeDb);
             DataTable _tabella = new DataTable();
             string Qry = "SELECT * From res10;";
-            await SqlDb.SqlQry(StrConn, Qry, _tabella);
+            await SqlAsync.SqlQryDataTable(StrConn, Qry, _tabella);
             List<Res10> _list = VarUtil.ConvDTtoList<Res10>(_tabella);
         }        
     }

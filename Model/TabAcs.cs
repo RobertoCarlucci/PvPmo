@@ -23,7 +23,7 @@
 
             string StrConn = Db.Conn.MysqlConn("pvpmo_origine");
             string Qry = "SELECT * From origine_acs;";
-            Db.SqlDb.SqlQrySyn(StrConn, Qry, _elencoInp);
+            Db.SqlSync.SqlQryDataTable(StrConn, Qry, _elencoInp);
             DataRow[] temp = _elencoInp.Select();
             foreach (DataRow v in temp)
             {
