@@ -5,15 +5,40 @@
         public static List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
         public static List<MySqlParameter> Params = new List<MySqlParameter>();
 
-        public static void AddParamAsync(string nome, Object vale)
+        public static void AddParam(string nome, Object vale)
         {
             var NewParam = new MySqlParameter(nome, vale);
             Params.Add(NewParam);
         }
-        public static void AddMappingAsync(int SourceOrdinal, string DestinationColumn)
+        public static void AddMapping(int SourceOrdinal, string DestinationColumn)
         {
             var NewMapping = new MySqlBulkCopyColumnMapping(SourceOrdinal, DestinationColumn);
             Mappings.Add(NewMapping);
+        }
+        public static async Task<DataTable> SqlQryDataReader(string StrConn, string Qry, DataTable _tabella)
+        {
+            try
+            {
+                var _connSql = new MySqlConnection(StrConn);
+                await _connSql.OpenAsync();
+                var _cmdSql = new MySqlCommand(Qry, _connSql);
+                Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
+                Params.Clear();
+                MySqlDataReader _datareader = _cmdSql.ExecuteReader();
+                _tabella.Load(_datareader);
+                _datareader.Close();
+                return _tabella;
+            }
+            catch (MySqlException ex)
+            {
+                await Shell.Current.DisplayAlert
+                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
+                return _tabella;
+            }
+            finally
+            {
+                if (ConnectionState.Open != ConnectionState.Closed) { };
+            }
         }
         public static async Task<DataTable> SqlQryDataTable(string StrConn, string Qry, DataTable _tabella)
         {

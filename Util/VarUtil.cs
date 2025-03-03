@@ -1,10 +1,11 @@
-﻿using System;
+﻿using PvPmo.Db;
+using System;
 
 namespace PvPmo.Util
 {
     public class VarUtil
     {
-        public static async Task<bool> CreaMappingAcsSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql)
+        public static bool CreaMappingAcsSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql)
         {
             DataTable _tabAcs = new DataTable();
             DataTable _tabSql = new DataTable();
@@ -13,15 +14,59 @@ namespace PvPmo.Util
                 "WHERE TABLE_SCHEMA = '" + nomeDbSql + "' AND TABLE_NAME = " +
                 "'" + nomeTbSql + "' ORDER BY ORDINAL_POSITION;";
 
+            string StrConnAcs = Conn.AcsDbConn(nomeDbAcs);
+            string StrConnSql = Conn.MysqlConn(nomeDbSql);
 
-            string StrConnAcs = Db.Conn.AcsDbConn(nomeDbAcs);
-            string StrConnSql = Db.Conn.MysqlConn(nomeDbSql);
+            AcsSync.AcsQryTab(StrConnAcs, QryAcs, _tabAcs);
+            SqlSync.SqlQryDataReader(StrConnSql, QrySql, _tabSql);
+            
+            int _dif = _tabSql.Rows.Count - _tabAcs.Columns.Count;
 
-            await Db.AcsDb.AcsQryTab(StrConnAcs, QryAcs, _tabAcs);
-            Db.SqlSync.SqlQryDataReader(StrConnSql, QrySql, _tabSql);
+            if (_dif == 0)
+            {
+                //DataRow[] _rowAcs = _tabAcs.Select();
+                DataRow[] _rowSql = _tabAcs.Select();
+                for (int x = 1; x < _tabSql.Rows.Count; x++)
+                {
+                    int SourceOrdinal = x;
+                    string DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
+                    SqlSync.AddMapping(SourceOrdinal, DestinationColumn);                    
+                }
+                return true;
+            }
+            //DataTable _result = new DataTable();
+            //_result = CreaMapping(_tabAcs, _tabSql);
 
-            return true;
+            return false;
         }
+        //public static DataTable CreaMapping(DataTable _tabAcs, DataTable _tabSql)
+        //{
+        //    int x = 0;
+
+        //    DataTable _result = GetTable();           
+
+        //    foreach (DataColumn ca in _tabAcs.Columns)
+        //    {
+        //        string AcsName = ca.ColumnName;
+        //        string AcsRow = x.ToString();
+        //        if (AcsName != "id") _result.Rows.Add.x
+        //        x++;
+        //    }
+
+        //    return _result;
+        //}
+        static DataTable GetTable()
+        {
+            DataTable table = new DataTable();
+            
+            table.Columns.Add("AcsRow", typeof(string));
+            table.Columns.Add("AcsName", typeof(string));
+            table.Columns.Add("SqlRow", typeof(string));
+            table.Columns.Add("SqlName", typeof(string));
+
+            return table;
+        }
+
         //Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
         //Si procede anche alla normalizzazione dei nomi colonna.
         public static string NormInp(string nomeTabDb, string nomeTabNorm, DataTable tabData)

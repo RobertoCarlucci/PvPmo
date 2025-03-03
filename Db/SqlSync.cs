@@ -5,12 +5,12 @@
         public static List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
         public static List<MySqlParameter> Params = new List<MySqlParameter>();
 
-        public static void AddParamSync(string nome, Object vale)
+        public static void AddParam(string nome, Object vale)
         {
             var NewParam = new MySqlParameter(nome, vale);
             Params.Add(NewParam);
         }
-        public static void AddMappingSync(int SourceOrdinal, string DestinationColumn)
+        public static void AddMapping(int SourceOrdinal, string DestinationColumn)
         {
             var NewMapping = new MySqlBulkCopyColumnMapping(SourceOrdinal, DestinationColumn);
             Mappings.Add(NewMapping);
@@ -98,6 +98,31 @@
                 Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
                 Params.Clear();               
                 _cmdSql.ExecuteNonQuery();
+                return true;
+            }
+            catch (MySqlException ex)
+            {
+                Shell.Current.DisplayAlert
+                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
+                return false;
+            }
+            finally
+            {
+                if (ConnectionState.Open != ConnectionState.Closed) { };
+            }
+        }
+        public static Boolean SqlBulkCopy(string StrConn, string tabMod, DataTable tabellain)
+        {
+            try
+            {
+                var _connSql = new MySqlConnection(StrConn + "AllowLoadLocalInfile=true;");
+                _connSql.Open();
+                var _bulk = new MySqlBulkCopy(_connSql);
+                _bulk.DestinationTableName = tabMod;
+                Mappings.ForEach(_mapping => { _bulk.ColumnMappings.Add(_mapping); });
+                Mappings.Clear();
+                var result = _bulk.WriteToServer(tabellain);
+                if (result.Warnings.Count != 0) ;
                 return true;
             }
             catch (MySqlException ex)

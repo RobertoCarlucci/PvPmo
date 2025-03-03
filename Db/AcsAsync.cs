@@ -1,6 +1,6 @@
 ﻿namespace PvPmo.Db
 {
-    public class AcsDb
+    public class AcsAsync
     {
         public static async Task<DataTable> AcsQryTab(string StrConn, string Qry, DataTable _tabella)
         {
@@ -46,8 +46,7 @@
             }
             finally
             {
-                if (ConnectionState.Open != ConnectionState.Closed) { }
-                ;
+                if (ConnectionState.Open != ConnectionState.Closed) { };
             }
         }
     }
