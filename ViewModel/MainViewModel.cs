@@ -37,7 +37,6 @@ namespace PvPmo.ViewModel
 
             await AcsToSql.NewDb();
 
-
             await Shell.Current.DisplayAlert
                 ("Hai premuto BtnImpAcs !", $"Non ci posso credere.", "Ok");
 
@@ -51,14 +50,7 @@ namespace PvPmo.ViewModel
             if (IsBusy)
                 return;
 
-            IsBusy = true;
-
-            //Db.SqlSync.AddMapping(1, "Test00");
-            //Db.SqlSync.AddMapping(1, "Test01");
-            //Db.SqlSync.AddMapping(1, "Test02");
-            //string StrConn = Db.Conn.MysqlConn("timesheet");
-            //DataTable tab = new DataTable();
-            //await Db.SqlSync.SqlBulkCopy("test", StrConn, tab);
+            IsBusy = true;            
 
             await Shell.Current.DisplayAlert
                 ("Hai premuto BtnAgData !", $"Non ci posso credere.", "Ok");

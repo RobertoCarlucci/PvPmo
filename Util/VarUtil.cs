@@ -23,8 +23,7 @@ namespace PvPmo.Util
             int _dif = _tabSql.Rows.Count - _tabAcs.Columns.Count;
 
             if (_dif == 0)
-            {
-                //DataRow[] _rowAcs = _tabAcs.Select();
+            {                
                 DataRow[] _rowSql = _tabAcs.Select();
                 for (int x = 1; x < _tabSql.Rows.Count; x++)
                 {
@@ -34,38 +33,26 @@ namespace PvPmo.Util
                 }
                 return true;
             }
-            //DataTable _result = new DataTable();
-            //_result = CreaMapping(_tabAcs, _tabSql);
-
+            else if (_dif > 0)
+            {               
+                DataRow[] _rowSql = _tabAcs.Select();
+                for (int x = 2; x < _tabSql.Rows.Count; x++)
+                {
+                    int SourceOrdinal = x - 1;
+                    string DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
+                    SqlSync.AddMapping(SourceOrdinal, DestinationColumn);
+                }
+                return true;
+            }
+            else if (_dif < 0)
+            {
+                //bool Conf = Shell.Current.DisplayAlert
+                //("Chiudi ed Esci.", "Vuoi chiudere l'aplicazione ?", "Si", "No");
+                //if (Conf == true)
+                //    return;
+            }
             return false;
-        }
-        //public static DataTable CreaMapping(DataTable _tabAcs, DataTable _tabSql)
-        //{
-        //    int x = 0;
-
-        //    DataTable _result = GetTable();           
-
-        //    foreach (DataColumn ca in _tabAcs.Columns)
-        //    {
-        //        string AcsName = ca.ColumnName;
-        //        string AcsRow = x.ToString();
-        //        if (AcsName != "id") _result.Rows.Add.x
-        //        x++;
-        //    }
-
-        //    return _result;
-        //}
-        static DataTable GetTable()
-        {
-            DataTable table = new DataTable();
-            
-            table.Columns.Add("AcsRow", typeof(string));
-            table.Columns.Add("AcsName", typeof(string));
-            table.Columns.Add("SqlRow", typeof(string));
-            table.Columns.Add("SqlName", typeof(string));
-
-            return table;
-        }
+        }        
 
         //Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
         //Si procede anche alla normalizzazione dei nomi colonna.

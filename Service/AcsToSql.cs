@@ -45,7 +45,7 @@ namespace PvPmo.Service
             bool Bol = SqlSync.SqlNoQry(StrConn, Qry);            
             return nomeTbNorm;
         }
-        public static async Task InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql)
+        public static async Task<bool> InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql)
         {
             bool bol = VarUtil.CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql);
             if(bol == true)
@@ -57,7 +57,7 @@ namespace PvPmo.Service
                 StrConn = Conn.MysqlConn(nomeDbSql);
                 SqlSync.SqlBulkCopy(StrConn, nomeTbSql, _tabella);
             }
-            return;            
+            return true;            
         }
     }
 }
