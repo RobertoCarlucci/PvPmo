@@ -122,7 +122,7 @@
                 Mappings.ForEach(_mapping => { _bulk.ColumnMappings.Add(_mapping); });
                 Mappings.Clear();
                 var result = _bulk.WriteToServer(tabellain);
-                if (result.Warnings.Count != 0) ;
+                //if (result.Warnings.Count != 0) ;
                 return true;
             }
             catch (MySqlException ex)

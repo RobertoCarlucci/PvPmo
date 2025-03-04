@@ -5,7 +5,7 @@ namespace PvPmo.Util
 {
     public class VarUtil
     {
-        public static bool CreaMappingAcsSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql)
+        public static async Task<bool> CreaMappingAcsSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql)
         {
             DataTable _tabAcs = new DataTable();
             DataTable _tabSql = new DataTable();
@@ -17,8 +17,8 @@ namespace PvPmo.Util
             string StrConnAcs = Conn.AcsDbConn(nomeDbAcs);
             string StrConnSql = Conn.MysqlConn(nomeDbSql);
 
-            AcsSync.AcsQryTab(StrConnAcs, QryAcs, _tabAcs);
-            SqlSync.SqlQryDataReader(StrConnSql, QrySql, _tabSql);
+            await AcsAsync.AcsQryTab(StrConnAcs, QryAcs, _tabAcs);
+            await SqlAsync.SqlQryDataReader(StrConnSql, QrySql, _tabSql);
             
             int _dif = _tabSql.Rows.Count - _tabAcs.Columns.Count;
 
@@ -29,22 +29,22 @@ namespace PvPmo.Util
                 {
                     int SourceOrdinal = x;
                     string DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
-                    SqlSync.AddMapping(SourceOrdinal, DestinationColumn);                    
+                    SqlAsync.AddMapping(SourceOrdinal, DestinationColumn);                    
                 }
                 return true;
             }
-            else if (_dif > 0)
+            else if (_dif == 1)
             {               
                 DataRow[] _rowSql = _tabAcs.Select();
-                for (int x = 2; x < _tabSql.Rows.Count; x++)
+                for (int x = 1; x < _tabSql.Rows.Count; x++)
                 {
                     int SourceOrdinal = x - 1;
                     string DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
-                    SqlSync.AddMapping(SourceOrdinal, DestinationColumn);
+                    SqlAsync.AddMapping(SourceOrdinal, DestinationColumn);
                 }
                 return true;
             }
-            else if (_dif < 0)
+            else if (_dif < 0 || _dif >  1)
             {
                 //bool Conf = Shell.Current.DisplayAlert
                 //("Chiudi ed Esci.", "Vuoi chiudere l'aplicazione ?", "Si", "No");
@@ -84,13 +84,16 @@ namespace PvPmo.Util
                         Type = ("nvarchar(50)");
                         break;
                     case "Double":
-                        Type = ("DECIMAL(2) UNSIGNED ZEROFILL");
+                        Type = ("SMALLINT UNSIGNED");
                         break;
                     case "Int16":
-                        Type = ("DECIMAL(2) UNSIGNED ZEROFILL");
+                        Type = ("SMALLINT UNSIGNED");
                         break;
                     case "Single":
-                        Type = ("DECIMAL(2) UNSIGNED ZEROFILL");
+                        Type = ("SMALLINT UNSIGNED");
+                        break;
+                    case "DateTime":
+                        Type = ("DATE");
                         break;
                 }
                 // Select nomi colonne e creazione chiave primaria dove necessaria.
@@ -99,6 +102,18 @@ namespace PvPmo.Util
                     case "ID":
                         Type = ("INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT");
                         Name = "id";
+                        break;
+                    case "Divisore":
+                        Type = ("FLOAT");                        
+                        break;
+                    case "ORE":
+                        Type = ("FLOAT");                        
+                        break;
+                    case "Hours Per Week":
+                        Type = ("FLOAT");                        
+                        break;
+                    case "Timesheet_Time":
+                        Type = ("FLOAT");
                         break;
                     case "Action Items, Completed (#)":
                         Name = "action_items_completed_val";

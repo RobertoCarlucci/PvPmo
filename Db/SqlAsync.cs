@@ -15,6 +15,29 @@
             var NewMapping = new MySqlBulkCopyColumnMapping(SourceOrdinal, DestinationColumn);
             Mappings.Add(NewMapping);
         }
+        public static async Task<Boolean> SqlNoQry(string strConn, string Qry)
+        {
+            try
+            {
+                var _connSql = new MySqlConnection(strConn);
+                await _connSql.OpenAsync();
+                var _cmdSql = new MySqlCommand(Qry, _connSql);
+                Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
+                Params.Clear();
+                await _cmdSql.ExecuteNonQueryAsync();
+                return true;
+            }
+            catch (MySqlException ex)
+            {
+                await Shell.Current.DisplayAlert
+                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
+                return false;
+            }
+            finally
+            {
+                if (ConnectionState.Open != ConnectionState.Closed) { };
+            }
+        }
         public static async Task<DataTable> SqlQryDataReader(string StrConn, string Qry, DataTable _tabella)
         {
             try
@@ -50,7 +73,7 @@
                 Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
                 Params.Clear();
                 var _adapter = new MySqlDataAdapter(_cmdSql);
-                await Task.Run(() => _adapter.Fill(_tabella));
+                int _contarecord = _adapter.Fill(_tabella);
                 return _tabella;
             }
             catch (MySqlException ex)
@@ -75,7 +98,7 @@
                 Mappings.ForEach(_mapping => { _bulk.ColumnMappings.Add(_mapping); });
                 Mappings.Clear();
                 var result = await _bulk.WriteToServerAsync(tabellain);
-                if (result.Warnings.Count != 0) ;
+                //if (result.Warnings.Count != 0);
                 return true;
             }
             catch (MySqlException ex)

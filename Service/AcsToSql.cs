@@ -37,25 +37,25 @@ namespace PvPmo.Service
             string StrConn = Conn.AcsDbConn(nomeDbAcs);
             DataTable _tabella = new DataTable();
             string Qry = "SELECT * FROM [" + nomeTbAcs + "] WHERE 1=0";
-            AcsSync.AcsQryTab(StrConn, Qry, _tabella);
+            await AcsAsync.AcsQryTab(StrConn, Qry, _tabella);
             string nomeTbNorm = VarUtil.NormNomeTab(nomeTbAcs);
             Qry = VarUtil.NormInp(nomeTbAcs, nomeTbNorm, _tabella);
             Qry = "CREATE OR REPLACE TABLE " +  Qry;            
             StrConn = Conn.MysqlConn(nomeDbSql);
-            bool Bol = SqlSync.SqlNoQry(StrConn, Qry);            
+            bool Bol = await SqlAsync.SqlNoQry(StrConn, Qry);            
             return nomeTbNorm;
         }
         public static async Task<bool> InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql)
         {
-            bool bol = VarUtil.CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql);
+            bool bol = await VarUtil.CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql);
             if(bol == true)
             {
                 string StrConn = Conn.AcsDbConn(nomeDbAcs);
                 DataTable _tabella = new DataTable();
                 string Qry = "SELECT * FROM [" + nomeTbAcs + "]";
-                AcsSync.AcsQryTab(StrConn, Qry, _tabella);
+                await AcsAsync.AcsQryTab(StrConn, Qry, _tabella);
                 StrConn = Conn.MysqlConn(nomeDbSql);
-                SqlSync.SqlBulkCopy(StrConn, nomeTbSql, _tabella);
+                await SqlAsync.SqlBulkCopy(StrConn, nomeTbSql, _tabella);
             }
             return true;            
         }

@@ -1,4 +1,5 @@
 ﻿using PvPmo.Service;
+using System.Diagnostics.Eventing.Reader;
 
 namespace PvPmo.ViewModel
 {
@@ -38,7 +39,8 @@ namespace PvPmo.ViewModel
             await AcsToSql.NewDb();
 
             await Shell.Current.DisplayAlert
-                ("Hai premuto BtnImpAcs !", $"Non ci posso credere.", "Ok");
+                ("Hai comletato l'importazione dei dati nel Db !", 
+                $"Importazione de dati da Access completata .", "Ok");
 
             IsBusy = false;
             return;
@@ -69,12 +71,11 @@ namespace PvPmo.ViewModel
 
             var Conf = await Shell.Current.DisplayAlert
                 ("Chiudi ed Esci.", "Vuoi chiudere l'aplicazione ?", "Si", "No");
-            if (Conf =! true)
-                return;
-
-            IsBusy = false;
-
-            Environment.Exit(0);
+            if (Conf == true)
+                Environment.Exit(0);
+            else
+                IsBusy = false;            
+            return;
         }
     }
 }

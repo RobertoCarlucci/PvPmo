@@ -10,8 +10,8 @@
                 _connAcs.Open();
                 var _cmdAcs = new OleDbCommand(Qry, _connAcs);                
                 var _adapter = new OleDbDataAdapter(_cmdAcs);
-                await Task.Run(() => _adapter.Fill(_tabella));                
-                //ContaRecord = _adapter.Fill(_tabella);
+                //await Task.Run(() => _adapter.Fill(_tabella));                
+                int ContaRecord = _adapter.Fill(_tabella);
                 return _tabella;
             }
             catch (OleDbException ex)
@@ -33,9 +33,9 @@
                 _connAcs.Open();
                 string[] restrictions = new string[4];
                 var _cmdAcs = new OleDbCommand(Qry, _connAcs);
-                var _adapter = new OleDbDataAdapter(_cmdAcs);
-                await Task.Run(() => _adapter.Fill(_tabella));
-                //ContaRecord = _adapter.Fill(_tabella);
+                OleDbDataReader _datareader = _cmdAcs.ExecuteReader();
+                _tabella.Load(_datareader);
+                _datareader.Close();                
                 return _tabella;
             }
             catch (OleDbException ex)
