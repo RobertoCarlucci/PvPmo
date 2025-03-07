@@ -21,6 +21,8 @@ namespace PvPmo
 #endif
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<MainViewModel>();
+            builder.Services.AddTransient<ModData>();
+            builder.Services.AddTransient<ModDataViewModel>();
 
             return builder.Build();
         }

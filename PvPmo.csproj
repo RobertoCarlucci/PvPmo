@@ -67,4 +67,10 @@
 		<PackageReference Include="System.Data.OleDb" Version="9.0.2" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <MauiXaml Update="View\ModData.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>

@@ -46,10 +46,16 @@ namespace PvPmo.Util
             }
             else if (_dif < 0 || _dif >  1)
             {
-                //bool Conf = Shell.Current.DisplayAlert
-                //("Chiudi ed Esci.", "Vuoi chiudere l'aplicazione ?", "Si", "No");
-                //if (Conf == true)
-                //    return;
+                var Conf = await Shell.Current.DisplayAlert
+                    ("Errore nel numero di Colonne delle Tabelle.", "La Tabella Access: "
+                    + _tabAcs + " Ha un numero di colonne diverso dalla tabella Sql: "
+                    + _tabSql + " Vuoi continuare ad importare le altre tabelle residue ? "
+                    , "Si", "No");
+                if (Conf == true)
+                   return true;
+                else
+                    
+                return false;
             }
             return false;
         }        
