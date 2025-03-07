@@ -7,6 +7,7 @@ namespace PvPmo
         public AppShell()
         {
             InitializeComponent();
+            Routing.RegisterRoute(nameof(ModData), typeof(ModData));
         }
     }
 }

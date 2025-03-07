@@ -5,9 +5,29 @@
              xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
              x:DataType="viewmodel:ModDataViewModel"
              Title="{Binding Title}">
-    
+
     <VerticalStackLayout>
-        <Grid>
+        <Grid 
+            ColumnDefinitions="*,*,*"             
+            RowDefinitions="*,*,*"
+            RowSpacing="0">
+
+            <Button Text="Aggiorna Data."
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnAnnullaEsciCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Margin="40"/>
+
+            <Button Text="Annulla ed Esci."
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnSalvaEsciCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="40"/>
+
             <Image x:Name="backgroundImage"
                     Source="wallpaper_dl.png"
                     Grid.RowSpan="3"

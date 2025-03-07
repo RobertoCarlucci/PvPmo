@@ -1,5 +1,4 @@
 ﻿using PvPmo.Service;
-using System.Diagnostics.Eventing.Reader;
 
 namespace PvPmo.ViewModel
 {
@@ -7,8 +6,11 @@ namespace PvPmo.ViewModel
     {        
         public MainViewModel() 
         {
-            Title = "Test Title";
+            Title = "Home Page";
         }
+
+        [ObservableProperty]
+        bool isRefreshing;
 
         [RelayCommand]
         async Task BtnAgDb()
@@ -17,9 +19,6 @@ namespace PvPmo.ViewModel
                 return;
 
             IsBusy = true;
-
-            // Res10Service.ListaRes10();
-            
 
             await Shell.Current.DisplayAlert
                 ("Hai premuto BtnAgDb !", $"Non ci posso credere.", "Ok");
