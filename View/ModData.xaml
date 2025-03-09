@@ -5,36 +5,39 @@
              xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
              x:DataType="viewmodel:ModDataViewModel"
              Title="{Binding Title}">
+    <ScrollView>
+        <VerticalStackLayout>
 
-    <VerticalStackLayout>
-        <Grid 
+            <Grid 
             ColumnDefinitions="*,*,*"             
             RowDefinitions="*,*,*"
             RowSpacing="0">
 
-            <Button Text="Aggiorna Data."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnAnnullaEsciCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Margin="40"/>
+            <Image x:Name="backgroundImage"
+                Source="wallpaper_dl.png"
+                Grid.RowSpan="3"
+                Grid.ColumnSpan="3"
+                HorizontalOptions="CenterAndExpand"
+                VerticalOptions="CenterAndExpand"
+                Aspect="AspectFill"/>
 
-            <Button Text="Annulla ed Esci."
+            <Button Text="Esci senza modifiche."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnAnnullaEsciCommand}"
+                    
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="40"/>
+
+                <Button Text="Salva Modifiche ed Esci."
                     Style="{StaticResource MyButton}"
                     Command="{Binding BtnSalvaEsciCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
+                    
                     Grid.Row="1"
                     Grid.Column="0"
                     Margin="40"/>
-
-            <Image x:Name="backgroundImage"
-                    Source="wallpaper_dl.png"
-                    Grid.RowSpan="3"
-                    Grid.ColumnSpan="3"
-                    HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="CenterAndExpand"
-                    Aspect="AspectFill"/>
-        </Grid>
-    </VerticalStackLayout>
+            
+            </Grid>      
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

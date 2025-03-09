@@ -1,4 +1,5 @@
 ﻿using PvPmo.Service;
+using PvPmo.View;
 
 namespace PvPmo.ViewModel
 {
@@ -13,19 +14,18 @@ namespace PvPmo.ViewModel
         bool isRefreshing;
 
         [RelayCommand]
-        async Task BtnAgDb()
-        {
-            if (IsBusy)
-                return;
 
-            IsBusy = true;
+        Task BtnAgDb() => Shell.Current.GoToAsync(nameof(ModData));
+        //{
+            
 
-            await Shell.Current.DisplayAlert
-                ("Hai premuto BtnAgDb !", $"Non ci posso credere.", "Ok");
+        //    IsBusy = true;
 
-            IsBusy = false;
-            return;
-        }
+            
+
+        //    IsBusy = false;
+        //    return;
+        //}
 
         [RelayCommand]
         async Task BtnImpAcs()

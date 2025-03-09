@@ -8,19 +8,8 @@
         }
 
         [RelayCommand]
-        async Task BtnAnnullaEsci()
-        {
-            if (IsBusy)
-                return;
-
-            IsBusy = true;
-
-            await Shell.Current.DisplayAlert
-                ("Hai premuto BtnAgDb !", $"Non ci posso credere.", "Ok");
-
-            IsBusy = false;
-            return;
-        }
+        Task BtnAnnullaEsci() => Shell.Current.GoToAsync("..");
+        
         [RelayCommand]
         async Task BtnSalvaEsci()
         {
