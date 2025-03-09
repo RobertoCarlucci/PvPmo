@@ -2,13 +2,24 @@
 {
     public partial class ModDataViewModel : BaseViewModel
     {
+        DataTable _tabData = new DataTable();
+        string StrConnSql = Db.Conn.MysqlConn("pmo");
+        string QrySql = "SELECT * FROM `01_tabella_data`";
+        
         public ModDataViewModel()
         {
             Title = "Aggiorna Data File Input";
+            _tabData = SqlSync.SqlQryDataTable(StrConnSql, QrySql, _tabData);
         }
 
         [RelayCommand]
-        Task BtnAnnullaEsci() => Shell.Current.GoToAsync("..");
+        async Task BtnAnnullaEsci()
+        {
+            if (IsBusy)
+                return;
+            await Shell.Current.GoToAsync("..");
+        }
+        
         
         [RelayCommand]
         async Task BtnSalvaEsci()

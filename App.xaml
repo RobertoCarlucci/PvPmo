@@ -55,8 +55,8 @@
                 <Setter Property="Background" Value="{StaticResource GialloVerde}"/>
                 <Setter Property="TextColor" Value="{StaticResource Dark}"/>
                 <Setter Property="BorderColor" Value="{StaticResource Primary}"/>
-                <Setter Property="BorderWidth" Value="2"/>
-                <Setter Property="HeightRequest" Value="40"/>
+                <Setter Property="BorderWidth" Value="4"/>
+                <Setter Property="HeightRequest" Value="50"/>
                 <Setter Property="CornerRadius" Value="20"/>
             </Style>
             

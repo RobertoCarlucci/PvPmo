@@ -6,7 +6,7 @@
              x:DataType="viewmodel:MainViewModel"
              Title="{Binding Title}">     
 
-    <RefreshView>
+    <RefreshView Command="{Binding IsRefreshing}">
         
         <Grid
             ColumnDefinitions="*,*,*"             

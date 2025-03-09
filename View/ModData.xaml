@@ -9,30 +9,30 @@
         <VerticalStackLayout>
 
             <Grid 
-            ColumnDefinitions="*,*,*"             
-            RowDefinitions="*,*,*"
+            ColumnDefinitions="*,*"             
+            RowDefinitions="*,*"
             RowSpacing="0">
 
-            <Image x:Name="backgroundImage"
-                Source="wallpaper_dl.png"
-                Grid.RowSpan="3"
-                Grid.ColumnSpan="3"
-                HorizontalOptions="CenterAndExpand"
-                VerticalOptions="CenterAndExpand"
-                Aspect="AspectFill"/>
+                <Image x:Name="backgroundImage"
+                    Source="wallpaper_dl.png"
+                    Grid.RowSpan="3"
+                    Grid.ColumnSpan="3"
+                    HorizontalOptions="CenterAndExpand"
+                    VerticalOptions="CenterAndExpand"
+                    Aspect="AspectFill"/>
 
-            <Button Text="Esci senza modifiche."
-                Style="{StaticResource MyButton}"
-                Command="{Binding BtnAnnullaEsciCommand}"
-                    
-                Grid.Row="0"
-                Grid.Column="0"
-                Margin="40"/>
+                <Button Text="Esci senza modifiche."
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnAnnullaEsciCommand}"
+                    VerticalOptions="Center"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Margin="40"/>
 
                 <Button Text="Salva Modifiche ed Esci."
                     Style="{StaticResource MyButton}"
                     Command="{Binding BtnSalvaEsciCommand}"
-                    
+                    VerticalOptions="Center"
                     Grid.Row="1"
                     Grid.Column="0"
                     Margin="40"/>
