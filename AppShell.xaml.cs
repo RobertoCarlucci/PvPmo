@@ -8,6 +8,7 @@ namespace PvPmo
         {
             InitializeComponent();
             Routing.RegisterRoute(nameof(ModData), typeof(ModData));
+            Routing.RegisterRoute(nameof(GesAcs), typeof(GesAcs));
         }
     }
 }

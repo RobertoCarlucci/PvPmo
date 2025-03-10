@@ -1,5 +1,4 @@
-﻿using PvPmo.Service;
-using PvPmo.View;
+﻿using PvPmo.View;
 
 namespace PvPmo.ViewModel
 {
@@ -14,39 +13,35 @@ namespace PvPmo.ViewModel
         bool isRefreshing;
 
         [RelayCommand]
-
-        Task BtnAgDb() => Shell.Current.GoToAsync(nameof(ModData));
-        //{
-            
-
-        //    IsBusy = true;
-
-            
-
-        //    IsBusy = false;
-        //    return;
-        //}
-
-        [RelayCommand]
-        async Task BtnImpAcs()
+        async Task BtnGesAcs()
         {
             if (IsBusy)
                 return;
 
             IsBusy = true;
 
-            await AcsToSql.NewDb();
-
-            await Shell.Current.DisplayAlert
-                ("Hai comletato l'importazione dei dati nel Db !", 
-                $"Importazione de dati da Access completata .", "Ok");
+            await Shell.Current.GoToAsync(nameof(GesAcs));
 
             IsBusy = false;
             return;
         }
 
         [RelayCommand]
-        async Task BtnAgData()
+        async Task BtnAgData() 
+        {
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+
+            await Shell.Current.GoToAsync(nameof(ModData));
+
+            IsBusy = false;
+            return;
+        }
+
+        [RelayCommand]
+        async Task BtnAgDb()
         {
             if (IsBusy)
                 return;
@@ -54,7 +49,7 @@ namespace PvPmo.ViewModel
             IsBusy = true;            
 
             await Shell.Current.DisplayAlert
-                ("Hai premuto BtnAgData !", $"Non ci posso credere.", "Ok");
+                ("Hai premuto BtnAgDb !", $"Non ci posso credere.", "Ok");
 
             IsBusy = false;
             return;

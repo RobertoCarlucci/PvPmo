@@ -21,47 +21,44 @@
                    VerticalOptions="CenterAndExpand"
                    Aspect="AspectFill"/>
 
+            <Button Text="Gestione Dati Access."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnGesAcsCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="40"/>
+
             <Button Text="Aggiorna Data Base."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnAgDbCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Margin="40"/>
-
-
-            <Button Text="Importa Dati Access."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnImpAcsCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Margin="40"/>
-
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnAgDbCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="40"/>
+            
             <Button Text="Aggiorna Data."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnAgDataCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Margin="40"/>
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnAgDataCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="2"
+                Grid.Column="0"
+                Margin="40"/>
 
             <Button Text="Chiudi ed Esci."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnEndCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="2"
-                    Grid.Column="2"
-                    Margin="40"/>
-
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnEndCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="2"
+                Grid.Column="2"
+                Margin="40"/>
 
             <ActivityIndicator IsVisible="{Binding IsBusy}"
-                               IsRunning="{Binding IsBusy}"
-                               HorizontalOptions="FillAndExpand"
-                               VerticalOptions="CenterAndExpand"                               
-                               Grid.RowSpan="2"
-                               Grid.ColumnSpan="2"/>
+                            IsRunning="{Binding IsBusy}"
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="CenterAndExpand"                               
+                            Grid.RowSpan="2"
+                            Grid.ColumnSpan="2"/>
         </Grid>
     </RefreshView>
-
 </ContentPage>

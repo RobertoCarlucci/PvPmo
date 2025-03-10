@@ -23,6 +23,8 @@ namespace PvPmo
             builder.Services.AddSingleton<MainViewModel>();
             builder.Services.AddTransient<ModData>();
             builder.Services.AddTransient<ModDataViewModel>();
+            builder.Services.AddTransient<GesAcs>();
+            builder.Services.AddTransient<GesAcsViewModel>();
 
             return builder.Build();
         }

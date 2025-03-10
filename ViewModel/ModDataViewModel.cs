@@ -2,7 +2,7 @@
 {
     public partial class ModDataViewModel : BaseViewModel
     {
-        DataTable _tabData = new DataTable();
+        public DataTable _tabData = new DataTable();
         string StrConnSql = Db.Conn.MysqlConn("pmo");
         string QrySql = "SELECT * FROM `01_tabella_data`";
         
@@ -11,6 +11,9 @@
             Title = "Aggiorna Data File Input";
             _tabData = SqlSync.SqlQryDataTable(StrConnSql, QrySql, _tabData);
         }
+
+        [ObservableProperty]
+        bool isRefreshing;
 
         [RelayCommand]
         async Task BtnAnnullaEsci()

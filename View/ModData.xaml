@@ -5,39 +5,42 @@
              xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
              x:DataType="viewmodel:ModDataViewModel"
              Title="{Binding Title}">
-    <ScrollView>
-        <VerticalStackLayout>
+    
+    <RefreshView Command="{Binding IsRefreshing}">        
 
             <Grid 
-            ColumnDefinitions="*,*"             
-            RowDefinitions="*,*"
-            RowSpacing="0">
+                ColumnDefinitions="*,*"             
+                RowDefinitions="*,*"
+                RowSpacing="0">
+            <CollectionView Grid.Column="1"
+                            ItemsSource="{Binding _tabData}"
+                            SelectionMode="Single">
+            </CollectionView>
+            <Image x:Name="backgroundImage"
+                Source="wallpaper_dl.png"
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="2"
+                HorizontalOptions="CenterAndExpand"
+                VerticalOptions="CenterAndExpand"
+                Aspect="AspectFill"/>
 
-                <Image x:Name="backgroundImage"
-                    Source="wallpaper_dl.png"
-                    Grid.RowSpan="3"
-                    Grid.ColumnSpan="3"
-                    HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="CenterAndExpand"
-                    Aspect="AspectFill"/>
+            <Button Text="Esci senza modifiche."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnAnnullaEsciCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                VerticalOptions="Center"
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="40"/>
 
-                <Button Text="Esci senza modifiche."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnAnnullaEsciCommand}"
-                    VerticalOptions="Center"
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Margin="40"/>
-
-                <Button Text="Salva Modifiche ed Esci."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnSalvaEsciCommand}"
-                    VerticalOptions="Center"
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Margin="40"/>
-            
-            </Grid>      
-        </VerticalStackLayout>
-    </ScrollView>
+            <Button Text="Salva Modifiche ed Esci."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnSalvaEsciCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                VerticalOptions="Center"
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="40"/>
+        </Grid>         
+    </RefreshView>
 </ContentPage>
