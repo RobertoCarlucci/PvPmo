@@ -28,14 +28,21 @@
                 Grid.Column="0"
                 Margin="40"/>
             
-            <Button Text="Esci senza modifiche."
+            <Button Text="Torna Home Page."
                 Style="{StaticResource MyButton}"
                 Command="{Binding BtnAnnullaEsciCommand}"
                 IsEnabled="{Binding IsNotBusy}"
                 VerticalOptions="Center"
                 Grid.Row="3"
                 Grid.Column="3"
-                Margin="40"/>              
+                Margin="40"/>
+            
+            <ActivityIndicator IsVisible="{Binding IsBusy}"
+                IsRunning="{Binding IsBusy}"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="CenterAndExpand"                               
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="2"/>
 
         </Grid>
     </RefreshView>

@@ -1,11 +1,10 @@
-﻿using PvPmo.Db;
-
-namespace PvPmo.Service
+﻿namespace PvPmo.Service
 {
     public class AcsToSql
     {
         public static async Task NewDb()
         {
+            string _acsPath = await SelCart.PickFolderStatic(default);
             TabAcsService _inpacs = new TabAcsService();
             int x = 1;
 
@@ -14,7 +13,7 @@ namespace PvPmo.Service
                 string nomeDbAcs = n.db_inp;
                 string nomeTbAcs = n.tabella;
                 string nomeDbSql = n.db_dest;
-                string tab = await TabAcstoTabSql(nomeDbAcs, nomeTbAcs, nomeDbSql);                
+                string tab = await TabAcstoTabSql(nomeDbAcs, nomeTbAcs, nomeDbSql, _acsPath);                
                 string StrConn = Conn.MysqlConn("pvpmo_origine");
                 string Qry = "UPDATE  origine_acs set tabella_sql = '" + tab + "' WHERE id = " + x + ";";
                 SqlSync.SqlQry(StrConn, Qry);
@@ -29,12 +28,12 @@ namespace PvPmo.Service
                 string nomeTbAcs = n.tabella;
                 string nomeDbSql = n.db_dest;
                 string nomeTbSql = n.tabella_sql;
-                await InpAcsDatitoSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql);            
+                await InpAcsDatitoSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, _acsPath);            
             }
         }
-        public static async Task<string> TabAcstoTabSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql)
+        public static async Task<string> TabAcstoTabSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string acsPath)
         {
-            string StrConn = Conn.AcsDbConn(nomeDbAcs);
+            string StrConn = Conn.AcsDbConn(nomeDbAcs, acsPath);
             DataTable _tabella = new DataTable();
             string Qry = "SELECT * FROM [" + nomeTbAcs + "] WHERE 1=0";
             await AcsAsync.AcsQryTab(StrConn, Qry, _tabella);
@@ -45,12 +44,12 @@ namespace PvPmo.Service
             bool Bol = await SqlAsync.SqlNoQry(StrConn, Qry);            
             return nomeTbNorm;
         }
-        public static async Task<bool> InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql)
+        public static async Task<bool> InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
         {
-            bool bol = await VarUtil.CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql);
+            bool bol = await VarUtil.CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, acsPath);
             if(bol == true)
             {
-                string StrConn = Conn.AcsDbConn(nomeDbAcs);
+                string StrConn = Conn.AcsDbConn(nomeDbAcs, acsPath);
                 DataTable _tabella = new DataTable();
                 string Qry = "SELECT * FROM [" + nomeTbAcs + "]";
                 await AcsAsync.AcsQryTab(StrConn, Qry, _tabella);

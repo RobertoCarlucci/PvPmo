@@ -5,7 +5,7 @@ namespace PvPmo.Util
 {
     public class VarUtil
     {
-        public static async Task<bool> CreaMappingAcsSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql)
+        public static async Task<bool> CreaMappingAcsSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
         {
             DataTable _tabAcs = new DataTable();
             DataTable _tabSql = new DataTable();
@@ -14,7 +14,7 @@ namespace PvPmo.Util
                 "WHERE TABLE_SCHEMA = '" + nomeDbSql + "' AND TABLE_NAME = " +
                 "'" + nomeTbSql + "' ORDER BY ORDINAL_POSITION;";
 
-            string StrConnAcs = Conn.AcsDbConn(nomeDbAcs);
+            string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
             string StrConnSql = Conn.MysqlConn(nomeDbSql);
 
             await AcsAsync.AcsQryTab(StrConnAcs, QryAcs, _tabAcs);

@@ -9,9 +9,9 @@
             string StrConn = NomeHost + UserName + nomeDb + ";";
             return StrConn;
         }
-        public static string AcsDbConn(string nomeDb)
+        public static string AcsDbConn(string nomeDb, string nomePath)
         {
-            string StrConn = "Provider=Microsoft.ACE.OLEDB.16.0; Data Source=C:\\Appo\\" + nomeDb + ".accdb;";
+            string StrConn = "Provider=Microsoft.ACE.OLEDB.16.0; Data Source=" + nomePath + "\\" + nomeDb + ".accdb;";
             return StrConn;
         }
         public static string ExFlConn(string fileImp)
