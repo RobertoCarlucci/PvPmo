@@ -68,7 +68,7 @@
         {
             try
             {
-                var _connSql = new MySqlConnection(StrConn);
+                var _connSql = new MySqlConnection(StrConn + "Convert Zero Datetime=True;");
                 _connSql.Open();
                 var _cmdSql = new MySqlCommand(Qry, _connSql);
                 Params.ForEach(param => { _cmdSql.Parameters.Add(param); });

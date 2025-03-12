@@ -13,8 +13,8 @@
                 RowDefinitions="*,*"
                 RowSpacing="0">
             <CollectionView Grid.Column="1"
-                            ItemsSource="{Binding _tabData}"
-                            SelectionMode="Single">
+                            ItemsSource="{Binding _inpData}">
+                
             </CollectionView>
             <Image x:Name="backgroundImage"
                 Source="wallpaper_dl.png"
@@ -41,6 +41,13 @@
                 Grid.Row="1"
                 Grid.Column="0"
                 Margin="40"/>
+
+            <ActivityIndicator IsVisible="{Binding IsBusy}"
+                IsRunning="{Binding IsBusy}"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="CenterAndExpand"                               
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="2"/>
         </Grid>         
     </RefreshView>
 </ContentPage>

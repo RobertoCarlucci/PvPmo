@@ -99,7 +99,7 @@ namespace PvPmo.Util
                         Type = ("SMALLINT UNSIGNED");
                         break;
                     case "DateTime":
-                        Type = ("DATE");
+                        Type = ("DATE NOT NULL DEFAULT '0000-00-00'");
                         break;
                 }
                 // Select nomi colonne e creazione chiave primaria dove necessaria.

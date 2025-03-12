@@ -1,40 +1,43 @@
-﻿namespace PvPmo.Model
+﻿using System.Collections.ObjectModel;
+
+namespace PvPmo.Model
 {
     public class TabData
     {
-        //public int id { get; }
-        public DateOnly PV_TotalData { get; set; }
-        public DateOnly GlobalTimesheetExtractData { get; set; }
-        public DateOnly PV_MeseSuAnno { get; set; }
+        public uint id { get; set; }
+        public DateTime PV_TotalData { get; set; }
+        public DateTime GlobalTimesheetExtractData { get; set; }
+        public DateTime PV_MeseSuAnno { get; set; }
 
     }
     public interface ITabDataService
     {
-        IList<TabData> TabDatas { get; }
+        ObservableCollection<TabData> TabDatas { get; }
     }
     public class TabDataService : ITabDataService
     {
-        private List<TabData> _inpdata;
+        private ObservableCollection<TabData> _inpdata;
 
         public TabDataService()
         {
             DataTable _elencoInp = new DataTable();
-            _inpdata = new List<TabData>();
+            _inpdata = new ObservableCollection<TabData>();
 
-            string StrConn = Db.Conn.MysqlConn("pvpmo_origine");
-            string Qry = "SELECT * From origine_acs;";
-            Db.SqlSync.SqlQryDataTable(StrConn, Qry, _elencoInp);
+            string StrConn = Conn.MysqlConn("pmo");
+            string Qry = "SELECT * From 01_tabella_data;";
+            SqlSync.SqlQryDataTable(StrConn, Qry, _elencoInp);
             DataRow[] temp = _elencoInp.Select();
             foreach (DataRow v in temp)
             {
                 _inpdata.Add(new TabData()
-                {
-                    PV_TotalData = (DateOnly)v["PV_TotalData"],
-                    GlobalTimesheetExtractData = (DateOnly)v["GlobalTimesheetExtractData"],
-                    PV_MeseSuAnno = (DateOnly)v["PV_MeseSuAnno"]                    
+                {   
+                    id = (uint)v["id"],
+                    PV_TotalData = (DateTime)v["PV_TotalData"],
+                    GlobalTimesheetExtractData = (DateTime)v["GlobalTimesheetExtractData"],
+                    PV_MeseSuAnno = (DateTime)v["PV_MeseSuAnno"]                    
                 });
             }
         }
-        public IList<TabData> TabDatas => _inpdata;
+        public ObservableCollection<TabData> TabDatas => _inpdata;
     }
 }
