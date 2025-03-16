@@ -1,4 +1,4 @@
-﻿namespace PvPmo.Service
+﻿namespace PvPmo.ImportDb
 {
     public partial class AcsToSql
     {
@@ -14,9 +14,9 @@
                 string nomeTbAcs = n.tabella;
                 string nomeDbSql = n.db_dest;
                 string tab = await TabAcstoTabSql(nomeDbAcs, nomeTbAcs, nomeDbSql, _acsPath);                
-                string StrConn = Conn.MysqlConn("pvpmo_origine");
+                string StrConnSql = Conn.MysqlConn("pvpmo_origine");
                 string Qry = "UPDATE  origine_acs set tabella_sql = '" + tab + "' WHERE id = " + x + ";";
-                SqlSync.SqlQry(StrConn, Qry);
+                SqlSync.SqlQry(StrConnSql, Qry);
                 x++;
             }
 
@@ -33,15 +33,15 @@
         }
         public static async Task<string> TabAcstoTabSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string acsPath)
         {
-            string StrConn = Conn.AcsDbConn(nomeDbAcs, acsPath);
+            string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
             DataTable _tabella = new DataTable();
             string Qry = "SELECT * FROM [" + nomeTbAcs + "] WHERE 1=0";
-            await AcsAsync.AcsQryTab(StrConn, Qry, _tabella);
+            await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
             string nomeTbNorm = VarUtil.NormNomeTab(nomeTbAcs);
             Qry = VarUtil.NormInp(nomeTbAcs, nomeTbNorm, _tabella);
             Qry = "CREATE OR REPLACE TABLE " +  Qry;            
-            StrConn = Conn.MysqlConn(nomeDbSql);
-            bool Bol = await SqlAsync.SqlNoQry(StrConn, Qry);            
+            string StrConnSql = Conn.MysqlConn(nomeDbSql);
+            bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);            
             return nomeTbNorm;
         }
         public static async Task<bool> InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
@@ -49,12 +49,12 @@
             bool bol = await VarUtil.CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, acsPath);
             if(bol == true)
             {
-                string StrConn = Conn.AcsDbConn(nomeDbAcs, acsPath);
+                string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
                 DataTable _tabella = new DataTable();
                 string Qry = "SELECT * FROM [" + nomeTbAcs + "]";
-                await AcsAsync.AcsQryTab(StrConn, Qry, _tabella);
-                StrConn = Conn.MysqlConn(nomeDbSql);
-                await SqlAsync.SqlBulkCopy(StrConn, nomeTbSql, _tabella);
+                await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
+                string StrConnSql = Conn.MysqlConn(nomeDbSql);
+                await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella);
             }
             return true;            
         }

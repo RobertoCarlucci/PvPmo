@@ -1,4 +1,4 @@
-﻿using PvPmo.Db;
+﻿using PvPmo.GestDb;
 
 namespace PvPmo.Util
 {

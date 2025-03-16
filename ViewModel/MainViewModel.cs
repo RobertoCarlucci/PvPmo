@@ -1,4 +1,5 @@
 ﻿using PvPmo.View;
+using System;
 
 namespace PvPmo.ViewModel
 {
@@ -46,7 +47,9 @@ namespace PvPmo.ViewModel
             if (IsBusy)
                 return;
 
-            IsBusy = true;            
+            IsBusy = true;
+
+            await UpdateDb.ExltoSql.InpExl();
 
             await Shell.Current.DisplayAlert
                 ("Hai premuto BtnAgDb !", $"Non ci posso credere.", "Ok");

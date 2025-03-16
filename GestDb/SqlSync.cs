@@ -1,6 +1,6 @@
-﻿namespace PvPmo.Db
+﻿namespace PvPmo.GestDb
 {
-    public partial class SqlAsync
+    public partial class SqlSync
     {
         public static List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
         public static List<MySqlParameter> Params = new List<MySqlParameter>();
@@ -15,21 +15,47 @@
             var NewMapping = new MySqlBulkCopyColumnMapping(SourceOrdinal, DestinationColumn);
             Mappings.Add(NewMapping);
         }
-        public static async Task<Boolean> SqlNoQry(string strConn, string Qry)
+
+        public static DataTable SqlQryDataReader(string StrConn, string Qry, DataTable _tabella)
         {
             try
             {
-                var _connSql = new MySqlConnection(strConn);
-                await _connSql.OpenAsync();
+                var _connSql = new MySqlConnection(StrConn);
+                _connSql.Open();
                 var _cmdSql = new MySqlCommand(Qry, _connSql);
                 Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
                 Params.Clear();
-                await _cmdSql.ExecuteNonQueryAsync();
+                MySqlDataReader _datareader = _cmdSql.ExecuteReader();
+                _tabella.Load(_datareader);                
+                _datareader.Close();
+                return _tabella;
+            }
+            catch (MySqlException ex)
+            {
+                Shell.Current.DisplayAlert
+                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
+                return _tabella;
+            }
+            finally
+            {                
+                if (ConnectionState.Open != ConnectionState.Closed) { };
+            }
+        }
+        public static bool SqlQry(string StrConn, string Qry)
+        {
+            try
+            {
+                var _connSql = new MySqlConnection(StrConn);
+                _connSql.Open();
+                var _cmdSql = new MySqlCommand(Qry, _connSql);
+                Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
+                Params.Clear();                         
+                var _reader = _cmdSql.ExecuteReader();                
                 return true;
             }
             catch (MySqlException ex)
             {
-                await Shell.Current.DisplayAlert
+                Shell.Current.DisplayAlert
                     ("Errore MariaDb", $"Codice: {ex}", "Ok");
                 return false;
             }
@@ -38,47 +64,22 @@
                 if (ConnectionState.Open != ConnectionState.Closed) { };
             }
         }
-        public static async Task<DataTable> SqlQryDataReader(string StrConn, string Qry, DataTable _tabella)
+        public static DataTable SqlQryDataTable(string StrConn, string Qry, DataTable _tabella)
         {
             try
             {
-                var _connSql = new MySqlConnection(StrConn);
-                await _connSql.OpenAsync();
-                var _cmdSql = new MySqlCommand(Qry, _connSql);
-                Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
-                Params.Clear();
-                MySqlDataReader _datareader = _cmdSql.ExecuteReader();
-                _tabella.Load(_datareader);
-                _datareader.Close();
-                return _tabella;
-            }
-            catch (MySqlException ex)
-            {
-                await Shell.Current.DisplayAlert
-                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
-                return _tabella;
-            }
-            finally
-            {
-                if (ConnectionState.Open != ConnectionState.Closed) { };
-            }
-        }
-        public static async Task<DataTable> SqlQryDataTable(string StrConn, string Qry, DataTable _tabella)
-        {
-            try
-            {
-                var _connSql = new MySqlConnection(StrConn);
-                await _connSql.OpenAsync();
+                var _connSql = new MySqlConnection(StrConn + "Convert Zero Datetime=True;");
+                _connSql.Open();
                 var _cmdSql = new MySqlCommand(Qry, _connSql);
                 Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
                 Params.Clear();
                 var _adapter = new MySqlDataAdapter(_cmdSql);
-                int _contarecord = _adapter.Fill(_tabella);
+                int ContaRecord = _adapter.Fill(_tabella);                
                 return _tabella;
             }
             catch (MySqlException ex)
             {
-                await Shell.Current.DisplayAlert
+                Shell.Current.DisplayAlert
                     ("Errore MariaDb", $"Codice: {ex}", "Ok");
                 return _tabella;
             }
@@ -86,24 +87,47 @@
             {
                 if (ConnectionState.Open != ConnectionState.Closed) { };
             }
-        }
-        public static async Task<Boolean> SqlBulkCopy(string StrConn, string tabMod, DataTable tabellain)
-        {
+        }        
+        public static Boolean SqlNoQry(string strConn, string Qry)
+        {            
             try
             {
-                var _connSql = new MySqlConnection(StrConn + "AllowLoadLocalInfile=true;");
-                await _connSql.OpenAsync();
-                var _bulk = new MySqlBulkCopy(_connSql);
-                _bulk.DestinationTableName = tabMod;
-                Mappings.ForEach(_mapping => { _bulk.ColumnMappings.Add(_mapping); });
-                Mappings.Clear();
-                var result = await _bulk.WriteToServerAsync(tabellain);
-                //if (result.Warnings.Count != 0);
+                var _connSql = new MySqlConnection(strConn);
+                _connSql.Open();
+                var _cmdSql = new MySqlCommand(Qry, _connSql);
+                Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
+                Params.Clear();               
+                _cmdSql.ExecuteNonQuery();
                 return true;
             }
             catch (MySqlException ex)
             {
-                await Shell.Current.DisplayAlert
+                Shell.Current.DisplayAlert
+                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
+                return false;
+            }
+            finally
+            {
+                if (ConnectionState.Open != ConnectionState.Closed) { };
+            }
+        }
+        public static Boolean SqlBulkCopy(string StrConn, string tabMod, DataTable tabellain)
+        {
+            try
+            {
+                var _connSql = new MySqlConnection(StrConn + "AllowLoadLocalInfile=true;");
+                _connSql.Open();
+                var _bulk = new MySqlBulkCopy(_connSql);
+                _bulk.DestinationTableName = tabMod;
+                Mappings.ForEach(_mapping => { _bulk.ColumnMappings.Add(_mapping); });
+                Mappings.Clear();
+                var result = _bulk.WriteToServer(tabellain);
+                //if (result.Warnings.Count != 0) ;
+                return true;
+            }
+            catch (MySqlException ex)
+            {
+                Shell.Current.DisplayAlert
                     ("Errore MariaDb", $"Codice: {ex}", "Ok");
                 return false;
             }

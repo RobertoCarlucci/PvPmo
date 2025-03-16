@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace PvPmo.Db
+﻿namespace PvPmo.GestDb
 {
     public class ExlFl
     {

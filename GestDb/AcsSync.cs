@@ -1,4 +1,4 @@
-﻿namespace PvPmo.Db
+﻿namespace PvPmo.GestDb
 {
     public class AcsSync
     {

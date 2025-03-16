@@ -1,25 +1,25 @@
 ﻿namespace PvPmo.Model
 {
-    public class InpUpdt
+    public class FileExl
     {        
         public string? db_inp { get; set; }
         public string? tabella { get; set; }
         public string? db_dest { get; set; }
         public string? tabella_sql { get; set; }        
     }
-    public interface IInpUptd
+    public interface IFileExl
     {
-        IList<InpUpdt> InpUpdt { get; }
+        IList<FileExl> FileExl { get; }
     }
-    public class ImpUptdService : IInpUptd
+    public class ImpExlService : IFileExl
     {
-        private List<InpUpdt> _inpuptd;
+        private List<FileExl> _inpuexl;
 
-        public ImpUptdService() 
+        public ImpExlService() 
         {
 
             DataTable _elencoInp = new DataTable();
-            _inpuptd = new List<InpUpdt>();
+            _inpuexl = new List<FileExl>();
 
             string StrConn = Conn.MysqlConn("pvpmo_origine");
             string Qry = "SELECT * From origine_update;";
@@ -27,7 +27,7 @@
             DataRow[] temp = _elencoInp.Select();
             foreach (DataRow v in temp)
             {
-                _inpuptd.Add(new InpUpdt()
+                _inpuexl.Add(new FileExl()
                 {
                     db_inp = v["db_inp"].ToString(),
                     tabella = v["tabella"].ToString(),
@@ -37,6 +37,6 @@
             }
 
         }
-        public IList<InpUpdt> InpUpdt => _inpuptd;
+        public IList<FileExl> FileExl => _inpuexl;
     }    
 }
