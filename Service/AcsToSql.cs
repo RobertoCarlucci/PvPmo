@@ -1,6 +1,6 @@
 ﻿namespace PvPmo.Service
 {
-    public class AcsToSql
+    public partial class AcsToSql
     {
         public static async Task NewDb()
         {

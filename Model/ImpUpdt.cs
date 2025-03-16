@@ -1,33 +1,33 @@
 ﻿namespace PvPmo.Model
 {
-    public class TabAcs
-    {
+    public class InpUpdt
+    {        
         public string? db_inp { get; set; }
         public string? tabella { get; set; }
         public string? db_dest { get; set; }
-        public string? tabella_sql { get; set; }
+        public string? tabella_sql { get; set; }        
     }
-    public interface ITabAcsService
+    public interface IInpUptd
     {
-        IList<TabAcs> InpAcs { get; }
+        IList<InpUpdt> InpUpdt { get; }
     }
-
-    public class TabAcsService : ITabAcsService
+    public class ImpUptdService : IInpUptd
     {
-        private List<TabAcs> _inpacs;
+        private List<InpUpdt> _inpuptd;
 
-        public TabAcsService()
+        public ImpUptdService() 
         {
+
             DataTable _elencoInp = new DataTable();
-            _inpacs = new List<TabAcs>();
+            _inpuptd = new List<InpUpdt>();
 
             string StrConn = Conn.MysqlConn("pvpmo_origine");
-            string Qry = "SELECT * From origine_acs;";
+            string Qry = "SELECT * From origine_update;";
             SqlSync.SqlQryDataTable(StrConn, Qry, _elencoInp);
             DataRow[] temp = _elencoInp.Select();
             foreach (DataRow v in temp)
             {
-                _inpacs.Add(new TabAcs()
+                _inpuptd.Add(new InpUpdt()
                 {
                     db_inp = v["db_inp"].ToString(),
                     tabella = v["tabella"].ToString(),
@@ -35,7 +35,8 @@
                     tabella_sql = v["tabella_sql"].ToString()
                 });
             }
+
         }
-        public IList<TabAcs> InpAcs => _inpacs;
-    }
+        public IList<InpUpdt> InpUpdt => _inpuptd;
+    }    
 }
