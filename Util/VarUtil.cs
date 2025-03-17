@@ -1,7 +1,4 @@
-﻿using PvPmo.GestDb;
-using System;
-
-namespace PvPmo.Util
+﻿namespace PvPmo.Util
 {
     public class VarUtil
     {
@@ -58,7 +55,51 @@ namespace PvPmo.Util
                 return false;
             }
             return false;
-        }        
+        }
+
+        public static string InpExl(string nomeTabDb, DataTable tabData)
+        {            
+            string Qry = nomeTabDb + " (";
+            int x = 0;
+            int i = tabData.Columns.Count - 1;
+
+            foreach (DataColumn col in tabData.Columns)
+            {
+                string Name = col.ColumnName;
+                string Type = col.DataType.ToString();
+                Type = Type.Remove(0, 7);                
+                switch (Type)
+                {
+                    case "String":
+                        Type = ("nvarchar(50)");
+                        break;
+                    case "Double":
+                        Type = ("SMALLINT UNSIGNED");
+                        break;
+                    case "Int16":
+                        Type = ("SMALLINT UNSIGNED");
+                        break;
+                    case "Single":
+                        Type = ("SMALLINT UNSIGNED");
+                        break;
+                    case "DateTime":
+                        Type = ("DATE NOT NULL DEFAULT '0000-00-00'");
+                        break;
+                }
+                
+                if (x < i)
+                {
+                    Qry = Qry + "`" + Name + "` " + Type + ", ";
+                }
+                else
+                {
+                    Qry = Qry + "`" + Name + "` " + Type;
+                }
+                x++;
+            }
+            Qry += ");";
+            return Qry;
+        }
 
         //Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
         //Si procede anche alla normalizzazione dei nomi colonna.

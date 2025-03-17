@@ -1,6 +1,6 @@
 ﻿namespace PvPmo.GestDb
 {
-    public class ExlFl
+    public class ExlSync
     {
         public static int ExcQry(string StrConn, string Qry)
         {            

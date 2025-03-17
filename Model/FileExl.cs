@@ -2,8 +2,8 @@
 {
     public class FileExl
     {        
-        public string? db_inp { get; set; }
         public string? tabella { get; set; }
+        public string? WorkSheet { get; set; }
         public string? db_dest { get; set; }
         public string? tabella_sql { get; set; }        
     }
@@ -29,8 +29,8 @@
             {
                 _inpuexl.Add(new FileExl()
                 {
-                    db_inp = v["db_inp"].ToString(),
                     tabella = v["tabella"].ToString(),
+                    WorkSheet = v["WorkSheet"].ToString(),
                     db_dest = v["db_dest"].ToString(),
                     tabella_sql = v["tabella_sql"].ToString()
                 });

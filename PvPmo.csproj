@@ -77,9 +77,4 @@
 	  </MauiXaml>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Arcivio\SupportTables\" />
-	  <Folder Include="Arcivio\UpdtPvPMO\" />
-	</ItemGroup>
-
 </Project>

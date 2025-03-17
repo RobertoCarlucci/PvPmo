@@ -1,21 +1,19 @@
-﻿using PvPmo.GestDb;
-
-namespace PvPmo.Util
+﻿namespace PvPmo.Util
 {
-    public class AcsQry
+    public class ExlQry
     {
         public static int SelExlQry(string fileImp, string foglio)
         {
-            string StrConn = Conn.ExFlConn(fileImp);
+            string StrConn = Conn.ExlFileConn(fileImp);
             string qry = "SELECT * FROM [" + foglio + "$];";
-            int Num = ExlFl.ExcQry(qry, StrConn);
+            int Num = ExlSync.ExcQry(qry, StrConn);
             return Num;
         }
         public static Boolean SelExlQry(string fileImp, string foglio, DataTable tabImp)
         {
-            string StrConn = Conn.ExFlConn(fileImp);
+            string StrConn = Conn.ExlFileConn(fileImp);
             string qry = "SELECT * FROM [" + foglio + "$];";
-            Boolean Bol = ExlFl.ExcQry(qry, StrConn, tabImp);
+            Boolean Bol = ExlSync.ExcQry(qry, StrConn, tabImp);
             return Bol;
         }
     }
