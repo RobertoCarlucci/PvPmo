@@ -3,6 +3,7 @@
     public partial class ExltoSql
     {
         //Importo i File Excel per l'aggiornamento mensile.
+        //private static string _cartInput = @"\Archivio\IN\Timesheet\";
         public static async Task InpExl()
         {
             string _exlPath = await SelCart.PickFolderStatic(default);
