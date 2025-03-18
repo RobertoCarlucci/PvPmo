@@ -1,5 +1,4 @@
-﻿using PvPmo.GestDb;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace PvPmo.Model
 {

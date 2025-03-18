@@ -1,6 +1,4 @@
-﻿using PvPmo.GestDb;
-
-namespace PvPmo.Model
+﻿namespace PvPmo.Model
 {
     public class TabAcs
     {
