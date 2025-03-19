@@ -6,8 +6,10 @@
         //private static string _cartInput = @"\Archivio\IN\Timesheet\";
         public static async Task InpExl()
         {
+            // Apro una finestra di sistema x la selezione della cartella di importazione.
             string _exlPath = await SelCart.PickFolderStatic(default);
             ImpExlService _inpexl = new ImpExlService();            
+            Boolean Bol = false;
 
             foreach (var n in _inpexl.FileExl)
             {                
@@ -16,59 +18,93 @@
                 string nomeDbSql = n.db_dest;
                 string nomeTdDest = n.tabella_sql;
                 string exlPath = _exlPath + "\\" + nomeTbExl;
-                Boolean Bol = await NomeColFileExltoTabSql(nomeFoglio, nomeDbSql, nomeTdDest, exlPath);
+                Bol = await NomeColFileExltoTabSql(nomeFoglio, nomeDbSql, nomeTdDest, exlPath);
                 Bol = await DatiFileExltoTabSql(nomeFoglio, nomeDbSql, nomeTdDest, exlPath);
-                switch (nomeTbExl)
-                {
-                    case "PV_Total_Uptd":
-                        Boolean bol = await PvTotalUptd();
-                        break;
-                    case "GlobalTimesheetExtract_Uptd":
-                        bol = await GlobalTimesExtrUptd(nomeDbSql);
-                        break;
-                }
+                
                 //string QrySql = "SHOW COLUMNS FROM " + nomeTdDest;
                 //DataTable _showcolumn = new DataTable();
                 //await SqlAsync.SqlQryDataTable(StrConnSql, QrySql, _showcolumn);
-            }            
+            }
+            Bol = await NormTabImp();
         }
-        // Se il File è Global Timesheer Extract aggiungo le colonne necessarie e popolo 
-        // le stesse con i dati attraverso le opportune query.
-        public static async Task<bool> GlobalTimesExtrUptd(string nomeDbSql)
+        public static async Task<bool> NormTabImp()
         {
             NormImpService _normimp = new NormImpService();
             foreach (var n in _normimp.NormImp)
             {
-                string _colonna = n.colonna;
-                string _azione = n.azione;
-                string _tabella = n.tabella;
-                if (_tabella == "global_timesheet_extract" && _azione == "ADD")
+                string _colonna = n.Colonna;
+                string _azione = n.Azione;
+                string _tabella = n.Tabella;
+                string _db = n.Dbdest;
+                switch (_tabella)
                 {
-                    Boolean bol = await AddCol(nomeDbSql, _colonna, _tabella);
-                    switch (_colonna)
-                    {
-                        case "DateID":
-                            bol = await PvTotalUptd();
-                            break;
-                        case "id_month_year":
-                            bol = await GlobalTimesExtrUptd(nomeDbSql);
-                            break;
-                        case "keyid":
-                            bol = await GlobalTimesExtrUptd(nomeDbSql);
-                            break;
-                    }
-                };
-            }            
+                    case "pv_total":
+                        Boolean bol = await PvTotalUptd(_db, _tabella, _colonna, _azione);
+                        break;
+                    case "global_timesheet_extract":
+                        bol = await GlobalTimesExtrUptd(_db, _tabella, _colonna, _azione);
+                        break;
+                }
+            }
+            return true;
+        }
+        // Se il File è Global Timesheer Extract aggiungo le colonne necessarie e popolo 
+        // le stesse con i dati attraverso le opportune query.
+        public static async Task<bool> GlobalTimesExtrUptd(string nomeDbSql, string nomeTab, string nomeCol, string azione)
+        {
+            string StrConnSql = Conn.MysqlConn(nomeDbSql);
+            string Qry = "";
+
+            if (nomeTab == "global_timesheet_extract" && azione == "ADD")
+            {
+                switch (nomeCol)
+                {
+                    case "DateID":
+                        Qry = "ALTER TABLE `" + nomeTab + "` ADD COLUMN `" + nomeCol + "` nvarchar(50);";
+                        break;
+                    case "id_month_year":
+                        Qry = "ALTER TABLE `" + nomeTab + "` ADD COLUMN `" + nomeCol + "` nvarchar(50);";
+                        break;
+                    case "keyid":
+                        Qry = "ALTER TABLE `" + nomeTab + "` ADD COLUMN `" + nomeCol + "` nvarchar(50);";
+                        break;
+                }
+                bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+            }                                  
             return true;
         }        
         // Se il File è PV_Total aggiungo le colonne necessarie e popolo 
         // le stesse con i dati attraverso le opportune query, imoltre rimuovo
         // le collonne che non vengono utilizzate.
-        public static async Task<bool> PvTotalUptd()
+        public static async Task<bool> PvTotalUptd(string nomeDbSql, string nomeTab, string nomeCol, string azione)
         {
+            string StrConnSql = Conn.MysqlConn(nomeDbSql);
+            string Qry = "";
+
+            if (nomeTab == "pv_total" && azione == "ADD")
+            {
+                switch (nomeCol)
+                {
+                    case "DateID":
+                        Qry = "ALTER TABLE `" + nomeTab + "` ADD COLUMN `" + nomeCol + "` nvarchar(50);";                        
+                        break;
+                    case "id_month_year":
+                        Qry = "ALTER TABLE `" + nomeTab + "` ADD COLUMN `" + nomeCol + "` nvarchar(50);";                        
+                        break;
+                    case "keyid":
+                        Qry = "ALTER TABLE `" + nomeTab + "` ADD COLUMN `" + nomeCol + "` nvarchar(50);";                        
+                        break;
+                }
+                bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+            }
+            else if (nomeTab == "pv_total" && azione == "DEL")
+            {
+                Qry = "ALTER TABLE `" + nomeTab + "` DROP IF EXISTS `" + nomeCol + "`;";
+                bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);                
+            };            
             return true;
         }
-        // Creo i le tabelle nel Db Sql per imortare i dati dai file Excel.
+        // Creo le tabelle nel Db Sql per importare i dati dai file Excel.
         public static async Task<bool> NomeColFileExltoTabSql(string nomeFoglio, string nomeDbSql, string nomeTbSql, string exlPath)
         {
             DataTable _tabella = new DataTable();
@@ -81,7 +117,7 @@
             Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);                        
             return true;
         }
-        // Inserisco i dati nelle opportune colonne righe
+        // Inserisco i dati nelle opportune tabelle colonne.
         public static async Task<bool> DatiFileExltoTabSql(string nomeFoglio, string nomeDbSql, string nomeTbSql, string exlPath)
         {
             DataTable _tabella = new DataTable();

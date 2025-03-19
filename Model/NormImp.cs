@@ -2,9 +2,11 @@
 {
     public class NormImp
     {
-        public string? colonna { get; set; }
-        public string? azione { get; set; }        
-        public string? tabella { get; set; }
+        public string? Colonna { get; set; }
+        public string? Azione { get; set; }        
+        public string? Tabella { get; set; }
+        public string? Dbdest { get; set; }
+
     }
     public interface INormImp
     {
@@ -28,9 +30,10 @@
             {
                 _normimp.Add(new NormImp()
                 {
-                    colonna = v["Colonna"].ToString(),
-                    azione = v["azione"].ToString(),
-                    tabella = v["tabella"].ToString()                    
+                    Colonna = v["colonna"].ToString(),
+                    Azione = v["azione"].ToString(),
+                    Tabella = v["tabella"].ToString(),
+                    Dbdest = v["dbdest"].ToString()
                 });
             }
         }

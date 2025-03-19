@@ -2,17 +2,19 @@
 {
     public partial class AcsToSql
     {
+        //Importazione dei due Db Access con i loro dati.
         public static async Task NewDb()
         {
+            // Apro una finestra di sistema x la selezione della cartella di importazione.
             string _acsPath = await SelCart.PickFolderStatic(default);
             TabAcsService _inpacs = new TabAcsService();
             int x = 1;
 
             foreach (var n in _inpacs.InpAcs)
             {                
-                string nomeDbAcs = n.db_inp;
-                string nomeTbAcs = n.tabella;
-                string nomeDbSql = n.db_dest;
+                string nomeDbAcs = n.DbInp;
+                string nomeTbAcs = n.Tabella;
+                string nomeDbSql = n.DbDest;
                 string tab = await TabAcstoTabSql(nomeDbAcs, nomeTbAcs, nomeDbSql, _acsPath);                
                 string StrConnSql = Conn.MysqlConn("pvpmo_origine");
                 string Qry = "UPDATE  origine_acs set tabella_sql = '" + tab + "' WHERE id = " + x + ";";
@@ -23,13 +25,15 @@
 
             foreach (var n in _inpacsdati.InpAcs)
             {
-                string nomeDbAcs = n.db_inp;
-                string nomeTbAcs = n.tabella;
-                string nomeDbSql = n.db_dest;
-                string nomeTbSql = n.tabella_sql;
+                string nomeDbAcs = n.DbInp;
+                string nomeTbAcs = n.Tabella;
+                string nomeDbSql = n.DbDest;
+                string nomeTbSql = n.TabellaSql;
                 await InpAcsDatitoSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, _acsPath);            
             }
         }
+        // Creo le tabelle Sql leggendo i nomi delle tabelle Access e normalizzando le
+        // intestazioni delle colonne in modo compatibile con sql.
         public static async Task<string> TabAcstoTabSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string acsPath)
         {
             string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
@@ -43,6 +47,8 @@
             bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);            
             return nomeTbNorm;
         }
+        // Importo i dati all'interno del Db andando a popolare con i valori le tabelle
+        // colonne precedentemente create.
         public static async Task<bool> InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
         {
             bool bol = await CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, acsPath);
@@ -57,6 +63,9 @@
             }
             return true;            
         }
+        // Vengono lette le intestazioni delle colonne Access e Sql per creare il mapping
+        // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
+        // AddMapping all'interno della cartella GestDb classe gestione Sql.
         public static async Task<bool> CreaMappingAcsSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
         {
             DataTable _tabAcs = new DataTable();
@@ -111,8 +120,8 @@
             }
             return false;
         }
-        //Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
-        //Si procede anche alla normalizzazione dei nomi colonna.
+        // Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
+        // Si procede anche alla normalizzazione dei nomi colonna.
         public static string NormInp(string nomeTabDb, string nomeTabNorm, DataTable tabData)
         {
             // Chiamata alla funzione di normalizzazione nome tabella.
@@ -213,7 +222,7 @@
             Qry += ");";
             return Qry;
         }
-        //Vengono normalizzati i nomi delle Tabelle Sql.
+        // Vengono normalizzati i nomi delle Tabelle Sql.
         public static string NormNomeTab(string nomeTab)
         {
             switch (nomeTab)

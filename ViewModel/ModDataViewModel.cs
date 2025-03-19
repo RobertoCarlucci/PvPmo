@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace PvPmo.ViewModel
+﻿namespace PvPmo.ViewModel
 {
     public partial class ModDataViewModel : BaseViewModel
     {

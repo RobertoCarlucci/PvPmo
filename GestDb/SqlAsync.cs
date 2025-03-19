@@ -14,7 +14,7 @@
         {
             var NewMapping = new MySqlBulkCopyColumnMapping(SourceOrdinal, DestinationColumn);
             Mappings.Add(NewMapping);
-        }
+        }        
         public static async Task<Boolean> SqlNoQry(string strConn, string Qry)
         {
             try
