@@ -35,14 +35,14 @@ namespace PvPmo.Util
         {
             string StrConn = Conn.MysqlConn(nomeDb);
             string qry = "ALTER TABLE `" + tabella + "` ADD COLUMN `" + nuovaCol + "`;";
-            Boolean Bol = await SqlAsync.SqlQry(qry, StrConn);
+            Boolean Bol = await SqlAsync.SqlNoQry(qry, StrConn);
             return Bol;
         }
         public static async Task<Boolean> DelColSql(string nomeDb, string tabella, string nomeCol)
         {
             string StrConn = Conn.MysqlConn(nomeDb);
             string qry = "ALTER TABLE `" + tabella + "` DROP IF EXISTS `" + nomeCol + "`;";
-            Boolean Bol = await SqlAsync.SqlQry(qry, StrConn);
+            Boolean Bol = await SqlAsync.SqlNoQry(qry, StrConn);
             return Bol;
         }
         public static async Task<DataTable> UpdTabSql(string nomeDb, string tabQry, DataTable tabella)

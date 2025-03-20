@@ -30,37 +30,39 @@
         public static async Task<bool> NormTabImp()
         {
             NormImpService _normimp = new NormImpService();
+            string _db = "";
+            bool Bol = false;
             foreach (var n in _normimp.NormImp)
             {
                 string _colonna = n.Colonna;
                 string _azione = n.Azione;
                 string _tabella = n.Tabella;
-                string _db = n.Dbdest;
+                _db = n.Dbdest;
                 switch (_tabella)
                 {
                     case "pv_total":
-                        Boolean bol = await PvTotalUptd(_db, _tabella, _colonna, _azione);
+                        Bol = await PvTotalUptd(_db, _tabella, _colonna, _azione);
                         break;
                     case "global_timesheet_extract":
-                        bol = await GlobalTimesExtrUptd(_db, _tabella, _colonna, _azione);
+                        Bol = await GlobalTimesExtrUptd(_db, _tabella, _colonna, _azione);
                         break;
                 }
             }
-            return true;
+            string StrConnSql = Conn.MysqlConn(_db);
+            string Qry = "DELETE FROM `pv_total`WHERE `Resource Name` = 'Farneti Thomas Old';";
+            Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+            return Bol;
         }
         // Se il File è Global Timesheer Extract aggiungo le colonne necessarie e popolo 
         // le stesse con i dati attraverso le opportune query.
         public static async Task<bool> GlobalTimesExtrUptd(string nomeDbSql, string nomeTab, string nomeCol, string azione)
         {
-            string StrConnSql = Conn.MysqlConn(nomeDbSql);
-            string Qry = "";
-
             if (nomeTab == "global_timesheet_extract" && azione == "ADD")
             {
                 switch (nomeCol)
                 {
                     case "DateID":
-                        Qry = "ALTER TABLE `" + nomeTab + "` ADD COLUMN `" + nomeCol + "` nvarchar(50);";
+                        string Qry = "ALTER TABLE `" + nomeTab + "` ADD COLUMN `" + nomeCol + "` nvarchar(50);";
                         break;
                     case "id_month_year":
                         Qry = "ALTER TABLE `" + nomeTab + "` ADD COLUMN `" + nomeCol + "` nvarchar(50);";
@@ -68,9 +70,8 @@
                     case "keyid":
                         Qry = "ALTER TABLE `" + nomeTab + "` ADD COLUMN `" + nomeCol + "` nvarchar(50);";
                         break;
-                }
-                bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
-            }                                  
+                }                
+            }            
             return true;
         }        
         // Se il File è PV_Total aggiungo le colonne necessarie e popolo 
@@ -80,6 +81,7 @@
         {
             string StrConnSql = Conn.MysqlConn(nomeDbSql);
             string Qry = "";
+            bool Bol = false;
 
             if (nomeTab == "pv_total" && azione == "ADD")
             {
@@ -95,14 +97,14 @@
                         Qry = "ALTER TABLE `" + nomeTab + "` ADD COLUMN `" + nomeCol + "` nvarchar(50);";                        
                         break;
                 }
-                bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+                Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
             }
             else if (nomeTab == "pv_total" && azione == "DEL")
             {
                 Qry = "ALTER TABLE `" + nomeTab + "` DROP IF EXISTS `" + nomeCol + "`;";
-                bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);                
+                Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);                
             };            
-            return true;
+            return Bol;
         }
         // Creo le tabelle nel Db Sql per importare i dati dai file Excel.
         public static async Task<bool> NomeColFileExltoTabSql(string nomeFoglio, string nomeDbSql, string nomeTbSql, string exlPath)
@@ -110,7 +112,7 @@
             DataTable _tabella = new DataTable();
             string StrConnExl = Conn.ExlFileConn(exlPath);
             string QryExl = "SELECT * FROM [" + nomeFoglio + "$] WHERE 1=0;";
-            Boolean Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabella);
+            bool Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabella);
             string QrySql = InpExl(nomeTbSql, _tabella);
             string StrConnSql = Conn.MysqlConn(nomeDbSql);
             QrySql = "CREATE OR REPLACE TABLE " + QrySql;
@@ -123,7 +125,7 @@
             DataTable _tabella = new DataTable();
             string StrConnExl = Conn.ExlFileConn(exlPath);
             string QryExl = "SELECT * FROM [" + nomeFoglio + "$];";
-            Boolean Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabella);
+            bool Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabella);
             string StrConnSql = Conn.MysqlConn(nomeDbSql);
             await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella);
             return Bol;            

@@ -51,8 +51,8 @@
         // colonne precedentemente create.
         public static async Task<bool> InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
         {
-            bool bol = await CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, acsPath);
-            if(bol == true)
+            bool Bol = await CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, acsPath);
+            if(Bol == true)
             {
                 string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
                 DataTable _tabella = new DataTable();
@@ -60,8 +60,32 @@
                 await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
                 string StrConnSql = Conn.MysqlConn(nomeDbSql);
                 await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella);
+                await AggiungiCol(nomeDbSql, nomeTbSql);
             }
-            return true;            
+            return Bol;            
+        }
+        public static async Task<bool> AggiungiCol(string nomeDbSql, string nomeTbSql)
+        {
+            string StrConnSql = Conn.MysqlConn(nomeDbSql);
+            string Qry = "";
+            bool Bol = true;
+
+            switch (nomeTbSql)
+            {
+                case "pv_total":
+                    Qry = "DELETE FROM `pv_total`WHERE `Resource Name` = 'Farneti Thomas Old';";
+                    Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+                    Qry = "ALTER TABLE `" + nomeTbSql + "` ADD COLUMN `id_month_year` nvarchar(50);";
+                    Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+                    Qry = "ALTER TABLE `" + nomeTbSql + "` ADD COLUMN `keyid` nvarchar(50);";
+                    Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+                    break;
+                case "global_timesheet_extract":
+                    
+                    break;
+            }
+
+            return false;
         }
         // Vengono lette le intestazioni delle colonne Access e Sql per creare il mapping
         // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
@@ -228,7 +252,7 @@
             switch (nomeTab)
             {
                 case "01_TabellaData":
-                    nomeTab = "01_tabella_data";
+                    nomeTab = "tabella_data";
                     break;
                 case "All Project Mapped - Power BI Column Set":
                     nomeTab = "all_project_mapped_power_bi_column_set";
@@ -259,10 +283,7 @@
                     break;
                 case "PBX_TimesheetInformationByMonth":
                     nomeTab = "pbx_timesheet_information_by_month";
-                    break;
-                case "01_tabelladata":
-                    nomeTab = "01_tabella_data";
-                    break;
+                    break;                
                 case "pv_total_outsoremese":
                     nomeTab = "pv_total_outs_ore_mese";
                     break;

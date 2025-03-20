@@ -2,6 +2,27 @@
 {
     public class VarUtil
     {
+        public static async Task<bool> CreaIdMonthYear(string nomeDbSql, string nomeTbSql, string nomeCol)
+        {
+            string StrConnSql = Conn.MysqlConn(nomeDbSql);
+            string Qry = "UPDATE `" + nomeTbSql + "` SET `" + nomeCol + "` = `Short Name` & Month (date) & YEAR (date);";
+            bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+            return true;
+        }
+        public static async Task<bool> CreaKeyId(string nomeDbSql, string nomeTbSql, string nomeCol)
+        {
+            string StrConnSql = Conn.MysqlConn(nomeDbSql);
+            string Qry = "UPDATE `pv_total` SET `keyid` = CONCAT_WS(`Organization (OBS)`,`Providing Org#`,`Team (OBS)`,`Competence (Primary Value)`,`Job Location Region`);";
+            bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+            return true;
+        }
+        public static async Task<bool> CreaDateId(string nomeDbSql, string nomeTbSql, string nomeCol)
+        {
+            string StrConnSql = Conn.MysqlConn(nomeDbSql);
+            string Qry = "UPDATE `" + nomeTbSql + "` SET `" + nomeCol + "` = `Short Name` & Month (date) & YEAR (date);";
+            bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+            return true;
+        }
         public static async Task<bool> AddCol(string nomeDbSql, string nomeColonna, string nomeTabella)
         {
             string QrySql = "ALTER TABLE ADD ";
