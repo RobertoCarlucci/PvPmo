@@ -27,7 +27,15 @@
                 Grid.Row="0"
                 Grid.Column="0"
                 Margin="40"/>
-            
+
+            <Button Text="Esporta PV_Total."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnExpExlCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="40"/>
+
             <Button Text="Torna Home Page."
                 Style="{StaticResource MyButton}"
                 Command="{Binding BtnAnnullaEsciCommand}"

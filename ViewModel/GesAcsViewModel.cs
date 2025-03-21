@@ -29,6 +29,24 @@ namespace PvPmo.ViewModel
             IsBusy = false;
             return;
         }
+        [RelayCommand]
+        async Task BtnExpExl()
+        {
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+            DataTable dt = new DataTable();
+            string _exlPath = await SelCart.PickFolderStatic(default);
+            ExportDt.LoadDt(dt);
+            ExportDt.ExportDataSet(dt, _exlPath);
+            await Shell.Current.DisplayAlert
+                ("Hai esportato il file !",
+                $"Esportazione de dati completata .", "Ok");
+
+            IsBusy = false;
+            return;
+        }
 
         [RelayCommand]
         async Task BtnAnnullaEsci()

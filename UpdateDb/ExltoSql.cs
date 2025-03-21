@@ -3,7 +3,7 @@
     public partial class ExltoSql
     {
         //Importo i File Excel per l'aggiornamento mensile.
-        //private static string _cartInput = @"\Archivio\IN\Timesheet\";
+        
         public static async Task InpExl()
         {
             // Apro una finestra di sistema x la selezione della cartella di importazione.
@@ -13,11 +13,11 @@
 
             foreach (var n in _inpexl.FileExl)
             {                
-                string nomeFoglio = n.WorkSheet;
-                string nomeTbExl = n.tabella;
-                string nomeDbSql = n.db_dest;
-                string nomeTdDest = n.tabella_sql;
-                string exlPath = _exlPath + "\\" + nomeTbExl;
+                string? nomeFoglio = n.WorkSheet;
+                string? nomeTbExl = n.tabella;
+                string? nomeDbSql = n.db_dest;
+                string? nomeTdDest = n.tabella_sql;                
+                string? exlPath = _exlPath + "\\" + nomeTbExl;
                 Bol = await NomeColFileExltoTabSql(nomeFoglio, nomeDbSql, nomeTdDest, exlPath);
                 Bol = await DatiFileExltoTabSql(nomeFoglio, nomeDbSql, nomeTdDest, exlPath);
                 
@@ -30,13 +30,13 @@
         public static async Task<bool> NormTabImp()
         {
             NormImpService _normimp = new NormImpService();
-            string _db = "";
+            string? _db = "";
             bool Bol = false;
             foreach (var n in _normimp.NormImp)
             {
-                string _colonna = n.Colonna;
-                string _azione = n.Azione;
-                string _tabella = n.Tabella;
+                string? _colonna = n.Colonna;
+                string? _azione = n.Azione;
+                string? _tabella = n.Tabella;
                 _db = n.Dbdest;
                 switch (_tabella)
                 {

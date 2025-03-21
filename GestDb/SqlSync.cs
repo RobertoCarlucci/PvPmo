@@ -15,6 +15,32 @@
             var NewMapping = new MySqlBulkCopyColumnMapping(SourceOrdinal, DestinationColumn);
             Mappings.Add(NewMapping);
         }
+        public static DataSet SqlQryDataSet(string StrConn, string Qry, DataSet _dataset)
+        {
+            try
+            {
+                var _connSql = new MySqlConnection(StrConn);
+                _connSql.Open();
+                var _cmdSql = new MySqlCommand(Qry, _connSql);
+                Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
+                Params.Clear();
+                MySqlDataS _datareader = _cmdSql.ExecuteReader();
+                _dataset.Load(_datareader);
+                _datareader.Close();
+                return _dataset;
+            }
+            catch (MySqlException ex)
+            {
+                Shell.Current.DisplayAlert
+                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
+                return _tabella;
+            }
+            finally
+            {
+                if (ConnectionState.Open != ConnectionState.Closed) { }
+                ;
+            }
+        }
 
         public static DataTable SqlQryDataReader(string StrConn, string Qry, DataTable _tabella)
         {

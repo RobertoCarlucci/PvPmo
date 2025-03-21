@@ -12,10 +12,10 @@
 
             foreach (var n in _inpacs.InpAcs)
             {                
-                string nomeDbAcs = n.DbInp;
-                string nomeTbAcs = n.Tabella;
-                string nomeDbSql = n.DbDest;
-                string tab = await TabAcstoTabSql(nomeDbAcs, nomeTbAcs, nomeDbSql, _acsPath);                
+                string? nomeDbAcs = n.DbInp;
+                string? nomeTbAcs = n.Tabella;
+                string? nomeDbSql = n.DbDest;
+                string? tab = await TabAcstoTabSql(nomeDbAcs, nomeTbAcs, nomeDbSql, _acsPath);                
                 string StrConnSql = Conn.MysqlConn("pvpmo_origine");
                 string Qry = "UPDATE  origine_acs set tabella_sql = '" + tab + "' WHERE id = " + x + ";";
                 SqlSync.SqlQry(StrConnSql, Qry);
@@ -25,10 +25,10 @@
 
             foreach (var n in _inpacsdati.InpAcs)
             {
-                string nomeDbAcs = n.DbInp;
-                string nomeTbAcs = n.Tabella;
-                string nomeDbSql = n.DbDest;
-                string nomeTbSql = n.TabellaSql;
+                string? nomeDbAcs = n.DbInp;
+                string? nomeTbAcs = n.Tabella;
+                string? nomeDbSql = n.DbDest;
+                string? nomeTbSql = n.TabellaSql;
                 await InpAcsDatitoSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, _acsPath);            
             }
         }
@@ -113,7 +113,7 @@
                 for (int x = 1; x < _tabSql.Rows.Count; x++)
                 {
                     int SourceOrdinal = x;
-                    string DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
+                    string? DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
                     SqlAsync.AddMapping(SourceOrdinal, DestinationColumn);
                 }
                 return true;
@@ -124,7 +124,7 @@
                 for (int x = 1; x < _tabSql.Rows.Count; x++)
                 {
                     int SourceOrdinal = x - 1;
-                    string DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
+                    string? DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
                     SqlAsync.AddMapping(SourceOrdinal, DestinationColumn);
                 }
                 return true;
