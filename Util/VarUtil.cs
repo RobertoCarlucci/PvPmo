@@ -1,123 +1,96 @@
-﻿namespace PvPmo.Util
+﻿namespace PvPmo.Util;
+
+public class VarUtil
 {
-    public class VarUtil
+    
+    // Leggo le intestazioni colonna della tabella temp_ e quelle della tabella di
+    // riferimento se il numero non corrisponde esco con errore altrimenti passo le liste.
+    public static string ComparaNomeColonna(string db, string nomeTabella)
     {
-        public static async Task<bool> CreaIdMonthYear(string nomeDbSql, string nomeTbSql, string nomeCol)
-        {
-            string StrConnSql = Conn.MysqlConn(nomeDbSql);
-            string Qry = "UPDATE `" + nomeTbSql + "` SET `" + nomeCol + "` = `Short Name` & Month (date) & YEAR (date);";
-            bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
-            return true;
-        }
-        public static async Task<bool> CreaKeyId(string nomeDbSql, string nomeTbSql, string nomeCol)
-        {
-            string StrConnSql = Conn.MysqlConn(nomeDbSql);
-            string Qry = "UPDATE `pv_total` SET `keyid` = CONCAT_WS(`Organization (OBS)`,`Providing Org#`,`Team (OBS)`,`Competence (Primary Value)`,`Job Location Region`);";
-            bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
-            return true;
-        }
-        public static async Task<bool> CreaDateId(string nomeDbSql, string nomeTbSql, string nomeCol)
-        {
-            string StrConnSql = Conn.MysqlConn(nomeDbSql);
-            string Qry = "UPDATE `" + nomeTbSql + "` SET `" + nomeCol + "` = `Short Name` & Month (date) & YEAR (date);";
-            bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
-            return true;
-        }
-        public static async Task<bool> AddCol(string nomeDbSql, string nomeColonna, string nomeTabella)
-        {
-            string QrySql = "ALTER TABLE ADD ";
-            string StrConnSql = Conn.MysqlConn(nomeDbSql);
-            return true;
-        }
-        // Leggo le intestazioni colonna della tabella temp_ e quelle della tabella di
-        // riferimento se il numero non corrisponde esco con errore altrimenti passo le liste.
-        public static string ComparaNomeColonna(string db, string nomeTabella)
-        {
-            DataTable TabTemp = new DataTable();
-            DataTable TabRif = new DataTable();
+        DataTable TabTemp = new DataTable();
+        DataTable TabRif = new DataTable();
 
-            //ElencoQrySql.NomiColSql(db, "temp_" + nomeTabella, TabTemp);
-            //ElencoQrySql.NomiColSql(db, nomeTabella, TabRif);
-            //// Test numero colonne.
-            //if (TabTemp.Rows.Count < TabRif.Rows.Count)
+        //ElencoQrySql.NomiColSql(db, "temp_" + nomeTabella, TabTemp);
+        //ElencoQrySql.NomiColSql(db, nomeTabella, TabRif);
+        //// Test numero colonne.
+        //if (TabTemp.Rows.Count < TabRif.Rows.Count)
+        //{
+        //    Utilita.MessErr("La tabella importata ha un numero di colonne minore di quella del Db.",
+        //    "Errore importazione Tabelle");
+        //    return "";
+        //}
+        //else if (TabTemp.Rows.Count > TabRif.Rows.Count)
+        //{
+        //    Utilita.MessErr("La tabella del Db ha un numero di colonne minore di quella importata.",
+        //    "Errore importazione Tabelle");
+        //    return "";
+        //}
+
+        List<string> ListaTemp = new List<string>();
+        DataRow[] temp = TabTemp.Select();
+        for (int j = 0; j < temp.Length; j++)
+        {
+            ListaTemp.Add(temp[j]["Field"].ToString());
+        }
+
+        List<string> ListaRif = new List<string>();
+        DataRow[] rif = TabTemp.Select();
+
+        for (int j = 0; j < rif.Length; j++)
+        {
+            ListaRif.Add(rif[j]["Field"].ToString());
+        }
+        string Qqry = AggTabSql(nomeTabella, ListaTemp, ListaRif);
+        return Qqry;
+    }
+    // Creo la Qry per aggiornare la tabella presente nel Db con la tabella Excel temporanea importata nel Db
+    // controllo se l'intestazione colonna corrispondono e più precisamente se la temporanea contiene
+    // il nome di quella di riferimento.
+    public static string AggTabSql(string nomeTab, List<string> temp, List<string> rif)
+    {
+        string Qry = "INSERT INTO `" + nomeTab + "` (";
+        string QryTabRif = "";
+        string QryTabTemp = "";
+        string TempLetto;
+        string RifLetto;
+
+        for (int j = 0; j < temp.Count; j++)
+        {
+            TempLetto = temp[j].ToString();
+            RifLetto = rif[j].ToString();
+            Boolean Contiene = TempLetto.Contains(RifLetto);
+            // Test se input contiene Db
+            if (Contiene == true)
+            {
+                QryTabRif = QryTabRif + "`" + RifLetto + "`, ";
+                QryTabTemp = QryTabTemp + "`temp_" + nomeTab + "`.`" + TempLetto + "`, ";
+            }
+            //else
             //{
-            //    Utilita.MessErr("La tabella importata ha un numero di colonne minore di quella del Db.",
-            //    "Errore importazione Tabelle");
+            //    Utilita.MessErr("La tabella del Db ha il nome colonna: " + RifLetto +
+            //    " non presente in quella imprtata.", "Errore importazione Tabelle");
             //    return "";
             //}
-            //else if (TabTemp.Rows.Count > TabRif.Rows.Count)
-            //{
-            //    Utilita.MessErr("La tabella del Db ha un numero di colonne minore di quella importata.",
-            //    "Errore importazione Tabelle");
-            //    return "";
-            //}
-
-            List<string> ListaTemp = new List<string>();
-            DataRow[] temp = TabTemp.Select();
-            for (int j = 0; j < temp.Length; j++)
-            {
-                ListaTemp.Add(temp[j]["Field"].ToString());
-            }
-
-            List<string> ListaRif = new List<string>();
-            DataRow[] rif = TabTemp.Select();
-
-            for (int j = 0; j < rif.Length; j++)
-            {
-                ListaRif.Add(rif[j]["Field"].ToString());
-            }
-            string Qqry = AggTabSql(nomeTabella, ListaTemp, ListaRif);
-            return Qqry;
         }
-        // Creo la Qry per aggiornare la tabella presente nel Db con la tabella Excel temporanea importata nel Db
-        // controllo se l'intestazione colonna corrispondono e più precisamente se la temporanea contiene
-        // il nome di quella di riferimento.
-        public static string AggTabSql(string nomeTab, List<string> temp, List<string> rif)
+        QryTabRif = QryTabRif.Substring(0, QryTabRif.Length - 2);
+        QryTabTemp = QryTabTemp.Substring(0, QryTabTemp.Length - 2);
+        Qry = Qry + QryTabRif + ") SELECT " + QryTabTemp + " FROM temp_" + nomeTab + ";";
+        return Qry;
+    }
+    public static List<T> ConvDTtoList<T>(DataTable dt) where T : new()
+    {
+        List<T> list = new List<T>();
+        foreach (DataRow row in dt.Rows)
         {
-            string Qry = "INSERT INTO `" + nomeTab + "` (";
-            string QryTabRif = "";
-            string QryTabTemp = "";
-            string TempLetto;
-            string RifLetto;
-
-            for (int j = 0; j < temp.Count; j++)
+            T obj = new T();
+            foreach (DataColumn col in dt.Columns)
             {
-                TempLetto = temp[j].ToString();
-                RifLetto = rif[j].ToString();
-                Boolean Contiene = TempLetto.Contains(RifLetto);
-                // Test se input contiene Db
-                if (Contiene == true)
-                {
-                    QryTabRif = QryTabRif + "`" + RifLetto + "`, ";
-                    QryTabTemp = QryTabTemp + "`temp_" + nomeTab + "`.`" + TempLetto + "`, ";
-                }
-                //else
-                //{
-                //    Utilita.MessErr("La tabella del Db ha il nome colonna: " + RifLetto +
-                //    " non presente in quella imprtata.", "Errore importazione Tabelle");
-                //    return "";
-                //}
+                var prop = obj.GetType().GetProperty(col.ColumnName);                    
+                if (prop != null && row[col] != DBNull.Value)                        
+                    prop.SetValue(obj, row[col]);
             }
-            QryTabRif = QryTabRif.Substring(0, QryTabRif.Length - 2);
-            QryTabTemp = QryTabTemp.Substring(0, QryTabTemp.Length - 2);
-            Qry = Qry + QryTabRif + ") SELECT " + QryTabTemp + " FROM temp_" + nomeTab + ";";
-            return Qry;
+            list.Add(obj);
         }
-        public static List<T> ConvDTtoList<T>(DataTable dt) where T : new()
-        {
-            List<T> list = new List<T>();
-            foreach (DataRow row in dt.Rows)
-            {
-                T obj = new T();
-                foreach (DataColumn col in dt.Columns)
-                {
-                    var prop = obj.GetType().GetProperty(col.ColumnName);                    
-                    if (prop != null && row[col] != DBNull.Value)                        
-                        prop.SetValue(obj, row[col]);
-                }
-                list.Add(obj);
-            }
-            return list;
-        }
+        return list;
     }
 }

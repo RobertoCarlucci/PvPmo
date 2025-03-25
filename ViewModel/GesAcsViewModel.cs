@@ -39,7 +39,7 @@ namespace PvPmo.ViewModel
             DataTable dt = new DataTable();
             string _exlPath = await SelCart.PickFolderStatic(default);
             ExportDt.LoadDt(dt);
-            ExportDt.ExportDataSet(dt, _exlPath);
+            //ExportDt.ExportDataSet(dt, _exlPath);
             await Shell.Current.DisplayAlert
                 ("Hai esportato il file !",
                 $"Esportazione de dati completata .", "Ok");

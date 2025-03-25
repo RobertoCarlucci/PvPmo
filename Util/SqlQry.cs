@@ -1,80 +1,56 @@
-﻿using PvPmo.GestDb;
+﻿namespace PvPmo.Util;
 
-namespace PvPmo.Util
+public class SqlQry
 {
-    public class SqlQry
-    {
-        public static Boolean NoQrySql(string nomeDb, string qry)
-        {
-            string StrConn = Conn.MysqlConn(nomeDb);
-            Boolean Bol = SqlSync.SqlNoQry(qry, StrConn);
-            return Bol;
-        }
-        public static async Task<bool> RunBulk(string nomeDb, string tabMod, DataTable tabBulk)
-        {
-            string StrConn = Conn.MysqlConn(nomeDb);
-            //string Tab = tabella;
-            Boolean Bol = await SqlAsync.SqlBulkCopy(tabMod, StrConn, tabBulk);
-            return Bol;
-        }
-        public static Boolean DelTabSql(string nomeDb, string tabella)
-        {
-            string StrConn = Conn.MysqlConn(nomeDb);
-            string qry = "DROP TABLE IF EXISTS " + tabella + ";";
-            Boolean Bol = SqlSync.SqlNoQry(qry, StrConn);
-            return Bol;
-        }
-        public static Boolean DelRecSql(string nomeDb, string tabella)
-        {
-            string StrConn = Conn.MysqlConn(nomeDb);
-            string qry = "DELETE FROM " + tabella + ";";
-            Boolean Bol = SqlSync.SqlNoQry(qry, StrConn);
-            return Bol;
-        }
-        public static async Task<Boolean> AddColSql(string nomeDb, string tabella, string nuovaCol)
-        {
-            string StrConn = Conn.MysqlConn(nomeDb);
-            string qry = "ALTER TABLE `" + tabella + "` ADD COLUMN `" + nuovaCol + "`;";
-            Boolean Bol = await SqlAsync.SqlNoQry(qry, StrConn);
-            return Bol;
-        }
-        public static async Task<Boolean> DelColSql(string nomeDb, string tabella, string nomeCol)
-        {
-            string StrConn = Conn.MysqlConn(nomeDb);
-            string qry = "ALTER TABLE `" + tabella + "` DROP IF EXISTS `" + nomeCol + "`;";
-            Boolean Bol = await SqlAsync.SqlNoQry(qry, StrConn);
-            return Bol;
-        }
-        public static async Task<DataTable> UpdTabSql(string nomeDb, string tabQry, DataTable tabella)
-        {
-            string StrConn = Conn.MysqlConn(nomeDb);
-            string qry = "UPDATE `" + tabQry + "` SET *;";
-            await SqlAsync.SqlQryDataTable(StrConn, qry, tabella);
-            return tabella;       }
-        public static async Task<DataTable> NomiColSql(string nomeDb, string tabQry, DataTable tabella)
-        {
-            string StrConn = Conn.MysqlConn(nomeDb);
-            string qry = "SHOW COLUMNS FROM `" + tabQry + "`; ";
-            await SqlAsync.SqlQryDataTable(StrConn, qry, tabella);
-            return tabella;
-        }
-        //public static int EseguiQrySql(string nomeDb, string qry)
-        //{
-        //    string StrConn = Conn.MysqlConn(nomeDb);
-        //    int Num = ConnDb.ConnSql.EseguiQry(qry, StrConn);
-        //    return Num;
-        //}
-        //public static int EseguiQrySql(string nomeDb, string qry, DataTable tabImp)
-        //{
-        //    string StrConn = Conn.MysqlConn(nomeDb);
-        //    int Num = ConnDb.ConnSql.EseguiQry(qry, StrConn, tabImp);
-        //    return Num;
-        //}
-        //public static int EseguiQrySqlParam(string nomeDb, string qry, DataTable tabImp)
-        //{
-        //    string StrConn = Conn.MysqlConn(nomeDb);
-        //    int Num = ConnDb.ConnSql.EseguiQryParam(qry, StrConn, tabImp);
-        //    return Num;
-        //}
+    public static async Task<bool> CreaIdMonthYear(string StrConnSql, string nomeTbSql, string nomeCol, string concatString)
+    {        
+        string QrySql = "UPDATE `" + nomeTbSql + "` SET `" + nomeCol + "` = CONCAT(" + concatString + ");";
+        bool Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);
+        return Bol;
     }
+    public static async Task<bool> CreaKeyId(string StrConnSql, string nomeTbSql, string nomeCol, string concatString)
+    {        
+        string QrySql = "UPDATE `" + nomeTbSql + "` SET " + nomeCol + " = CONCAT(" + concatString + ");";
+        bool Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);
+        return Bol;
+    }
+    public static async Task<bool> CreaDateId(string StrConnSql, string nomeTbSql, string nomeCol, string concatString)
+    {        
+        string QrySql = "UPDATE `" + nomeTbSql + "` SET `" + nomeCol + "` = CONCAT(" + concatString + ");";
+        bool Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);
+        return Bol;
+    }
+    public static async Task<bool> AddColSql(string StrConnSql, string nomeColSql, string nomeTbSql, string sType)
+    {        
+        string QrySql = "ALTER TABLE " + nomeTbSql + " ADD COLUMN `" + nomeColSql + "` " + sType + ";";
+        bool Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);
+        return Bol;
+    }
+    public static async Task<bool> DelColSql(string StrConnSql, string nomeTabSql, string nomeColSql)
+    {
+        string QrySql = "ALTER TABLE `" + nomeTabSql + "` DROP IF EXISTS `" + nomeColSql + "`;";
+        bool Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);
+        return Bol;
+    }
+    public static Boolean DelRecSql(string nomeDb, string tabella)
+    {
+        string StrConn = Conn.MysqlConn(nomeDb);
+        string QrySql = "DELETE FROM " + tabella + ";";
+        Boolean Bol = SqlSync.SqlNoQry(QrySql, StrConn);
+        return Bol;
+    }           
+    public static async Task<bool> RinColSql(string StrConnSql, string nomeTabSql, string oldNomeColSql, string newwNomeColSql, string typeColSql)
+    {        
+        string QrySql = "ALTER TABLE `" + nomeTabSql + "` CHANGE `" + oldNomeColSql + "`" +
+            " `" + newwNomeColSql + "` " + typeColSql + "";
+        bool Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);
+        return Bol;       
+    }
+    public static async Task<DataTable> NomiColSql(string nomeDb, string tabQry, DataTable tabella)
+    {
+        string StrConn = Conn.MysqlConn(nomeDb);
+        string qry = "SHOW COLUMNS FROM `" + tabQry + "`; ";
+        await SqlAsync.SqlQryDataTable(StrConn, qry, tabella);
+        return tabella;
+    }    
 }
