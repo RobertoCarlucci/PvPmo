@@ -19,11 +19,7 @@ public partial class ExltoSql
             string? nomeTdDest = n.tabella_sql;                
             string? exlPath = _exlPath + "\\" + nomeTbExl;
             Bol = await NomeColFileExltoTabSql(nomeFoglio, nomeDbSql, nomeTdDest, exlPath);
-            Bol = await DatiFileExltoTabSql(nomeFoglio, nomeDbSql, nomeTdDest, exlPath);
-            
-            //string QrySql = "SHOW COLUMNS FROM " + nomeTdDest;
-            //DataTable _showcolumn = new DataTable();
-            //await SqlAsync.SqlQryDataTable(StrConnSql, QrySql, _showcolumn);
+            Bol = await DatiFileExltoTabSql(nomeFoglio, nomeDbSql, nomeTdDest, exlPath);            
         }
         Bol = await NormTabImp();
     }
@@ -51,10 +47,8 @@ public partial class ExltoSql
                     case "timesheet_information_by_month":
                         Bol = await TimesheetInformationbyMonthUptd(_db, _tabella, _colonna, _azione);
                         break;
-                }
-                if (Bol == true) { return true; }
-            }
-            return Bol;
+                }                
+            }            
         }
         return Bol;
     }
@@ -87,7 +81,7 @@ public partial class ExltoSql
         {
             switch (nomeColSql)
             {
-                case "DateID":
+                case "dateid":
                     Bol = await SqlQry.AddColSql(StrConnSql, nomeColSql, nomeTabSql, "nvarchar(50)");
                     string concat = "'01', LPAD(`Timesheet_Month`,2,0), `Timesheet_Year`";
                     Bol = await SqlQry.CreaDateId(StrConnSql, nomeTabSql, nomeColSql, concat);
@@ -139,14 +133,16 @@ public partial class ExltoSql
         return Bol;
     }
     // Creo le tabelle nel Db Sql per importare i dati dai file Excel.
-    public static async Task<bool> NomeColFileExltoTabSql(string nomeFoglio, string nomeDbSql, string nomeTbSql, string exlPath)
+    public static async Task<bool> NomeColFileExltoTabSql(string nomeFoglioExl, string nomeDbSql, string nomeTbSql, string exlPath)
     {
-        DataTable _tabella = new DataTable();
+        DataTable _tabellaExl = new DataTable();
+        //DataTable _tabellaSql = new DataTable();
         string StrConnExl = Conn.ExlFileConn(exlPath);
-        string QryExl = "SELECT * FROM [" + nomeFoglio + "$] WHERE 1=0;";
-        bool Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabella);
-        string QrySql = InpExl(nomeTbSql, _tabella);
         string StrConnSql = Conn.MysqlConn(nomeDbSql);
+        string QryExl = "SELECT * FROM [" + nomeFoglioExl + "$] WHERE 1=0;";        
+        //_tabellaSql = await SqlQry.NomiColSql(StrConnSql, nomeTbSql, _tabellaSql);
+        bool Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabellaExl);
+        string QrySql = InpExl(nomeTbSql, _tabellaExl);        
         QrySql = "CREATE OR REPLACE TABLE " + QrySql;
         Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);                        
         return true;

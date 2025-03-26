@@ -1,69 +1,68 @@
 ﻿namespace PvPmo.Util;
 
 public class VarUtil
-{
-    
+{    
     // Leggo le intestazioni colonna della tabella temp_ e quelle della tabella di
     // riferimento se il numero non corrisponde esco con errore altrimenti passo le liste.
-    public static string ComparaNomeColonna(string db, string nomeTabella)
+    public static string ComparaNomeColonna(string nomeTabella, DataTable _tabellaExl, DataTable _tabellaSql)
     {
-        DataTable TabTemp = new DataTable();
-        DataTable TabRif = new DataTable();
+        //Table _tabellaExl = new DataTable();
+        //DataTable TabRif = new DataTable();
 
         //ElencoQrySql.NomiColSql(db, "temp_" + nomeTabella, TabTemp);
         //ElencoQrySql.NomiColSql(db, nomeTabella, TabRif);
-        //// Test numero colonne.
-        //if (TabTemp.Rows.Count < TabRif.Rows.Count)
-        //{
-        //    Utilita.MessErr("La tabella importata ha un numero di colonne minore di quella del Db.",
-        //    "Errore importazione Tabelle");
-        //    return "";
-        //}
-        //else if (TabTemp.Rows.Count > TabRif.Rows.Count)
-        //{
-        //    Utilita.MessErr("La tabella del Db ha un numero di colonne minore di quella importata.",
-        //    "Errore importazione Tabelle");
-        //    return "";
-        //}
-
-        List<string> ListaTemp = new List<string>();
-        DataRow[] temp = TabTemp.Select();
-        for (int j = 0; j < temp.Length; j++)
+        // Test numero colonne.
+        if (_tabellaExl.Rows.Count < _tabellaSql.Rows.Count)
         {
-            ListaTemp.Add(temp[j]["Field"].ToString());
+            //Utilita.MessErr("La tabella importata ha un numero di colonne minore di quella del Db.",
+            //"Errore importazione Tabelle");
+            //return "";
+        }
+        else if (_tabellaExl.Rows.Count > _tabellaSql.Rows.Count)
+        {
+            //Utilita.MessErr("La tabella del Db ha un numero di colonne minore di quella importata.",
+            //"Errore importazione Tabelle");
+            //return "";
         }
 
-        List<string> ListaRif = new List<string>();
-        DataRow[] rif = TabTemp.Select();
-
-        for (int j = 0; j < rif.Length; j++)
+        List<string> ListaExl = new List<string>();
+        DataRow[] exl = _tabellaExl.Select();
+        for (int j = 0; j < exl.Length; j++)
         {
-            ListaRif.Add(rif[j]["Field"].ToString());
+            ListaExl.Add(exl[j]["Field"].ToString());
         }
-        string Qqry = AggTabSql(nomeTabella, ListaTemp, ListaRif);
+
+        List<string> ListaSql = new List<string>();
+        DataRow[] sql = _tabellaSql.Select();
+
+        for (int j = 0; j < sql.Length; j++)
+        {
+            ListaSql.Add(sql[j]["Field"].ToString());
+        }
+        string Qqry = AggTabSql(nomeTabella, ListaExl, ListaSql);
         return Qqry;
     }
-    // Creo la Qry per aggiornare la tabella presente nel Db con la tabella Excel temporanea importata nel Db
-    // controllo se l'intestazione colonna corrispondono e più precisamente se la temporanea contiene
-    // il nome di quella di riferimento.
-    public static string AggTabSql(string nomeTab, List<string> temp, List<string> rif)
+    // Creo la Qry per aggiornare la tabella presente nel Db con la tabella Excel temporanea
+    // importata nel Db controllo se l'intestazione colonna corrispondono e più
+    // precisamente se la temporanea contiene il nome di quella di riferimento.
+    public static string AggTabSql(string nomeTab, List<string> listaExl, List<string> listaSql)
     {
         string Qry = "INSERT INTO `" + nomeTab + "` (";
         string QryTabRif = "";
         string QryTabTemp = "";
-        string TempLetto;
-        string RifLetto;
+        string exlLetto;
+        string sqlLetto;
 
-        for (int j = 0; j < temp.Count; j++)
+        for (int j = 0; j < listaExl.Count; j++)
         {
-            TempLetto = temp[j].ToString();
-            RifLetto = rif[j].ToString();
-            Boolean Contiene = TempLetto.Contains(RifLetto);
+            exlLetto = listaExl[j].ToString();
+            sqlLetto = listaSql[j].ToString();
+            Boolean Contiene = exlLetto.Contains(sqlLetto);
             // Test se input contiene Db
             if (Contiene == true)
             {
-                QryTabRif = QryTabRif + "`" + RifLetto + "`, ";
-                QryTabTemp = QryTabTemp + "`temp_" + nomeTab + "`.`" + TempLetto + "`, ";
+                QryTabRif = QryTabRif + "`" + sqlLetto + "`, ";
+                QryTabTemp = QryTabTemp + "`temp_" + nomeTab + "`.`" + exlLetto + "`, ";
             }
             //else
             //{

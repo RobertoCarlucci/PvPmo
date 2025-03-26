@@ -46,11 +46,10 @@ public class SqlQry
         bool Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);
         return Bol;       
     }
-    public static async Task<DataTable> NomiColSql(string nomeDb, string tabQry, DataTable tabella)
-    {
-        string StrConn = Conn.MysqlConn(nomeDb);
-        string qry = "SHOW COLUMNS FROM `" + tabQry + "`; ";
-        await SqlAsync.SqlQryDataTable(StrConn, qry, tabella);
+    public static async Task<DataTable> NomiColSql(string StrConnSql, string nomeTbSql, DataTable tabella)
+    {        
+        string qry = "SHOW COLUMNS FROM `" + nomeTbSql + "`; ";
+        await SqlAsync.SqlQryDataTable(StrConnSql, qry, tabella);
         return tabella;
     }    
 }
