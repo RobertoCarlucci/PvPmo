@@ -1,25 +1,25 @@
-﻿namespace PvPmo.Model
+﻿namespace PvPmo.UpdateDb
 {
-    public class FileExl
+    public class LeggiTabDbFileExlImp
     {        
         public string? tabella { get; set; }
         public string? WorkSheet { get; set; }
         public string? db_dest { get; set; }
         public string? tabella_sql { get; set; }        
     }
-    public interface IFileExl
+    public interface ILeggiTabDbFileExlImp
     {
-        IList<FileExl> FileExl { get; }
+        IList<LeggiTabDbFileExlImp> LeggiTabDbFileExlImp { get; }
     }
-    public class ImpExlService : IFileExl
+    public class LeggiTabDbFileExlImpService : ILeggiTabDbFileExlImp
     {
-        private List<FileExl> _inpuexl;
+        private List<LeggiTabDbFileExlImp> _leggitabdbfileexlimp;
 
-        public ImpExlService() 
+        public LeggiTabDbFileExlImpService() 
         {
 
             DataTable _elencoInp = new DataTable();
-            _inpuexl = new List<FileExl>();
+            _leggitabdbfileexlimp = new List<LeggiTabDbFileExlImp>();
 
             string StrConn = Conn.MysqlConn("pvpmo_origine");
             string Qry = "SELECT * From origine_update;";
@@ -27,7 +27,7 @@
             DataRow[] temp = _elencoInp.Select();
             foreach (DataRow v in temp)
             {
-                _inpuexl.Add(new FileExl()
+                _leggitabdbfileexlimp.Add(new LeggiTabDbFileExlImp()
                 {
                     tabella = v["tabella"].ToString(),
                     WorkSheet = v["WorkSheet"].ToString(),
@@ -37,6 +37,6 @@
             }
 
         }
-        public IList<FileExl> FileExl => _inpuexl;
+        public IList<LeggiTabDbFileExlImp> LeggiTabDbFileExlImp => _leggitabdbfileexlimp;
     }    
 }

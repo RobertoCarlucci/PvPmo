@@ -1,39 +1,41 @@
-﻿namespace PvPmo.ImportDb
+﻿using PvPmo.Service;
+
+namespace PvPmo.UpdateDb
 {
-    public partial class NormTabImp
+    public partial class NormTabExl
     {
-        public static async Task<bool> NormTabImportate()
+        public static async Task<bool> NormTabImp()
         {
-            NormImpService _normimp = new NormImpService();
-            //string _db = "";
+            LeggiTabDbNormExlService _normimp = new LeggiTabDbNormExlService();
             bool Bol = false;
-            foreach (var n in _normimp.NormImp)
+            foreach (var n in _normimp.LeggiTabDbNormExl)
             {
                 string? _colonna = n.Colonna;
                 string? _azione = n.Azione;
                 string? _tabella = n.Tabella;
                 string? _db = n.Dbdest;
-                if (_tabella is not null && _db == "pmo")
+                string? _inptype = n.InpType;
+                if (_tabella is not null && _inptype == "EXL")
                 {
                     switch (_tabella)
                     {
                         case "pv_total":
-                            Bol = await PvTotal(_db, _tabella, _colonna, _azione);
+                            Bol = await PvTotalUptd(_db, _tabella, _colonna, _azione);
                             break;
                         case "global_timesheet_extract":
-                            Bol = await GlobalTimesExtr(_db, _tabella, _colonna, _azione);
+                            Bol = await GlobalTimesExtrUptd(_db, _tabella, _colonna, _azione);
                             break;
                         case "timesheet_information_by_month":
-                            Bol = await TimesheetInformationbyMonth(_db, _tabella, _colonna, _azione);
+                            Bol = await TimesheetInformationbyMonthUptd(_db, _tabella, _colonna, _azione);
                             break;
                     }
-                    if (Bol == true) { return true; }
                 }
-                return Bol;
             }
             return Bol;
         }
-        public static async Task<bool> TimesheetInformationbyMonth(string nomeDbSql, string nomeTabSql, string nomeColSql, string azione)
+        // Se il File è Timesheet Information by Month aggiungo la colonna necessaria
+        // e popolo la stessa con i dati attraverso le opportune query.
+        public static async Task<bool> TimesheetInformationbyMonthUptd(string nomeDbSql, string nomeTabSql, string nomeColSql, string azione)
         {
             string StrConnSql = Conn.MysqlConn(nomeDbSql);
             bool Bol = false;
@@ -52,7 +54,7 @@
         }
         // Se il File è Global Timesheer Extract aggiungo le colonne necessarie e popolo 
         // le stesse con i dati attraverso le opportune query.
-        public static async Task<bool> GlobalTimesExtr(string nomeDbSql, string nomeTabSql, string nomeColSql, string azione)
+        public static async Task<bool> GlobalTimesExtrUptd(string nomeDbSql, string nomeTabSql, string nomeColSql, string azione)
         {
             string StrConnSql = Conn.MysqlConn(nomeDbSql);
             bool Bol = false;
@@ -60,7 +62,7 @@
             {
                 switch (nomeColSql)
                 {
-                    case "DateID":
+                    case "dateid":
                         Bol = await SqlQry.AddColSql(StrConnSql, nomeColSql, nomeTabSql, "nvarchar(50)");
                         string concat = "'01', LPAD(`Timesheet_Month`,2,0), `Timesheet_Year`";
                         Bol = await SqlQry.CreaDateId(StrConnSql, nomeTabSql, nomeColSql, concat);
@@ -82,7 +84,7 @@
         // Se il File è PV_Total aggiungo le colonne necessarie e popolo 
         // le stesse con i dati attraverso le opportune query, imoltre rimuovo
         // le collonne che non vengono utilizzate.
-        public static async Task<bool> PvTotal(string nomeDbSql, string nomeTabSql, string nomeColSql, string azione)
+        public static async Task<bool> PvTotalUptd(string nomeDbSql, string nomeTabSql, string nomeColSql, string azione)
         {
             string StrConnSql = Conn.MysqlConn(nomeDbSql);
             bool Bol = false;

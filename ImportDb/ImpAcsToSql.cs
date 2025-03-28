@@ -1,29 +1,38 @@
-﻿namespace PvPmo.ImportDb;
+﻿using PvPmo.Service;
 
-public partial class AcsToSql
+namespace PvPmo.ImportDb;
+
+public partial class ImpAcsToSql
 {
     //Importazione dei due Db Access con i loro dati.
     public static async Task NewDb()
     {
         // Apro una finestra di sistema x la selezione della cartella di importazione.
         string _acsPath = await SelCart.PickFolderStatic(default);
-        TabAcsService _inpacs = new TabAcsService();
+        LeggiTabDbOrigineService _inpdbacs = new LeggiTabDbOrigineService();
         int x = 1;
 
-        foreach (var n in _inpacs.InpAcs)
+        foreach (var n in _inpdbacs.LeggiTabDbOrigine)
         {                
             string? nomeDbAcs = n.DbInp;
-            string? nomeTbAcs = n.Tabella;
+            string? nomeTb = n.Tabella;
             string? nomeDbSql = n.DbDest;
-            string? tab = await TabAcstoTabSql(nomeDbAcs, nomeTbAcs, nomeDbSql, _acsPath);                
-            string StrConnSql = Conn.MysqlConn("pvpmo_origine");
-            string Qry = "UPDATE  origine_acs set tabella_sql = '" + tab + "' WHERE id = " + x + ";";
-            SqlSync.SqlQry(StrConnSql, Qry);
-            x++;
+            string? nomeTabSql = n.TabellaSql;
+            string? nomeWorkSheet = n.WorkSheet;
+            string? inpType = n.InpType;
+            if(inpType == "ACS")
+            {
+                bool tab = await TabAcstoTabSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
+                //string StrConnSql = Conn.MysqlConn("pvpmo_origine");
+                //string Qry = "UPDATE  origine_acs set tabella_sql = '" + tab + "' WHERE id = " + x + ";";
+                //SqlSync.SqlQry(StrConnSql, Qry);
+                x++;
+            }
+            
         }
-        TabAcsService _inpacsdati = new TabAcsService();
+        LeggiTabDbOrigineService _inpacsdati = new LeggiTabDbOrigineService();
 
-        foreach (var n in _inpacsdati.InpAcs)
+        foreach (var n in _inpacsdati.LeggiTabDbOrigine)
         {
             string? nomeDbAcs = n.DbInp;
             string? nomeTbAcs = n.Tabella;
@@ -34,18 +43,18 @@ public partial class AcsToSql
     }    
     // Creo le tabelle Sql leggendo i nomi delle tabelle Access e normalizzando le
     // intestazioni delle colonne in modo compatibile con sql.
-    public static async Task<string> TabAcstoTabSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string acsPath)
+    public static async Task<bool> TabAcstoTabSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
     {
         string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
         DataTable _tabella = new DataTable();
         string Qry = "SELECT * FROM [" + nomeTbAcs + "] WHERE 1=0";
         await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
-        string nomeTbNorm = NormNomeTab(nomeTbAcs);
-        Qry = NormInp(nomeTbAcs, nomeTbNorm, _tabella);
+        //string nomeTbNorm = NormNomeTab(nomeTbAcs);
+        Qry = NormInp(nomeTbAcs, nomeTbSql, _tabella);
         Qry = "CREATE OR REPLACE TABLE " +  Qry;            
         string StrConnSql = Conn.MysqlConn(nomeDbSql);
         bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);            
-        return nomeTbNorm;
+        return Bol;
     }
     // Importo i dati all'interno del Db andando a popolare con i valori le tabelle
     // colonne precedentemente create.
@@ -60,33 +69,11 @@ public partial class AcsToSql
             await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
             string StrConnSql = Conn.MysqlConn(nomeDbSql);
             await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella);
-            await AggiungiCol(nomeDbSql, nomeTbSql);
+            //await AggiungiCol(nomeDbSql, nomeTbSql);
         }
         return Bol;            
     }
-    public static async Task<bool> AggiungiCol(string nomeDbSql, string nomeTbSql)
-    {
-        string StrConnSql = Conn.MysqlConn(nomeDbSql);
-        string Qry = "";
-        bool Bol = true;
-
-        switch (nomeTbSql)
-        {
-            case "pv_total":
-                Qry = "DELETE FROM `pv_total`WHERE `Resource Name` = 'Farneti Thomas Old';";
-                Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
-                Qry = "ALTER TABLE `" + nomeTbSql + "` ADD COLUMN `id_month_year` nvarchar(50);";
-                Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
-                Qry = "ALTER TABLE `" + nomeTbSql + "` ADD COLUMN `keyid` nvarchar(50);";
-                Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
-                break;
-            case "global_timesheet_extract":
-                
-                break;
-        }
-
-        return false;
-    }
+    
     // Vengono lette le intestazioni delle colonne Access e Sql per creare il mapping
     // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
     // AddMapping all'interno della cartella GestDb classe gestione Sql.
@@ -146,12 +133,12 @@ public partial class AcsToSql
     }
     // Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
     // Si procede anche alla normalizzazione dei nomi colonna.
-    public static string NormInp(string nomeTabDb, string nomeTabNorm, DataTable tabData)
+    public static string NormInp(string nomeTabNorm, string nomeTbSql, DataTable tabData)
     {
         // Chiamata alla funzione di normalizzazione nome tabella.
-        nomeTabDb = nomeTabNorm;
+        string nomeTabDb = nomeTabNorm;
 
-        string Qry = nomeTabDb + " (";
+        string Qry = nomeTbSql + " (";
         int x = 0;
         int i = tabData.Columns.Count - 1;
 
@@ -250,47 +237,70 @@ public partial class AcsToSql
         return Qry;
     }
     // Vengono normalizzati i nomi delle Tabelle Sql.
-    public static string NormNomeTab(string nomeTab)
-    {
-        switch (nomeTab)
-        {
-            case "01_TabellaData":
-                nomeTab = "tabella_data";
-                break;
-            case "All Project Mapped - Power BI Column Set":
-                nomeTab = "all_project_mapped_power_bi_column_set";
-                break;
-            case "PBX_ AllProjectMappedPowerBIColumnSet":
-                nomeTab = "pbx_all_project_mapped_power_bi_column_set";
-                break;
-            case "Resource Type":
-                nomeTab = "resource_type";
-                break;
-            case "ScenarioRestoAnno":
-                nomeTab = "scenario_resto_anno";
-                break;
-            case "Standard Activities":
-                nomeTab = "standard_activities";
-                break;
-            case "Timesheet Information By Month":
-                nomeTab = "timesheet_information_by_month";
-                break;
-            case "Working Hours by Day":
-                nomeTab = "working_hours_by_day";
-                break;
-            case "GlobalTimesheetExtract":
-                nomeTab = "global_timesheet_extract";
-                break;
-            case "Key":
-                nomeTab = "key_global";
-                break;
-            case "PBX_TimesheetInformationByMonth":
-                nomeTab = "pbx_timesheet_information_by_month";
-                break;                
-            case "pv_total_outsoremese":
-                nomeTab = "pv_total_outs_ore_mese";
-                break;
-        }
-        return nomeTab;
-    }
+    //public static string NormNomeTab(string nomeTab)
+    //{
+    //    switch (nomeTab)
+    //    {
+    //        case "01_TabellaData":
+    //            nomeTab = "tabella_data";
+    //            break;
+    //        case "All Project Mapped - Power BI Column Set":
+    //            nomeTab = "all_project_mapped_power_bi_column_set";
+    //            break;
+    //        case "PBX_ AllProjectMappedPowerBIColumnSet":
+    //            nomeTab = "pbx_all_project_mapped_power_bi_column_set";
+    //            break;
+    //        case "Resource Type":
+    //            nomeTab = "resource_type";
+    //            break;
+    //        case "ScenarioRestoAnno":
+    //            nomeTab = "scenario_resto_anno";
+    //            break;
+    //        case "Standard Activities":
+    //            nomeTab = "standard_activities";
+    //            break;
+    //        case "Timesheet Information By Month":
+    //            nomeTab = "timesheet_information_by_month";
+    //            break;
+    //        case "Working Hours by Day":
+    //            nomeTab = "working_hours_by_day";
+    //            break;
+    //        case "GlobalTimesheetExtract":
+    //            nomeTab = "global_timesheet_extract";
+    //            break;
+    //        case "Key":
+    //            nomeTab = "key_global";
+    //            break;
+    //        case "PBX_TimesheetInformationByMonth":
+    //            nomeTab = "pbx_timesheet_information_by_month";
+    //            break;                
+    //        case "pv_total_outsoremese":
+    //            nomeTab = "pv_total_outs_ore_mese";
+    //            break;
+    //    }
+    //    return nomeTab;
+    //}
+    //public static async Task<bool> AggiungiCol(string nomeDbSql, string nomeTbSql)
+    //{
+    //    string StrConnSql = Conn.MysqlConn(nomeDbSql);
+    //    string Qry = "";
+    //    bool Bol = true;
+
+    //    switch (nomeTbSql)
+    //    {
+    //        case "pv_total":
+    //            Qry = "DELETE FROM `pv_total`WHERE `Resource Name` = 'Farneti Thomas Old';";
+    //            Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+    //            Qry = "ALTER TABLE `" + nomeTbSql + "` ADD COLUMN `id_month_year` nvarchar(50);";
+    //            Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+    //            Qry = "ALTER TABLE `" + nomeTbSql + "` ADD COLUMN `keyid` nvarchar(50);";
+    //            Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+    //            break;
+    //        case "global_timesheet_extract":
+
+    //            break;
+    //    }
+
+    //    return false;
+    //}
 }
