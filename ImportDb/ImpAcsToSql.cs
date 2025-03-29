@@ -9,8 +9,7 @@ public partial class ImpAcsToSql
     {
         // Apro una finestra di sistema x la selezione della cartella di importazione.
         string _acsPath = await SelCart.PickFolderStatic(default);
-        LeggiTabDbOrigineService _inpdbacs = new LeggiTabDbOrigineService();
-        int x = 1;
+        LeggiTabDbOrigineService _inpdbacs = new LeggiTabDbOrigineService();        
 
         foreach (var n in _inpdbacs.LeggiTabDbOrigine)
         {                
@@ -23,23 +22,9 @@ public partial class ImpAcsToSql
             if(inpType == "ACS")
             {
                 bool tab = await TabAcstoTabSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
-                //string StrConnSql = Conn.MysqlConn("pvpmo_origine");
-                //string Qry = "UPDATE  origine_acs set tabella_sql = '" + tab + "' WHERE id = " + x + ";";
-                //SqlSync.SqlQry(StrConnSql, Qry);
-                x++;
-            }
-            
-        }
-        LeggiTabDbOrigineService _inpacsdati = new LeggiTabDbOrigineService();
-
-        foreach (var n in _inpacsdati.LeggiTabDbOrigine)
-        {
-            string? nomeDbAcs = n.DbInp;
-            string? nomeTbAcs = n.Tabella;
-            string? nomeDbSql = n.DbDest;
-            string? nomeTbSql = n.TabellaSql;
-            await InpAcsDatitoSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, _acsPath);            
-        }
+                tab = await InpAcsDatitoSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);                
+            }            
+        }        
     }    
     // Creo le tabelle Sql leggendo i nomi delle tabelle Access e normalizzando le
     // intestazioni delle colonne in modo compatibile con sql.
@@ -48,8 +33,7 @@ public partial class ImpAcsToSql
         string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
         DataTable _tabella = new DataTable();
         string Qry = "SELECT * FROM [" + nomeTbAcs + "] WHERE 1=0";
-        await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
-        //string nomeTbNorm = NormNomeTab(nomeTbAcs);
+        await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);        
         Qry = NormInp(nomeTbAcs, nomeTbSql, _tabella);
         Qry = "CREATE OR REPLACE TABLE " +  Qry;            
         string StrConnSql = Conn.MysqlConn(nomeDbSql);

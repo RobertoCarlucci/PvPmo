@@ -1,4 +1,6 @@
-﻿namespace PvPmo.UpdateDb;
+﻿using PvPmo.Service;
+
+namespace PvPmo.UpdateDb;
 
 public partial class ExltoSql
 {
@@ -8,18 +10,23 @@ public partial class ExltoSql
     {
         // Apro una finestra di sistema x la selezione della cartella di importazione.
         string _exlPath = await SelCart.PickFolderStatic(default);
-        LeggiTabDbFileExlImpService _inpexl = new LeggiTabDbFileExlImpService();            
+        LeggiTabDbOrigineService _leggitabdborigine = new LeggiTabDbOrigineService();
         bool Bol = false;
 
-        foreach (var n in _inpexl.LeggiTabDbFileExlImp)
-        {                
-            string? nomeFoglio = n.WorkSheet;
-            string? nomeTbExl = n.tabella;
-            string? nomeDbSql = n.db_dest;
-            string? nomeTdDest = n.tabella_sql;                
-            string? exlPath = _exlPath + "\\" + nomeTbExl;
-            Bol = await NomeColFileExltoTabSql(nomeFoglio, nomeDbSql, nomeTdDest, exlPath);
-            Bol = await DatiFileExltoTabSql(nomeFoglio, nomeDbSql, nomeTdDest, exlPath);            
+        foreach (var n in _leggitabdborigine.LeggiTabDbOrigine)
+        {
+            string? nomeDbAcs = n.DbInp;
+            string? nomeTb = n.Tabella;
+            string? nomeDbSql = n.DbDest;
+            string? nomeTabSql = n.TabellaSql;
+            string? nomeWorkSheet = n.WorkSheet;
+            string? inpType = n.InpType;
+            if (inpType == "EXL")
+            {
+                string? exlPath = _exlPath + "\\" + nomeTb;
+                Bol = await NomeColFileExltoTabSql(nomeWorkSheet, nomeDbSql, nomeTabSql, exlPath);
+                Bol = await DatiFileExltoTabSql(nomeWorkSheet, nomeDbSql, nomeTabSql, exlPath);
+            }                        
         }
         Bol= await NormTabExl.NormTabImp();
     }
