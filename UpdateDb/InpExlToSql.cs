@@ -2,7 +2,7 @@
 
 namespace PvPmo.UpdateDb;
 
-public partial class ExltoSql
+public partial class InpExlToSql
 {
     //Importo i File Excel per l'aggiornamento mensile.
     
@@ -10,10 +10,10 @@ public partial class ExltoSql
     {
         // Apro una finestra di sistema x la selezione della cartella di importazione.
         string _exlPath = await SelCart.PickFolderStatic(default);
-        LeggiTabDbOrigineService _leggitabdborigine = new LeggiTabDbOrigineService();
+        CaricaTabOriginiService _leggitabdborigine = new CaricaTabOriginiService();
         bool Bol = false;
 
-        foreach (var n in _leggitabdborigine.LeggiTabDbOrigine)
+        foreach (var n in _leggitabdborigine.CaricaTabOrigini)
         {
             string? nomeDbAcs = n.DbInp;
             string? nomeTb = n.Tabella;
@@ -28,7 +28,7 @@ public partial class ExltoSql
                 Bol = await DatiFileExltoTabSql(nomeWorkSheet, nomeDbSql, nomeTabSql, exlPath);
             }                        
         }
-        Bol= await NormTabExl.NormTabImp();
+        Bol= await NormTab.NormTabImp();
     }
     
     // Creo le tabelle nel Db Sql per importare i dati dai file Excel.

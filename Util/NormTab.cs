@@ -1,38 +1,92 @@
 ﻿using PvPmo.Service;
 
-namespace PvPmo.UpdateDb
+namespace PvPmo.Util
 {
-    public partial class NormTabExl
+    public partial class NormTab
     {
         public static async Task<bool> NormTabImp()
         {
-            LeggiTabDbNormExlService _normimp = new LeggiTabDbNormExlService();
+            CaricaTabNormService _caricatabnorm = new CaricaTabNormService();
             bool Bol = false;
-            foreach (var n in _normimp.LeggiTabDbNormExl)
+            foreach (var n in _caricatabnorm.CaricaTabNorm)
             {
                 string? _colonna = n.Colonna;
                 string? _azione = n.Azione;
                 string? _tabella = n.Tabella;
                 string? _db = n.Dbdest;
                 string? _inptype = n.InpType;
-                if (_tabella is not null && _inptype == "EXL")
+                if (_inptype == "EXL")
                 {
-                    switch (_tabella)
+                    switch (_azione)
                     {
-                        case "pv_total":
-                            Bol = await PvTotalUptd(_db, _tabella, _colonna, _azione);
+                        case "DEL":
+                            string StrConnSql = Conn.MysqlConn(_db);
+                            Bol = await SqlQry.DelColSql(StrConnSql, _tabella, _colonna);
                             break;
-                        case "global_timesheet_extract":
-                            Bol = await GlobalTimesExtrUptd(_db, _tabella, _colonna, _azione);
+                        case "ADD":
+                            Bol = await AddMod(_db, _tabella, _colonna);
                             break;
                         case "timesheet_information_by_month":
-                            Bol = await TimesheetInformationbyMonthUptd(_db, _tabella, _colonna, _azione);
+                            Bol = await TimesheetInformationbyMonthUptd(_db, _tabella, _colonna);
                             break;
                     }
                 }
             }
             return Bol;
         }
+        public static async Task<bool> AddMod(string nomeDbSql, string nomeTabSql, string nomeColSql)
+        {
+            string StrConnSql = Conn.MysqlConn(nomeDbSql);
+            bool Bol = false;
+
+            switch (nomeTabSql, nomeColSql)
+            {
+                case ("global_timesheet_extract" , "pvpmo_origine"):
+
+                    switch (nomeColSql)
+                    {
+                        case "dateid":
+                            Bol = await SqlQry.AddColSql(StrConnSql, nomeColSql, nomeTabSql, "nvarchar(50)");
+                            string concat = "'01', LPAD(`Timesheet_Month`,2,0), `Timesheet_Year`";
+                            Bol = await SqlQry.CreaDateId(StrConnSql, nomeTabSql, nomeColSql, concat);
+                            break;
+                        case "id_month_year":
+                            Bol = await SqlQry.AddColSql(StrConnSql, nomeColSql, nomeTabSql, "nvarchar(50)");
+                            concat = "`GEC`, LPAD(`Timesheet_Month`,2,0), `Timesheet_Year`";
+                            Bol = await SqlQry.CreaIdMonthYear(StrConnSql, nomeTabSql, nomeColSql, concat);
+                            break;
+                        case "keyid":
+                            Bol = await SqlQry.AddColSql(StrConnSql, nomeColSql, nomeTabSql, "nvarchar(100)");
+                            concat = "`Organization`,`Providing_Org`,`Team`,`Competence`,`Location_Region`";
+                            Bol = await SqlQry.CreaKeyId(StrConnSql, nomeTabSql, nomeColSql, concat);
+                            break;
+                    }
+                    break;
+            }
+            switch (nomeTabSql, nomeColSql)
+            {
+                case ("global_timesheet_extract", "pmo"):
+
+                    switch (nomeColSql)
+                    {
+                        case "dateid":
+                            string concat = "'01', LPAD(`Timesheet_Month`,2,0), `Timesheet_Year`";
+                            Bol = await SqlQry.CreaDateId(StrConnSql, nomeTabSql, nomeColSql, concat);
+                            break;
+                        case "id_month_year":
+                            concat = "`GEC`, LPAD(`Timesheet_Month`,2,0), `Timesheet_Year`";
+                            Bol = await SqlQry.CreaIdMonthYear(StrConnSql, nomeTabSql, nomeColSql, concat);
+                            break;
+                        case "keyid":
+                            concat = "`Organization`,`Providing_Org`,`Team`,`Competence`,`Location_Region`";
+                            Bol = await SqlQry.CreaKeyId(StrConnSql, nomeTabSql, nomeColSql, concat);
+                            break;
+                    }
+                    break;
+            }
+            return Bol;
+        }
+
         // Se il File è Timesheet Information by Month aggiungo la colonna necessaria
         // e popolo la stessa con i dati attraverso le opportune query.
         public static async Task<bool> TimesheetInformationbyMonthUptd(string nomeDbSql, string nomeTabSql, string nomeColSql, string azione)

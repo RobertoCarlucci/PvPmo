@@ -20,7 +20,7 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            await ImpAcsToSql.NewDb();
+            await InpAcsToSql.NewDb();
 
             await Shell.Current.DisplayAlert
                 ("Hai completato l'importazione dei dati nel Db !",

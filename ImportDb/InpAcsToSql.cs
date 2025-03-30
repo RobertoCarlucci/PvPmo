@@ -2,16 +2,16 @@
 
 namespace PvPmo.ImportDb;
 
-public partial class ImpAcsToSql
+public partial class InpAcsToSql
 {
     //Importazione dei due Db Access con i loro dati.
     public static async Task NewDb()
     {
         // Apro una finestra di sistema x la selezione della cartella di importazione.
         string _acsPath = await SelCart.PickFolderStatic(default);
-        LeggiTabDbOrigineService _inpdbacs = new LeggiTabDbOrigineService();        
+        CaricaTabOriginiService _inpdbacs = new CaricaTabOriginiService();        
 
-        foreach (var n in _inpdbacs.LeggiTabDbOrigine)
+        foreach (var n in _inpdbacs.CaricaTabOrigini)
         {                
             string? nomeDbAcs = n.DbInp;
             string? nomeTb = n.Tabella;

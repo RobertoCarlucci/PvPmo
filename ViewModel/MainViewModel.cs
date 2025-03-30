@@ -49,7 +49,7 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            await UpdateDb.ExltoSql.InpExl();
+            await UpdateDb.InpExlToSql.InpExl();
 
             await Shell.Current.DisplayAlert
                 ("Hai premuto BtnAgDb !", $"Non ci posso credere.", "Ok");

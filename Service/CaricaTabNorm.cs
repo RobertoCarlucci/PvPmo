@@ -1,6 +1,6 @@
 ﻿namespace PvPmo.Service;
 
-public class LeggiTabDbNormExl
+public class CaricaTabNorm
 {
     public string? Colonna { get; set; }
     public string? Azione { get; set; }        
@@ -9,19 +9,19 @@ public class LeggiTabDbNormExl
     public string? InpType { get; set; }
 
 }
-public interface ILeggiTabDbNormExl
+public interface ICaricaTabNorm
 {
-    IList<LeggiTabDbNormExl> LeggiTabDbNormExl { get; }
+    IList<CaricaTabNorm> CaricaTabNorm { get; }
 }
 
-public class LeggiTabDbNormExlService : ILeggiTabDbNormExl
+public class CaricaTabNormService : ICaricaTabNorm
 {
-    private List<LeggiTabDbNormExl> _leggitabdbnormexl;
+    private List<CaricaTabNorm> _caricatabnorm;
 
-    public LeggiTabDbNormExlService()
+    public CaricaTabNormService()
     {
         DataTable _elencoInp = new DataTable();
-        _leggitabdbnormexl = new List<LeggiTabDbNormExl>();
+        _caricatabnorm = new List<CaricaTabNorm>();
 
         string StrConn = Conn.MysqlConn("pvpmo_origine");
         string Qry = "SELECT * From normalizza;";
@@ -29,7 +29,7 @@ public class LeggiTabDbNormExlService : ILeggiTabDbNormExl
         DataRow[] temp = _elencoInp.Select();
         foreach (DataRow v in temp)
         {
-            _leggitabdbnormexl.Add(new LeggiTabDbNormExl()
+            _caricatabnorm.Add(new CaricaTabNorm()
             {
                 Colonna = v["colonna"].ToString(),
                 Azione = v["azione"].ToString(),
@@ -39,5 +39,5 @@ public class LeggiTabDbNormExlService : ILeggiTabDbNormExl
             });
         }
     }
-    public IList<LeggiTabDbNormExl> LeggiTabDbNormExl => _leggitabdbnormexl;
+    public IList<CaricaTabNorm> CaricaTabNorm => _caricatabnorm;
 }

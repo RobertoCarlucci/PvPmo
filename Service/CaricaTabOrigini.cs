@@ -1,6 +1,6 @@
 ﻿namespace PvPmo.Service
 {
-    public class LeggiTabDbOrigine
+    public class CaricaTabOrigini
     {
         public string? DbInp { get; set; }
         public string? Tabella { get; set; }
@@ -9,19 +9,19 @@
         public string? WorkSheet { get; set; }
         public string? InpType { get; set; }
     }
-    public interface ILeggiTabDbOrigine
+    public interface ICaricaTabOrigini
     {
-        IList<LeggiTabDbOrigine> LeggiTabDbOrigine { get; }
+        IList<CaricaTabOrigini> CaricaTabOrigini { get; }
     }
 
-    public class LeggiTabDbOrigineService : ILeggiTabDbOrigine
+    public class CaricaTabOriginiService : ICaricaTabOrigini
     {
-        private List<LeggiTabDbOrigine> _leggitabdborigine;
+        private List<CaricaTabOrigini> _caricataborigini;
 
-        public LeggiTabDbOrigineService()
+        public CaricaTabOriginiService()
         {
             DataTable _elencoInp = new DataTable();
-            _leggitabdborigine = new List<LeggiTabDbOrigine>();
+            _caricataborigini = new List<CaricaTabOrigini>();
 
             string StrConn = Conn.MysqlConn("pvpmo_origine");
             string Qry = "SELECT * From origine;";
@@ -29,7 +29,7 @@
             DataRow[] temp = _elencoInp.Select();
             foreach (DataRow v in temp)
             {
-                _leggitabdborigine.Add(new LeggiTabDbOrigine()
+                _caricataborigini.Add(new CaricaTabOrigini()
                 {
                     DbInp = v["DbInp"].ToString(),
                     Tabella = v["Tabella"].ToString(),
@@ -40,6 +40,6 @@
                 });
             }
         }
-        public IList<LeggiTabDbOrigine> LeggiTabDbOrigine => _leggitabdborigine;
+        public IList<CaricaTabOrigini> CaricaTabOrigini => _caricataborigini;
     }
 }
