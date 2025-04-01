@@ -6,7 +6,7 @@ namespace PvPmo.ViewModel
     {
         public GesAcsViewModel()
         {
-            Title = "Gestione import Access.";
+            Title = "Gestione Db Access.";
         }
 
         [ObservableProperty]
@@ -29,6 +29,25 @@ namespace PvPmo.ViewModel
             IsBusy = false;
             return;
         }
+
+        [RelayCommand]
+        async Task BtnImpSetup()
+        {
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+
+            await InpExlSetup.NewSetup();
+
+            await Shell.Current.DisplayAlert
+                ("Hai completato l'importazione dei dati nel Db !",
+                $"Importazione de dati di configurazione completata .", "Ok");
+
+            IsBusy = false;
+            return;
+        }
+
         [RelayCommand]
         async Task BtnExpExl()
         {

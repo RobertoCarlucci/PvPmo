@@ -4,7 +4,7 @@ namespace PvPmo.Util
 {
     public partial class NormTab
     {
-        public static async Task<bool> NormTabImp()
+        public static async Task<bool> NormTabImp(string tipoImportazione)
         {
             CaricaTabNormService _caricatabnorm = new CaricaTabNormService();
             bool Bol = false;
@@ -15,7 +15,7 @@ namespace PvPmo.Util
                 string? _tabella = n.Tabella;
                 string? _db = n.Dbdest;
                 string? _inptype = n.InpType;
-                if (_inptype == "EXL")
+                if (_inptype == tipoImportazione)
                 {
                     switch (_azione)
                     {
@@ -23,12 +23,16 @@ namespace PvPmo.Util
                             string StrConnSql = Conn.MysqlConn(_db);
                             Bol = await SqlQry.DelColSql(StrConnSql, _tabella, _colonna);
                             break;
+                        case "REN":
+                            StrConnSql = Conn.MysqlConn(_db);
+                            //Bol = await SqlQry.RinColSql(StrConnSql, _tabella, _colonna);
+                            break;
                         case "ADD":
                             Bol = await AddMod(_db, _tabella, _colonna);
                             break;
-                        case "timesheet_information_by_month":
-                            Bol = await TimesheetInformationbyMonthUptd(_db, _tabella, _colonna);
-                            break;
+                        //case "timesheet_information_by_month":
+                        //    Bol = await TimesheetInformationbyMonthUptd(_db, _tabella, _colonna);
+                        //    break;
                     }
                 }
             }

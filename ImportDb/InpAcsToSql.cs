@@ -23,7 +23,8 @@ public partial class InpAcsToSql
             {
                 bool tab = await TabAcstoTabSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
                 tab = await InpAcsDatitoSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);                
-            }            
+            }
+            bool Bol = await NormTab.NormTabImp("ACS");
         }        
     }    
     // Creo le tabelle Sql leggendo i nomi delle tabelle Access e normalizzando le
@@ -188,7 +189,16 @@ public partial class InpAcsToSql
                 case "DateID":
                     Name = "dateid";
                     break;
+                case "DateKeY":
+                    Name = "keyfte_mese";
+                    break;
+                case "KeyFTE_Mese":
+                    Name = "keyfte_mese";
+                    break;
                 case "Key":
+                    Name = "keyid";
+                    break;
+                case "KeyID":
                     Name = "keyid";
                     break;
                 case "ID&Month&Year":

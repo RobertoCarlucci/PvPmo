@@ -28,13 +28,21 @@
                 Grid.Column="0"
                 Margin="40"/>
 
-            <Button Text="Esporta PV_Total."
+            <Button Text="Importa File Setup."
                 Style="{StaticResource MyButton}"
-                Command="{Binding BtnExpExlCommand}"
+                Command="{Binding BtnImpSetupCommand}"
                 IsEnabled="{Binding IsNotBusy}"
                 Grid.Row="0"
                 Grid.Column="1"
                 Margin="40"/>
+
+            <Button Text="Esporta PV_Total."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnExpExlCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="40"/>             
 
             <Button Text="Torna Home Page."
                 Style="{StaticResource MyButton}"

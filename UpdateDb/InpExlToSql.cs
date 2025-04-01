@@ -28,7 +28,7 @@ public partial class InpExlToSql
                 Bol = await DatiFileExltoTabSql(nomeWorkSheet, nomeDbSql, nomeTabSql, exlPath);
             }                        
         }
-        Bol= await NormTab.NormTabImp();
+        //Bol= await NormTab.NormTabImp();
     }
     
     // Creo le tabelle nel Db Sql per importare i dati dai file Excel.
