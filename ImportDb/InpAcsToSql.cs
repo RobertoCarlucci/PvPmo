@@ -169,7 +169,7 @@ public partial class InpAcsToSql
                     Type = ("FLOAT");
                     break;
                 case "Modifica":
-                    Type = ("nvarchar(100)");
+                    Type = ("nvarchar(120)");
                     break;
                 case "ORE":
                     Type = ("FLOAT");

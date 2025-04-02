@@ -6,8 +6,8 @@ public class VarUtil
     // riferimento se il numero non corrisponde esco con errore altrimenti passo le liste.
     public static string ComparaNomeColonna(string nomeTabella, DataTable _tabellaExl, DataTable _tabellaSql)
     {
-        //Table _tabellaExl = new DataTable();
-        //DataTable TabRif = new DataTable();
+        //DataTable _tabellaExl = new DataTable();
+        DataTable TabRif = new DataTable();
 
         //ElencoQrySql.NomiColSql(db, "temp_" + nomeTabella, TabTemp);
         //ElencoQrySql.NomiColSql(db, nomeTabella, TabRif);
