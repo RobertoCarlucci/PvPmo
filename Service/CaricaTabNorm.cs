@@ -2,12 +2,13 @@
 
 public class CaricaTabNorm
 {
-    public string? Colonna { get; set; }
-    public string? Azione { get; set; }        
-    public string? Tabella { get; set; }
-    public string? Dbdest { get; set; }
+    public string? Azione { get; set; }
+    public string? ColDaMod { get; set; }
+    public string? Modifica {  get; set; }
+    public string? TipoCol { get; set; }
+    public string? TabellaMod { get; set; }
+    public string? DbDest { get; set; }
     public string? InpType { get; set; }
-
 }
 public interface ICaricaTabNorm
 {
@@ -31,10 +32,12 @@ public class CaricaTabNormService : ICaricaTabNorm
         {
             _caricatabnorm.Add(new CaricaTabNorm()
             {
-                Colonna = v["colonna"].ToString(),
                 Azione = v["azione"].ToString(),
-                Tabella = v["tabella"].ToString(),
-                Dbdest = v["dbdest"].ToString(),
+                ColDaMod = v["coldamod"].ToString(),
+                Modifica = v["modifica"].ToString(),
+                TipoCol = v["tipocol"].ToString(),
+                TabellaMod = v["tabellamod"].ToString(),
+                DbDest = v["dbdest"].ToString(),
                 InpType = v["inptype"].ToString()
             });
         }

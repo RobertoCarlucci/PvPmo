@@ -80,7 +80,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Archivio\ExportXLSX\" />
-	  <Folder Include="Archivio\Normalizza\" />
+	  <Folder Include="Archivio\Setup\" />
 	</ItemGroup>
 
 </Project>

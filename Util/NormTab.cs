@@ -10,34 +10,46 @@ namespace PvPmo.Util
             bool Bol = false;
             foreach (var n in _caricatabnorm.CaricaTabNorm)
             {
-                string? _colonna = n.Colonna;
                 string? _azione = n.Azione;
-                string? _tabella = n.Tabella;
-                string? _db = n.Dbdest;
+                string? _coldamod = n.ColDaMod;
+                string? _modifica = n.Modifica;
+                string? _tipocol = n.TipoCol;
+                string? _tabellamod = n.TabellaMod;
+                string? _dbdest = n.DbDest;
                 string? _inptype = n.InpType;
                 if (_inptype == tipoImportazione)
                 {
+                    string StrConnSql = Conn.MysqlConn(_dbdest);
                     switch (_azione)
                     {
                         case "DEL":
-                            string StrConnSql = Conn.MysqlConn(_db);
-                            Bol = await SqlQry.DelColSql(StrConnSql, _tabella, _colonna);
+                            Bol = await SqlQry.DelColSql(StrConnSql, _tabellamod, _coldamod);
                             break;
                         case "REN":
-                            StrConnSql = Conn.MysqlConn(_db);
-                            //Bol = await SqlQry.RinColSql(StrConnSql, _tabella, _colonna);
+                            Bol = await SqlQry.RinColSql(StrConnSql, _tabellamod, _coldamod, _modifica, _tipocol);
                             break;
                         case "ADD":
-                            Bol = await AddMod(_db, _tabella, _colonna);
+                            Bol = await SqlQry.AddColSql(StrConnSql, _tabellamod, _coldamod, _tipocol);
                             break;
-                        //case "timesheet_information_by_month":
-                        //    Bol = await TimesheetInformationbyMonthUptd(_db, _tabella, _colonna);
-                        //    break;
+                        case "GEN":
+                            switch (_coldamod)
+                            {
+                                case "dateid":
+                                    Bol = await SqlQry.CreaDateId(StrConnSql, _tabellamod, _coldamod, _modifica);
+                                    break;
+                                case "id_month_year":
+                                    Bol = await SqlQry.CreaIdMonthYear(StrConnSql, _tabellamod, _coldamod, _modifica);
+                                    break;
+                                case "keyid":
+                                    Bol = await SqlQry.CreaKeyId(StrConnSql, _tabellamod, _coldamod, _modifica);
+                                    break;
+                            }
+                            break;
+                        }
                     }
                 }
-            }
             return Bol;
-        }
+        }        
         public static async Task<bool> AddMod(string nomeDbSql, string nomeTabSql, string nomeColSql)
         {
             string StrConnSql = Conn.MysqlConn(nomeDbSql);

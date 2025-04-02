@@ -20,9 +20,9 @@ public class SqlQry
         bool Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);
         return Bol;
     }
-    public static async Task<bool> AddColSql(string StrConnSql, string nomeColSql, string nomeTbSql, string sType)
+    public static async Task<bool> AddColSql(string StrConnSql, string nomeTbSql, string nomeColSql, string sType)
     {        
-        string QrySql = "ALTER TABLE " + nomeTbSql + " ADD COLUMN `" + nomeColSql + "` " + sType + ";";
+        string QrySql = "ALTER TABLE `" + nomeTbSql + "` ADD COLUMN `" + nomeColSql + "` " + sType + ";";
         bool Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);
         return Bol;
     }
@@ -42,7 +42,7 @@ public class SqlQry
     public static async Task<bool> RinColSql(string StrConnSql, string nomeTabSql, string oldNomeColSql, string newwNomeColSql, string typeColSql)
     {        
         string QrySql = "ALTER TABLE `" + nomeTabSql + "` CHANGE `" + oldNomeColSql + "`" +
-            " `" + newwNomeColSql + "` " + typeColSql + "";
+            " `" + newwNomeColSql + "` " + typeColSql + ";";
         bool Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);
         return Bol;       
     }

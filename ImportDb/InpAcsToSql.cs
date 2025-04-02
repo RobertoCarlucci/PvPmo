@@ -168,6 +168,9 @@ public partial class InpAcsToSql
                 case "Divisore":
                     Type = ("FLOAT");
                     break;
+                case "Modifica":
+                    Type = ("nvarchar(100)");
+                    break;
                 case "ORE":
                     Type = ("FLOAT");
                     break;
