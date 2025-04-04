@@ -4,7 +4,6 @@ namespace PvPmo.Model
 {
     public class TabData
     {
-        public uint id { get; set; }
         public DateTime PV_TotalData { get; set; }
         public DateTime GlobalTimesheetExtractData { get; set; }
         public DateTime PV_MeseSuAnno { get; set; }
@@ -30,8 +29,7 @@ namespace PvPmo.Model
             foreach (DataRow v in temp)
             {
                 _inpdata.Add(new TabData()
-                {   
-                    id = (uint)v["id"],
+                {
                     PV_TotalData = (DateTime)v["PV_TotalData"],
                     GlobalTimesheetExtractData = (DateTime)v["GlobalTimesheetExtractData"],
                     PV_MeseSuAnno = (DateTime)v["PV_MeseSuAnno"]                    

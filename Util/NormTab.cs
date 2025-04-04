@@ -4,10 +4,16 @@ namespace PvPmo.Util
 {
     public partial class NormTab
     {
+        // Viene caricata la tabella "normalizza" dal Db "pvpmo_origine"
+        // utilizzando dalla cartella Service il servizio "CaricaTabNorm" che mi
+        // fornisce la mappatura delle colonne da modificare e se necessario anche la
+        // stringa da inserire nel comando Sql CONCAT
         public static async Task<bool> NormTabImp(string tipoImportazione)
         {
+            // Carico la tabella con le azioni da svolgere dal Service
             CaricaTabNormService _caricatabnorm = new CaricaTabNormService();
             bool Bol = false;
+            // "tipoImportazione" identifica il tipo di file da lavorare ACS o EXL
             foreach (var n in _caricatabnorm.CaricaTabNorm)
             {
                 string? _azione = n.Azione;
@@ -50,78 +56,5 @@ namespace PvPmo.Util
                 }
             return Bol;
         }        
-        public static async Task<bool> AddMod(string nomeDbSql, string nomeTabSql, string nomeColSql)
-        {
-            string StrConnSql = Conn.MysqlConn(nomeDbSql);
-            bool Bol = false;
-
-            switch (nomeTabSql, nomeColSql)
-            {
-                case ("global_timesheet_extract" , "pvpmo_origine"):
-
-                    switch (nomeColSql)
-                    {
-                        case "dateid":
-                            Bol = await SqlQry.AddColSql(StrConnSql, nomeColSql, nomeTabSql, "nvarchar(50)");
-                            string concat = "'01', LPAD(`Timesheet_Month`,2,0), `Timesheet_Year`";
-                            Bol = await SqlQry.CreaDateId(StrConnSql, nomeTabSql, nomeColSql, concat);
-                            break;
-                        case "id_month_year":
-                            Bol = await SqlQry.AddColSql(StrConnSql, nomeColSql, nomeTabSql, "nvarchar(50)");
-                            concat = "`GEC`, LPAD(`Timesheet_Month`,2,0), `Timesheet_Year`";
-                            Bol = await SqlQry.CreaIdMonthYear(StrConnSql, nomeTabSql, nomeColSql, concat);
-                            break;
-                        case "keyid":
-                            Bol = await SqlQry.AddColSql(StrConnSql, nomeColSql, nomeTabSql, "nvarchar(100)");
-                            concat = "`Organization`,`Providing_Org`,`Team`,`Competence`,`Location_Region`";
-                            Bol = await SqlQry.CreaKeyId(StrConnSql, nomeTabSql, nomeColSql, concat);
-                            break;
-                    }
-                    break;
-            }
-            switch (nomeTabSql, nomeColSql)
-            {
-                case ("global_timesheet_extract", "pmo"):
-
-                    switch (nomeColSql)
-                    {
-                        case "dateid":
-                            string concat = "'01', LPAD(`Timesheet_Month`,2,0), `Timesheet_Year`";
-                            Bol = await SqlQry.CreaDateId(StrConnSql, nomeTabSql, nomeColSql, concat);
-                            break;
-                        case "id_month_year":
-                            concat = "`GEC`, LPAD(`Timesheet_Month`,2,0), `Timesheet_Year`";
-                            Bol = await SqlQry.CreaIdMonthYear(StrConnSql, nomeTabSql, nomeColSql, concat);
-                            break;
-                        case "keyid":
-                            concat = "`Organization`,`Providing_Org`,`Team`,`Competence`,`Location_Region`";
-                            Bol = await SqlQry.CreaKeyId(StrConnSql, nomeTabSql, nomeColSql, concat);
-                            break;
-                    }
-                    break;
-            }
-            return Bol;
-        }
-
-        // Se il File è Timesheet Information by Month aggiungo la colonna necessaria
-        // e popolo la stessa con i dati attraverso le opportune query.
-        public static async Task<bool> TimesheetInformationbyMonthUptd(string nomeDbSql, string nomeTabSql, string nomeColSql, string azione)
-        {
-            string StrConnSql = Conn.MysqlConn(nomeDbSql);
-            bool Bol = false;
-            if (nomeTabSql == "timesheet_information_by_month" && azione == "ADD")
-            {
-                switch (nomeColSql)
-                {
-                    case "id_month_year":
-                        Bol = await SqlQry.AddColSql(StrConnSql, nomeColSql, nomeTabSql, "nvarchar(50)");
-                        string concat = "`Short Name`, LPAD(MONTH(`Date`),2,0), YEAR(`Date`)";
-                        Bol = await SqlQry.CreaIdMonthYear(StrConnSql, nomeTabSql, nomeColSql, concat);
-                        break;
-                }
-            }
-            return true;
-        }
-        
     }
 }

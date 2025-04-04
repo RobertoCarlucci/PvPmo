@@ -57,6 +57,22 @@ namespace PvPmo.ViewModel
             IsBusy = false;
             return;
         }
+        [RelayCommand]
+        async Task BtnTest()
+        {
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+
+            await UpdateDb.TestImpExl.TestFileExlImp();
+
+            await Shell.Current.DisplayAlert
+                ("Fine Test !", $"Rientro da procedura.", "Ok");
+
+            IsBusy = false;
+            return;
+        }
 
         [RelayCommand]
         async Task BtnEnd()

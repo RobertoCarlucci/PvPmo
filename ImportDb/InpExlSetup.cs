@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Vml;
-using PvPmo.UpdateDb;
-
-namespace PvPmo.ImportDb
+﻿namespace PvPmo.ImportDb
 {
     public partial class InpExlSetup
     {

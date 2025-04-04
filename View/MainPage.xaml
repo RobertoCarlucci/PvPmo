@@ -21,7 +21,7 @@
                    VerticalOptions="CenterAndExpand"
                    Aspect="AspectFill"/>
 
-            <Button Text="Gestione Dati Access."
+            <Button Text="Gestione Importazioni Dati Acs ed Exl."
                 Style="{StaticResource MyButton}"
                 Command="{Binding BtnGesAcsCommand}"
                 IsEnabled="{Binding IsNotBusy}"
@@ -29,7 +29,7 @@
                 Grid.Column="0"
                 Margin="40"/>
 
-            <Button Text="Aggiorna Data Base."
+            <Button Text="Aggiornamento mensile Data Base."
                 Style="{StaticResource MyButton}"
                 Command="{Binding BtnAgDbCommand}"
                 IsEnabled="{Binding IsNotBusy}"
@@ -37,7 +37,7 @@
                 Grid.Column="0"
                 Margin="40"/>
             
-            <Button Text="Aggiorna Data."
+            <Button Text="Aggiornamento tabella Date."
                 Style="{StaticResource MyButton}"
                 Command="{Binding BtnAgDataCommand}"
                 IsEnabled="{Binding IsNotBusy}"
@@ -45,6 +45,14 @@
                 Grid.Column="0"
                 Margin="40"/>
 
+            <Button Text="TEST."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnTestCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="40"/>
+            
             <Button Text="Chiudi ed Esci."
                 Style="{StaticResource MyButton}"
                 Command="{Binding BtnEndCommand}"
