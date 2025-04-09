@@ -38,6 +38,7 @@ public partial class SqlAsync
             if (ConnectionState.Open != ConnectionState.Closed) { };
         }
     }
+
     public static async Task<DataTable> SqlQryDataReader(string StrConn, string Qry, DataTable _tabella)
     {
         try
@@ -86,7 +87,7 @@ public partial class SqlAsync
         {
             if (ConnectionState.Open != ConnectionState.Closed) { };
         }
-    }
+    }    
     public static async Task<Boolean> SqlBulkCopy(string StrConn, string tabMod, DataTable tabellain)
     {
         try

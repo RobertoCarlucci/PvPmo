@@ -65,7 +65,7 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            await UpdateDb.TestImpExl.TestFileExlImp();
+            await UpdateDb.TestDateImpExl.FinalizzaUptd();
 
             await Shell.Current.DisplayAlert
                 ("Fine Test !", $"Rientro da procedura.", "Ok");

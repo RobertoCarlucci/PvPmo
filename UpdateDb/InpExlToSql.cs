@@ -82,7 +82,8 @@ public partial class InpExlToSql
                     Type = ("SMALLINT UNSIGNED");
                     break;
                 case "DateTime":
-                    Type = ("DATE NOT NULL DEFAULT '0001-01-01'");
+                    //Type = ("DATE NOT NULL DEFAULT '0001-01-01'");
+                    Type = ("DATE");
                     break;
             }
 

@@ -9,6 +9,7 @@
             
             bool Bol = await ImportSetup(_exlPath, "NormalizzaInp", "Foglio 1", "pvpmo_origine", "normalizza");
             Bol = await ImportSetup(_exlPath, "Origine", "Foglio1", "pvpmo_origine", "origine");
+            Bol = await ImportSetup(_exlPath, "finalizzatest", "Foglio1", "pvpmo_origine", "finalizza");
         }
         public static async Task<bool> ImportSetup(string _exlPath, string nomeFoglioExl, string nomeWorkSheet, string nomeDbSql, string nomeTbSql)
         {

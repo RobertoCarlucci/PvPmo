@@ -1,26 +1,24 @@
-﻿using System.Collections.ObjectModel;
-
-namespace PvPmo.Model
+﻿namespace PvPmo.Model
 {
     public class TabData
     {
-        public DateTime PV_TotalData { get; set; }
-        public DateTime GlobalTimesheetExtractData { get; set; }
-        public DateTime PV_MeseSuAnno { get; set; }
+        public DateTime? PV_TotalData { get; set; }
+        public DateTime? GlobalTimesheetExtractData { get; set; }
+        public DateTime? PV_MeseSuAnno { get; set; }
 
     }
     public interface ITabDataService
     {
-        ObservableCollection<TabData> TabDatas { get; }
+        IList<TabData> TabDatas { get; }
     }
     public class TabDataService : ITabDataService
     {
-        private ObservableCollection<TabData> _inpdata;
+        private List<TabData> _inpdata;
 
         public TabDataService()
         {
             DataTable _elencoInp = new DataTable();
-            _inpdata = new ObservableCollection<TabData>();
+            _inpdata = new List<TabData>();
 
             string StrConn = Conn.MysqlConn("pmo");
             string Qry = "SELECT * From 01_tabella_data;";
@@ -36,6 +34,6 @@ namespace PvPmo.Model
                 });
             }
         }
-        public ObservableCollection<TabData> TabDatas => _inpdata;
+        public IList<TabData> TabDatas => _inpdata;
     }
 }
