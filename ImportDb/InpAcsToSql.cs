@@ -9,24 +9,24 @@ public partial class InpAcsToSql
     {
         // Apro una finestra di sistema x la selezione della cartella di importazione.
         string _acsPath = await SelCart.PickFolderStatic(default);
-        CaricaTabOriginiService _inpdbacs = new CaricaTabOriginiService();        
+        CaricaTabOriginiService _inpdbacs = new CaricaTabOriginiService();
 
         foreach (var n in _inpdbacs.CaricaTabOrigini)
-        {                
+        {
             string? nomeDbAcs = n.DbInp;
             string? nomeTb = n.Tabella;
             string? nomeDbSql = n.DbDest;
             string? nomeTabSql = n.TabellaSql;
             string? nomeWorkSheet = n.WorkSheet;
             string? inpType = n.InpType;
-            if(inpType == "ACS")
+            if (inpType == "ACS")
             {
                 bool tab = await TabAcstoTabSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
-                tab = await InpAcsDatitoSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);                
+                tab = await InpAcsDatitoSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
             }
-            bool Bol = await NormTab.NormTabImp("ACS");
-        }        
-    }    
+        }
+        //bool Bol = await NormTab.NormTabImp("ACS");
+    }
     // Creo le tabelle Sql leggendo i nomi delle tabelle Access e normalizzando le
     // intestazioni delle colonne in modo compatibile con sql.
     public static async Task<bool> TabAcstoTabSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
@@ -34,11 +34,11 @@ public partial class InpAcsToSql
         string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
         DataTable _tabella = new DataTable();
         string Qry = "SELECT * FROM [" + nomeTbAcs + "] WHERE 1=0";
-        await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);        
+        await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
         Qry = NormInp(nomeTbAcs, nomeTbSql, _tabella);
-        Qry = "CREATE OR REPLACE TABLE " +  Qry;            
+        Qry = "CREATE OR REPLACE TABLE " + Qry;
         string StrConnSql = Conn.MysqlConn(nomeDbSql);
-        bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);            
+        bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
         return Bol;
     }
     // Importo i dati all'interno del Db andando a popolare con i valori le tabelle
@@ -46,7 +46,7 @@ public partial class InpAcsToSql
     public static async Task<bool> InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
     {
         bool Bol = await CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, acsPath);
-        if(Bol == true)
+        if (Bol == true)
         {
             string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
             DataTable _tabella = new DataTable();
@@ -56,9 +56,9 @@ public partial class InpAcsToSql
             await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella);
             //await AggiungiCol(nomeDbSql, nomeTbSql);
         }
-        return Bol;            
+        return Bol;
     }
-    
+
     // Vengono lette le intestazioni delle colonne Access e Sql per creare il mapping
     // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
     // AddMapping all'interno della cartella GestDb classe gestione Sql.
@@ -155,7 +155,7 @@ public partial class InpAcsToSql
                     Type = ("SMALLINT UNSIGNED");
                     break;
                 case "DateTime":
-                    Type = ("DATE NOT NULL DEFAULT '0001-01-01'");
+                    Type = ("DATE");
                     break;
             }
             // Select nomi colonne e creazione chiave primaria dove necessaria.
@@ -173,6 +173,7 @@ public partial class InpAcsToSql
                     break;
                 case "ORE":
                     Type = ("FLOAT");
+                    Name = "Ore";
                     break;
                 case "Hours Per Week":
                     Type = ("FLOAT");
@@ -181,42 +182,46 @@ public partial class InpAcsToSql
                     Type = ("FLOAT");
                     break;
                 case "Action Items, Completed (#)":
-                    Name = "action_items_completed_val";
+                    Name = "ActionItemsCompletedVal";
                     break;
                 case "Action Items, Completed (%)":
-                    Name = "action_items_completed_perc";
+                    Name = "ActionItemsCompletedPerc";
                     break;
                 case "Date":
-                    Name = "dateid";
+                    Name = "Dateid";
                     break;
                 case "DateID":
-                    Name = "dateid";
+                    Name = "Dateid";
+                    break;
+                case "Date ID":
+                    Name = "Dateid";
                     break;
                 case "DateKeY":
-                    Name = "keyfte_mese";
+                    Name = "Datekey";
                     break;
                 case "KeyFTE_Mese":
-                    Name = "keyfte_mese";
+                    Name = "KeyFteMese";
                     break;
                 case "Key":
-                    Name = "keyid";
+                    Name = "Keyid";
                     break;
                 case "KeyID":
-                    Name = "keyid";
+                    Name = "Keyid";
                     break;
                 case "ID&Month&Year":
-                    Name = "id_month_year";
+                    Name = "IdMonthYear";
                     break;
                 case "Work ID #":
-                    Name = "work_id";
+                    Name = "WorkId";
                     break;
             }
             // Eliminazione dei caratteri speciali possibili in access.
             string RemVirgola = Name.Replace(",", "");
-            string RemTrattino = RemVirgola.Replace("-", "_");
-            string RemSpazi = RemTrattino.Replace(" ", "_");
-            string RemTondeIn = RemSpazi.Replace("(", "_");
-            string RemTondeFn = RemTondeIn.Replace(")", "_");
+            string RemTrattinoAlto = RemVirgola.Replace("-", "");
+            string RemTrattinoBasso = RemTrattinoAlto.Replace("_", "");
+            string RemSpazi = RemTrattinoBasso.Replace(" ", "");
+            string RemTondeIn = RemSpazi.Replace("(", "");
+            string RemTondeFn = RemTondeIn.Replace(")", "");
             // Accodamento nella query dei nomi campi.
             // Viene usato il carattere ` (Alt + 96) per indicare tipo stringa nel
             // nome colonna.
@@ -233,71 +238,4 @@ public partial class InpAcsToSql
         Qry += ");";
         return Qry;
     }
-    // Vengono normalizzati i nomi delle Tabelle Sql.
-    //public static string NormNomeTab(string nomeTab)
-    //{
-    //    switch (nomeTab)
-    //    {
-    //        case "01_TabellaData":
-    //            nomeTab = "tabella_data";
-    //            break;
-    //        case "All Project Mapped - Power BI Column Set":
-    //            nomeTab = "all_project_mapped_power_bi_column_set";
-    //            break;
-    //        case "PBX_ AllProjectMappedPowerBIColumnSet":
-    //            nomeTab = "pbx_all_project_mapped_power_bi_column_set";
-    //            break;
-    //        case "Resource Type":
-    //            nomeTab = "resource_type";
-    //            break;
-    //        case "ScenarioRestoAnno":
-    //            nomeTab = "scenario_resto_anno";
-    //            break;
-    //        case "Standard Activities":
-    //            nomeTab = "standard_activities";
-    //            break;
-    //        case "Timesheet Information By Month":
-    //            nomeTab = "timesheet_information_by_month";
-    //            break;
-    //        case "Working Hours by Day":
-    //            nomeTab = "working_hours_by_day";
-    //            break;
-    //        case "GlobalTimesheetExtract":
-    //            nomeTab = "global_timesheet_extract";
-    //            break;
-    //        case "Key":
-    //            nomeTab = "key_global";
-    //            break;
-    //        case "PBX_TimesheetInformationByMonth":
-    //            nomeTab = "pbx_timesheet_information_by_month";
-    //            break;                
-    //        case "pv_total_outsoremese":
-    //            nomeTab = "pv_total_outs_ore_mese";
-    //            break;
-    //    }
-    //    return nomeTab;
-    //}
-    //public static async Task<bool> AggiungiCol(string nomeDbSql, string nomeTbSql)
-    //{
-    //    string StrConnSql = Conn.MysqlConn(nomeDbSql);
-    //    string Qry = "";
-    //    bool Bol = true;
-
-    //    switch (nomeTbSql)
-    //    {
-    //        case "pv_total":
-    //            Qry = "DELETE FROM `pv_total`WHERE `Resource Name` = 'Farneti Thomas Old';";
-    //            Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
-    //            Qry = "ALTER TABLE `" + nomeTbSql + "` ADD COLUMN `id_month_year` nvarchar(50);";
-    //            Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
-    //            Qry = "ALTER TABLE `" + nomeTbSql + "` ADD COLUMN `keyid` nvarchar(50);";
-    //            Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
-    //            break;
-    //        case "global_timesheet_extract":
-
-    //            break;
-    //    }
-
-    //    return false;
-    //}
 }
