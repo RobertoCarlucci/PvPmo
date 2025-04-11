@@ -23,13 +23,13 @@
             bool Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabellaExl);
             string QrySql = InpAcsToSql.NormInp(nomeFoglioExl, nomeTbSql, _tabellaExl);
             QrySql = "CREATE OR REPLACE TABLE " + QrySql;
-            Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);
+            Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql, 30);
             Bol = await CreaMappingExlSql(StrConnExl, StrConnSql, nomeWorkSheet, nomeDbSql, nomeTbSql);
             QryExl = "SELECT * FROM [" + nomeWorkSheet + "$];";
             _tabellaExl = new DataTable();
             Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabellaExl);
             StrConnSql = Conn.MysqlConn(nomeDbSql);
-            await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabellaExl);
+            await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabellaExl, 30);
             return false;
         }
         public static async Task<bool> CreaMappingExlSql(string StrConnExl, string StrConnSql, string nomeWorkSheet, string nomeDbSql, string nomeTbSql)
@@ -42,7 +42,7 @@
                 "'" + nomeTbSql + "' ORDER BY ORDINAL_POSITION;";
 
             ExlSync.ExcQry(StrConnExl, QryExl, _tabExl);
-            await SqlAsync.SqlQryDataReader(StrConnSql, QrySql, _tabSql);
+            await SqlAsync.SqlQryDataReader(StrConnSql, QrySql, _tabSql, 30);
 
             int _dif = _tabSql.Rows.Count - _tabExl.Columns.Count;
 

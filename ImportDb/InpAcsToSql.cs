@@ -25,7 +25,7 @@ public partial class InpAcsToSql
                 tab = await InpAcsDatitoSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
             }
         }
-        //bool Bol = await NormTab.NormTabImp("ACS");
+        bool Bol = await NormTab.NormTabImp("ACS");
     }
     // Creo le tabelle Sql leggendo i nomi delle tabelle Access e normalizzando le
     // intestazioni delle colonne in modo compatibile con sql.
@@ -38,7 +38,7 @@ public partial class InpAcsToSql
         Qry = NormInp(nomeTbAcs, nomeTbSql, _tabella);
         Qry = "CREATE OR REPLACE TABLE " + Qry;
         string StrConnSql = Conn.MysqlConn(nomeDbSql);
-        bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry);
+        bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry, 30);
         return Bol;
     }
     // Importo i dati all'interno del Db andando a popolare con i valori le tabelle
@@ -53,8 +53,7 @@ public partial class InpAcsToSql
             string Qry = "SELECT * FROM [" + nomeTbAcs + "]";
             await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
             string StrConnSql = Conn.MysqlConn(nomeDbSql);
-            await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella);
-            //await AggiungiCol(nomeDbSql, nomeTbSql);
+            await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella, 180);            
         }
         return Bol;
     }
@@ -75,7 +74,7 @@ public partial class InpAcsToSql
         string StrConnSql = Conn.MysqlConn(nomeDbSql);
 
         await AcsAsync.AcsQryTab(StrConnAcs, QryAcs, _tabAcs);
-        await SqlAsync.SqlQryDataReader(StrConnSql, QrySql, _tabSql);
+        await SqlAsync.SqlQryDataReader(StrConnSql, QrySql, _tabSql, 30);
 
         int _dif = _tabSql.Rows.Count - _tabAcs.Columns.Count;
 

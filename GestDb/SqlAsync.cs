@@ -10,18 +10,19 @@ public partial class SqlAsync
         var NewParam = new MySqlParameter(nome, vale);
         Params.Add(NewParam);
     }
-    public static void AddMapping(int SourceOrdinal, string DestinationColumn)
+    public static void AddMapping(int sourceOrdinal, string destinationColumn)
     {
-        var NewMapping = new MySqlBulkCopyColumnMapping(SourceOrdinal, DestinationColumn);
+        var NewMapping = new MySqlBulkCopyColumnMapping(sourceOrdinal, destinationColumn);
         Mappings.Add(NewMapping);
     }        
-    public static async Task<Boolean> SqlNoQry(string strConn, string Qry)
+    public static async Task<Boolean> SqlNoQry(string strConn, string qry, int time)
     {
         try
         {
             var _connSql = new MySqlConnection(strConn);
             await _connSql.OpenAsync();
-            var _cmdSql = new MySqlCommand(Qry, _connSql);
+            var _cmdSql = new MySqlCommand(qry, _connSql);
+            _cmdSql.CommandTimeout = time;
             Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
             Params.Clear();
             await _cmdSql.ExecuteNonQueryAsync();
@@ -39,13 +40,14 @@ public partial class SqlAsync
         }
     }
 
-    public static async Task<DataTable> SqlQryDataReader(string StrConn, string Qry, DataTable _tabella)
+    public static async Task<DataTable> SqlQryDataReader(string strConn, string qry, DataTable _tabella, int time)
     {
         try
         {
-            var _connSql = new MySqlConnection(StrConn);
+            var _connSql = new MySqlConnection(strConn);
             await _connSql.OpenAsync();
-            var _cmdSql = new MySqlCommand(Qry, _connSql);
+            var _cmdSql = new MySqlCommand(qry, _connSql);
+            _cmdSql.CommandTimeout = time;
             Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
             Params.Clear();
             MySqlDataReader _datareader = _cmdSql.ExecuteReader();
@@ -64,13 +66,14 @@ public partial class SqlAsync
             if (ConnectionState.Open != ConnectionState.Closed) { };
         }
     }
-    public static async Task<DataTable> SqlQryDataTable(string StrConn, string Qry, DataTable _tabella)
+    public static async Task<DataTable> SqlQryDataTable(string strConn, string qry, DataTable _tabella, int time)
     {
         try
         {
-            var _connSql = new MySqlConnection(StrConn);
+            var _connSql = new MySqlConnection(strConn);
             await _connSql.OpenAsync();
-            var _cmdSql = new MySqlCommand(Qry, _connSql);
+            var _cmdSql = new MySqlCommand(qry, _connSql);
+            _cmdSql.CommandTimeout = time;
             Params.ForEach(param => { _cmdSql.Parameters.Add(param); });
             Params.Clear();
             var _adapter = new MySqlDataAdapter(_cmdSql);
@@ -88,13 +91,15 @@ public partial class SqlAsync
             if (ConnectionState.Open != ConnectionState.Closed) { };
         }
     }    
-    public static async Task<Boolean> SqlBulkCopy(string StrConn, string tabMod, DataTable tabellain)
+    public static async Task<Boolean> SqlBulkCopy(string strConn, string tabMod, DataTable tabellain, int time)
     {
         try
         {
-            var _connSql = new MySqlConnection(StrConn + "AllowLoadLocalInfile=true;");
+            var _connSql = new MySqlConnection(strConn + "AllowLoadLocalInfile=true;");
+            
             await _connSql.OpenAsync();
-            var _bulk = new MySqlBulkCopy(_connSql);
+            var _bulk = new MySqlBulkCopy(_connSql);            
+            _bulk.BulkCopyTimeout = time;
             _bulk.DestinationTableName = tabMod;
             Mappings.ForEach(_mapping => { _bulk.ColumnMappings.Add(_mapping); });
             Mappings.Clear();

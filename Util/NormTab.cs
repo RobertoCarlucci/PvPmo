@@ -40,13 +40,13 @@ namespace PvPmo.Util
                         case "GEN":
                             switch (_coldamod)
                             {
-                                case "dateid":
+                                case "Dateid":
                                     Bol = await SqlQry.CreaDateId(StrConnSql, _tabellamod, _coldamod, _modifica);
                                     break;
-                                case "id_month_year":
+                                case "IdMonthYear":
                                     Bol = await SqlQry.CreaIdMonthYear(StrConnSql, _tabellamod, _coldamod, _modifica);
                                     break;
-                                case "keyid":
+                                case "Keyid":
                                     Bol = await SqlQry.CreaKeyId(StrConnSql, _tabellamod, _coldamod, _modifica);
                                     break;
                             }

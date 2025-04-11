@@ -4,8 +4,7 @@ namespace PvPmo.UpdateDb;
 
 public partial class InpExlToSql
 {
-    //Importo i File Excel per l'aggiornamento mensile.
-    
+    //Importo i File Excel per l'aggiornamento mensile.    
     public static async Task InpExl()
     {
         // Apro una finestra di sistema x la selezione della cartella di importazione.
@@ -41,7 +40,7 @@ public partial class InpExlToSql
         bool Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabellaExl);
         string QrySql = InpExl(nomeTbSql, _tabellaExl);        
         QrySql = "CREATE OR REPLACE TABLE " + QrySql;
-        Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql);                        
+        Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql, 30);                        
         return true;
     }
     // Inserisco i dati nelle opportune tabelle colonne.
@@ -52,7 +51,7 @@ public partial class InpExlToSql
         string QryExl = "SELECT * FROM [" + nomeFoglio + "$];";
         bool Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabella);
         string StrConnSql = Conn.MysqlConn(nomeDbSql);
-        await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella);
+        await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella, 120);
         return Bol;            
     }
     // Normalizzo il tipo di dati da importare alle necessità di Sql.
@@ -66,7 +65,7 @@ public partial class InpExlToSql
         {
             string Name = col.ColumnName;
             string Type = col.DataType.ToString();
-            Type = Type.Remove(0, 7);
+            Type = Type.Remove(0, 7);            
             switch (Type)
             {
                 case "String":
@@ -81,12 +80,10 @@ public partial class InpExlToSql
                 case "Single":
                     Type = ("SMALLINT UNSIGNED");
                     break;
-                case "DateTime":
-                    //Type = ("DATE NOT NULL DEFAULT '0001-01-01'");
+                case "DateTime":                    
                     Type = ("DATE");
                     break;
             }
-
             if (x < i)
             {
                 Qry = Qry + "`" + Name + "` " + Type + ", ";
