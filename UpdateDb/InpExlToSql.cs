@@ -28,6 +28,7 @@ public partial class InpExlToSql
             }                        
         }
         Bol= await NormTab.NormTabImp("EXL");
+        Bol = await TestDateImpExl.FinalizzaUptd();
     }
     
     // Creo le tabelle nel Db Sql per importare i dati dai file Excel.
