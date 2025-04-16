@@ -38,7 +38,8 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            await InpExlSetup.NewSetup();
+            //await InpExlSetup.NewSetup();
+            await Renata.NewSetup();
 
             await Shell.Current.DisplayAlert
                 ("Hai completato l'importazione dei dati nel Db !",

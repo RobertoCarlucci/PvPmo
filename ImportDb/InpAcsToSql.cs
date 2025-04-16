@@ -35,7 +35,7 @@ public partial class InpAcsToSql
         DataTable _tabella = new DataTable();
         string Qry = "SELECT * FROM [" + nomeTbAcs + "] WHERE 1=0";
         await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
-        Qry = NormInp(nomeTbAcs, nomeTbSql, _tabella);
+        Qry = NormInp(nomeTbSql, _tabella);
         Qry = "CREATE OR REPLACE TABLE " + Qry;
         string StrConnSql = Conn.MysqlConn(nomeDbSql);
         bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry, 30);
@@ -66,9 +66,7 @@ public partial class InpAcsToSql
         DataTable _tabAcs = new DataTable();
         DataTable _tabSql = new DataTable();
         string QryAcs = "SELECT * FROM [" + nomeTbAcs + "] WHERE 1=0;";
-        string QrySql = "SELECT * FROM `information_schema`.`COLUMNS` " +
-            "WHERE TABLE_SCHEMA = '" + nomeDbSql + "' AND TABLE_NAME = " +
-            "'" + nomeTbSql + "' ORDER BY ORDINAL_POSITION;";
+        string QrySql = "SHOW COLUMNS FROM `" + nomeTbSql + "`;";
 
         string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
         string StrConnSql = Conn.MysqlConn(nomeDbSql);
@@ -84,7 +82,7 @@ public partial class InpAcsToSql
             for (int x = 1; x < _tabSql.Rows.Count; x++)
             {
                 int SourceOrdinal = x;
-                string? DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
+                string? DestinationColumn = _tabSql.Rows[x]["Field"].ToString();
                 SqlAsync.AddMapping(SourceOrdinal, DestinationColumn);
             }
             return true;
@@ -95,7 +93,7 @@ public partial class InpAcsToSql
             for (int x = 1; x < _tabSql.Rows.Count; x++)
             {
                 int SourceOrdinal = x - 1;
-                string? DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
+                string? DestinationColumn = _tabSql.Rows[x]["Field"].ToString();
                 SqlAsync.AddMapping(SourceOrdinal, DestinationColumn);
             }
             return true;
@@ -117,10 +115,9 @@ public partial class InpAcsToSql
     }
     // Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
     // Si procede anche alla normalizzazione dei nomi colonna.
-    public static string NormInp(string nomeTabNorm, string nomeTbSql, DataTable tabData)
+    public static string NormInp(string nomeTbSql, DataTable tabData)
     {
-        // Chiamata alla funzione di normalizzazione nome tabella.
-        string nomeTabDb = nomeTabNorm;
+        // Chiamata alla funzione di normalizzazione nome tabella.        
 
         string Qry = nomeTbSql + " (";
         int x = 0;

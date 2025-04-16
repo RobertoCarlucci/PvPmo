@@ -4,7 +4,8 @@ namespace PvPmo.UpdateDb
 {
     public partial class TestDateImpExl
     {
-        // Test delle tabelle di Uptd prima di procedere all'importazione.
+        // Test delle tabelle di Uptd prima di procedere all'aggiornamento
+        // del Db di produzione.
         public static async Task<bool> FinalizzaUptd()
         {
             // Carico il File dall'archivio con la sequenza da svolgere
@@ -25,11 +26,11 @@ namespace PvPmo.UpdateDb
             }
             return Bol;
         }
-        // Eseguo i test sui file exl di update.
+        // Eseguo i test sui file exl di update importati in pmo_origine.
         public static async Task<bool> TestFileExlImp(
             string _azione, string _tabProd, string _colProd, string _tabUptd, string _colUptd, string _dbProd, string _dbUptd)
         {
-            // Test corrisponde alla tabella Uptd.
+            // Produzione corrisponde alla tabella di Uptd.
             DataTable dataProd = new DataTable();
             DataTable dataUptd = new DataTable();
             
@@ -63,7 +64,9 @@ namespace PvPmo.UpdateDb
                     if (countUptd != countProd) 
                     {
                         await Shell.Current.DisplayAlert
-                            ("Test numero righe  data !", $"Le  non corrispondono.", "Ok");
+                            ("Test numero righe della data !", 
+                            $"Le righe in produzione non corrispondono a quelle del Uptd.", 
+                            "Ok");
                         Bol = true; 
                     }
                     
@@ -72,13 +75,15 @@ namespace PvPmo.UpdateDb
                     if (result != null) 
                     {
                         await Shell.Current.DisplayAlert
-                            ("Test Valore date !", $"Le date non corrispondono.", "Ok");
+                            ("Test Valore date !", 
+                            $"Il valore delle date non corrisponde.", "Ok");
                         Bol = true; 
-                    }                    
+                    }
+                    
                     break;
                 case "NUM":
-                    // Viene testato il numero delle colonne presenti in Uptd rispetto alle tabelle presenti
-                    // nel Db di produzione.                    
+                    // Viene testato il numero delle colonne presenti in Uptd rispetto alle
+                    // tabelle presenti nel Db di produzione.                    
                     QrySqlProd = "SHOW COLUMNS FROM '" + _tabProd + ";";
                     QrySqlUptd = "SHOW COLUMNS FROM '" + _tabUptd + ";";
 
@@ -89,14 +94,20 @@ namespace PvPmo.UpdateDb
                     if (_dif != 0) 
                     {
                         await Shell.Current.DisplayAlert
-                            ("Test Numero colonne !", $"Il numero delle colonne non corrisponde.", "Ok");
+                            ("Test Numero colonne !", 
+                            $"Il numero delle colonne non corrisponde.", "Ok");
                         return true; 
                     }                    
                     break;
-                    // Vengono cambiati i nomi colonna adeguandoli a quelli delle tabelle presenti
-                    // nel Db di produzione.
+                    // Vengono cambiati i nomi colonna adeguandoli a quelli delle tabelle
+                    // presenti nel Db di produzione.
                 case "REN":
+                    QrySqlProd = "SHOW COLUMNS FROM '" + _tabProd + ";";
+                    QrySqlUptd = "SHOW COLUMNS FROM '" + _tabUptd + ";";
 
+                    await SqlAsync.SqlQryDataReader(StrConnUptd, QrySqlUptd, dataUptd, 30);
+                    await SqlAsync.SqlQryDataReader(StrConnProd, QrySqlProd, dataProd, 30);
+                    VarUtil.AggTabSql(_tabProd, dataUptd, dataProd);
                     break;
             }
             

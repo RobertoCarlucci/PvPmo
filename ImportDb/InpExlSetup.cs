@@ -9,7 +9,7 @@
             
             bool Bol = await ImportSetup(_exlPath, "NormalizzaInp", "Foglio 1", "pvpmo_origine", "normalizza");
             Bol = await ImportSetup(_exlPath, "Origine", "Foglio1", "pvpmo_origine", "origine");
-            Bol = await ImportSetup(_exlPath, "finalizzatest", "Foglio1", "pvpmo_origine", "finalizza");
+            Bol = await ImportSetup(_exlPath, "finalizzatest", "Foglio1", "pvpmo_origine", "finalizza");            
         }
         public static async Task<bool> ImportSetup(string _exlPath, string nomeFoglioExl, string nomeWorkSheet, string nomeDbSql, string nomeTbSql)
         {
@@ -21,7 +21,7 @@
 
             string QryExl = "SELECT * FROM [" + nomeWorkSheet + "$] WHERE 1=0;";
             bool Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabellaExl);
-            string QrySql = InpAcsToSql.NormInp(nomeFoglioExl, nomeTbSql, _tabellaExl);
+            string QrySql = InpAcsToSql.NormInp(nomeTbSql, _tabellaExl);
             QrySql = "CREATE OR REPLACE TABLE " + QrySql;
             Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql, 30);
             Bol = await CreaMappingExlSql(StrConnExl, StrConnSql, nomeWorkSheet, nomeDbSql, nomeTbSql);
@@ -37,9 +37,7 @@
             DataTable _tabExl = new DataTable();
             DataTable _tabSql = new DataTable();
             string QryExl = "SELECT * FROM [" + nomeWorkSheet + "$] WHERE 1=0;";
-            string QrySql = "SELECT * FROM `information_schema`.`COLUMNS` " +
-                "WHERE TABLE_SCHEMA = '" + nomeDbSql + "' AND TABLE_NAME = " +
-                "'" + nomeTbSql + "' ORDER BY ORDINAL_POSITION;";
+            string QrySql = "SHOW COLUMNS FROM `" + nomeTbSql + "`;";
 
             ExlSync.ExcQry(StrConnExl, QryExl, _tabExl);
             await SqlAsync.SqlQryDataReader(StrConnSql, QrySql, _tabSql, 30);
@@ -52,7 +50,7 @@
                 for (int x = 1; x < _tabSql.Rows.Count; x++)
                 {
                     int SourceOrdinal = x;
-                    string? DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
+                    string? DestinationColumn = _tabSql.Rows[x]["Field"].ToString();
                     SqlAsync.AddMapping(SourceOrdinal, DestinationColumn);
                 }
                 return true;
@@ -63,7 +61,7 @@
                 for (int x = 1; x < _tabSql.Rows.Count; x++)
                 {
                     int SourceOrdinal = x - 1;
-                    string? DestinationColumn = _tabSql.Rows[x]["COLUMN_NAME"].ToString();
+                    string? DestinationColumn = _tabSql.Rows[x]["Field"].ToString();
                     SqlAsync.AddMapping(SourceOrdinal, DestinationColumn);
                 }
                 return true;
@@ -71,7 +69,7 @@
             else if (_dif < 0 || _dif > 1)
             {
                 var Conf = await Shell.Current.DisplayAlert
-                    ("Errore nel numero di Colonne delle Tabelle.", "La Tabella Access: "
+                    ("Errore nel numero di Colonne delle Tabelle.", "La Tabella Excel: "
                     + _tabExl + " Ha un numero di colonne diverso dalla tabella Sql: "
                     + _tabSql + " Vuoi continuare ad importare le altre tabelle residue ? "
                     , "Si", "No");

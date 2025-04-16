@@ -65,7 +65,8 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            await UpdateDb.TestDateImpExl.FinalizzaUptd();
+            //await UpdateDb.TestDateImpExl.FinalizzaUptd();
+            await ImportDb.Renata.ExpAcs();
 
             await Shell.Current.DisplayAlert
                 ("Fine Test !", $"Rientro da procedura.", "Ok");
