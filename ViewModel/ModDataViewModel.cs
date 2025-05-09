@@ -3,7 +3,7 @@
     public partial class ModDataViewModel : BaseViewModel
     {
         
-        public TabDataService _inpData = new();
+        //public TabDataService _inpData = new();
                         
         public ModDataViewModel()
         {

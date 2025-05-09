@@ -5,7 +5,7 @@
         public static async Task NewSetup()
         {
             // Apro una finestra di sistema x la selezione della cartella di importazione.
-            string _exlPath = await SelCart.PickFolderStatic(default);             
+            string _exlPath = await SelCart.PickFolder();             
             
             bool Bol = await ImportSetup(_exlPath, "NormalizzaInp", "Foglio 1", "pvpmo_origine", "normalizza");
             Bol = await ImportSetup(_exlPath, "Origine", "Foglio1", "pvpmo_origine", "origine");

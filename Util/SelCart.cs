@@ -4,42 +4,45 @@ namespace PvPmo.Util
 {
     public partial class SelCart : BaseViewModel
     {                
-        public static async Task<string> PickFolderStatic(CancellationToken cancellationToken)
-        {
-            var folderResult = await FolderPicker.PickAsync("DCIM", cancellationToken);
-            if (folderResult.IsSuccessful)
-            {
-                var filesCount = Directory.EnumerateFiles(folderResult.Folder.Path).Count();
-                string _path = folderResult.Folder.Path.ToString();
-                return _path;                
-            }
-            else
-            {
-                return "";                
-            }
-        }
-        public static async Task<FileResult> PickAndShow(PickOptions options)
+        public static async Task<string> PickFolder()
         {
             try
             {
-                var result = await FilePicker.Default.PickAsync(options);
-                if (result != null)
+                var folderResult = await FolderPicker.PickAsync("DCIM");
+                if (folderResult.IsSuccessful)
                 {
-                    if (result.FileName.EndsWith("jpg", StringComparison.OrdinalIgnoreCase) ||
-                        result.FileName.EndsWith("png", StringComparison.OrdinalIgnoreCase))
-                    {
-                        using var stream = await result.OpenReadAsync();
-                        var image = ImageSource.FromStream(() => stream);
-                    }
-                }
-
-                return result;
+                    var filesCount = Directory.EnumerateFiles(folderResult.Folder.Path).Count();
+                    string _path = folderResult.Folder.Path.ToString();
+                    return _path;
+                }                
             }
             catch (Exception ex)
             {
-                // The user canceled or something went wrong
+                await Shell.Current.DisplayAlert
+                    ("Errore Selezione Cartella !", $"Codice: {ex}", "Ok");
             }
-
+            return null;
+        }
+        public static async Task<String> PickFile()
+        {
+            try
+            {
+                var result = await FilePicker.Default.PickAsync();
+                if (result != null)
+                {
+                    if (result.FileName.EndsWith("accdb", StringComparison.OrdinalIgnoreCase) ||
+                        result.FileName.EndsWith("xlsx", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string ritorno = result.FullPath.ToString();
+                        return ritorno;
+                    }
+                }                
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert
+                    ("Errore Selezione File !", $"Codice: {ex}", "Ok");
+            }
             return null;
         }
     }

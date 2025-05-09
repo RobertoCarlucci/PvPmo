@@ -57,7 +57,7 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
             DataTable dt = new DataTable();
-            string _exlPath = await SelCart.PickFolderStatic(default);
+            string _exlPath = await SelCart.PickFolder();
             ExportDt.LoadDt(dt);
             //ExportDt.ExportDataSet(dt, _exlPath);
             await Shell.Current.DisplayAlert

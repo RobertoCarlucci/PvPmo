@@ -1,6 +1,4 @@
-﻿using PvPmo.Service;
-
-namespace PvPmo.ImportDb;
+﻿namespace PvPmo.ImportDb;
 
 public partial class InpAcsToSql
 {
@@ -8,23 +6,26 @@ public partial class InpAcsToSql
     public static async Task NewDb()
     {
         // Apro una finestra di sistema x la selezione della cartella di importazione.
-        string _acsPath = await SelCart.PickFolderStatic(default);
-        CaricaTabOriginiService _inpdbacs = new CaricaTabOriginiService();
+        string _acsPath = await SelCart.PickFolder();
+        var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
 
-        foreach (var n in _inpdbacs.CaricaTabOrigini)
-        {
-            string? nomeDbAcs = n.DbInp;
-            string? nomeTb = n.Tabella;
-            string? nomeDbSql = n.DbDest;
-            string? nomeTabSql = n.TabellaSql;
-            string? nomeWorkSheet = n.WorkSheet;
-            string? inpType = n.InpType;
-            if (inpType == "ACS")
-            {
-                bool tab = await TabAcstoTabSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
-                tab = await InpAcsDatitoSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
-            }
-        }
+        var dati = await repo.GetAllAsync();
+
+
+        //foreach (var n in dati.)
+        //{
+        //    string? nomeDbAcs = n.DbInp;
+        //    string? nomeTb = n.Tabella;
+        //    string? nomeDbSql = n.DbDest;
+        //    string? nomeTabSql = n.TabellaSql;
+        //    string? nomeWorkSheet = n.WorkSheet;
+        //    string? inpType = n.InpType;
+        //    if (inpType == "ACS")
+        //    {
+        //        bool tab = await TabAcstoTabSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
+        //        tab = await InpAcsDatitoSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
+        //    }
+        //}
         bool Bol = await NormTab.NormTabImp("ACS");
     }
     // Creo le tabelle Sql leggendo i nomi delle tabelle Access e normalizzando le
@@ -72,7 +73,7 @@ public partial class InpAcsToSql
         string StrConnSql = Conn.MysqlConn(nomeDbSql);
 
         await AcsAsync.AcsQryTab(StrConnAcs, QryAcs, _tabAcs);
-        await SqlAsync.SqlQryDataReader(StrConnSql, QrySql, _tabSql, 30);
+        await SqlAsync.SqlNoQry(StrConnSql, QrySql, _tabSql, 30);
 
         int _dif = _tabSql.Rows.Count - _tabAcs.Columns.Count;
 

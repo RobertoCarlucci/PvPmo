@@ -1,6 +1,4 @@
-﻿using PvPmo.Service;
-
-namespace PvPmo.UpdateDb;
+﻿namespace PvPmo.UpdateDb;
 
 public partial class InpExlToSql
 {
@@ -8,25 +6,28 @@ public partial class InpExlToSql
     public static async Task InpExl()
     {
         // Apro una finestra di sistema x la selezione della cartella di importazione.
-        string _exlPath = await SelCart.PickFolderStatic(default);
-        CaricaTabOriginiService _leggitabdborigine = new CaricaTabOriginiService();
+        string _exlPath = await SelCart.PickFolder();
+        var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
+
+        var dati = await repo.GetAllAsync();
+        
         bool Bol = false;
 
-        foreach (var n in _leggitabdborigine.CaricaTabOrigini)
-        {
-            string? nomeDbAcs = n.DbInp;
-            string? nomeTb = n.Tabella;
-            string? nomeDbSql = n.DbDest;
-            string? nomeTabSql = n.TabellaSql;
-            string? nomeWorkSheet = n.WorkSheet;
-            string? inpType = n.InpType;
-            if (inpType == "EXL")
-            {
-                string? exlPath = _exlPath + "\\" + nomeTb;
-                Bol = await NomeColFileExltoTabSql(nomeWorkSheet, nomeDbSql, nomeTabSql, exlPath);
-                Bol = await DatiFileExltoTabSql(nomeWorkSheet, nomeDbSql, nomeTabSql, exlPath);
-            }                        
-        }
+        //foreach (var n in _leggitabdborigine.CaricaTabOrigini)
+        //{
+        //    string? nomeDbAcs = n.DbInp;
+        //    string? nomeTb = n.Tabella;
+        //    string? nomeDbSql = n.DbDest;
+        //    string? nomeTabSql = n.TabellaSql;
+        //    string? nomeWorkSheet = n.WorkSheet;
+        //    string? inpType = n.InpType;
+        //    if (inpType == "EXL")
+        //    {
+        //        string? exlPath = _exlPath + "\\" + nomeTb;
+        //        Bol = await NomeColFileExltoTabSql(nomeWorkSheet, nomeDbSql, nomeTabSql, exlPath);
+        //        Bol = await DatiFileExltoTabSql(nomeWorkSheet, nomeDbSql, nomeTabSql, exlPath);
+        //    }                        
+        //}
         Bol= await NormTab.NormTabImp("EXL");
         //Bol = await TestDateImpExl.FinalizzaUptd();
     }

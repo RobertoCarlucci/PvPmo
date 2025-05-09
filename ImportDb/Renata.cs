@@ -5,7 +5,7 @@
         public static async Task NewSetup()
         {
             // Apro una finestra di sistema x la selezione della cartella di importazione.
-            string _exlPath = await SelCart.PickFolderStatic(default);
+            string _exlPath = await SelCart.PickFolder();
             
             bool Bol = await ImportSetup(_exlPath, "Project Cost Performance 2025 Q1", "BC_Database_New", "pvpmo_origine", "Renata");
         }
@@ -91,7 +91,7 @@
             await SqlAsync.SqlQryDataTable(StrConnSql, QrySql, _tabSql, 30);
             string QryAcs = NormExpAcs(nomeTbSql, _tabSql);
             QryAcs = "CREATE TABLE " + QryAcs;
-            string filePath = await SelCart.PickAndShow(default);
+            string filePath = await SelCart.PickFile();
 
             return true;
         }

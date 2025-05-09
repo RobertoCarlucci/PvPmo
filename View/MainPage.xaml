@@ -12,14 +12,14 @@
             ColumnDefinitions="*,*,*"             
             RowDefinitions="*,*,*"
             RowSpacing="0">
-            
+
             <Image x:Name="backgroundImage"
                    Source="wallpaper_dl.png"
                    Grid.RowSpan="3"
                    Grid.ColumnSpan="3"
-                   HorizontalOptions="CenterAndExpand"
-                   VerticalOptions="CenterAndExpand"
-                   Aspect="AspectFill"/>
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Aspect="AspectFill" />
 
             <Button Text="Gestione Importazioni Dati Acs ed Exl."
                 Style="{StaticResource MyButton}"
@@ -62,11 +62,11 @@
                 Margin="40"/>
 
             <ActivityIndicator IsVisible="{Binding IsBusy}"
-                            IsRunning="{Binding IsBusy}"
-                            HorizontalOptions="FillAndExpand"
-                            VerticalOptions="CenterAndExpand"                               
-                            Grid.RowSpan="2"
-                            Grid.ColumnSpan="2"/>
+                                IsRunning="{Binding IsBusy}"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"                              
+                                Grid.RowSpan="2"
+                                Grid.ColumnSpan="2"/>
         </Grid>
     </RefreshView>
 </ContentPage>

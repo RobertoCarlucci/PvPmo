@@ -1,5 +1,7 @@
 ﻿global using PvPmo.ViewModel;
-global using PvPmo.Model;
+global using PvPmo.Models;
+global using PvPmo.Services;
+global using PvPmo.Repositories;
 global using PvPmo.Util;
 global using PvPmo.GestDb;
 global using CommunityToolkit.Mvvm.ComponentModel;

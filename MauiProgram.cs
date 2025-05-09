@@ -20,12 +20,18 @@ namespace PvPmo
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+            //Wiews
+
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<MainViewModel>();
             builder.Services.AddTransient<ModData>();
             builder.Services.AddTransient<ModDataViewModel>();
             builder.Services.AddTransient<GesAcs>();
             builder.Services.AddTransient<GesAcsViewModel>();
+
+            //Services
+
+            builder.Services.AddPvPmoServices();
 
             return builder.Build();
         }

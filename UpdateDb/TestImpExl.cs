@@ -1,6 +1,4 @@
-﻿using PvPmo.Service;
-
-namespace PvPmo.UpdateDb
+﻿namespace PvPmo.UpdateDb
 {
     public partial class TestDateImpExl
     {
@@ -10,20 +8,23 @@ namespace PvPmo.UpdateDb
         {
             // Carico il File dall'archivio con la sequenza da svolgere
             // e provvedo all'esecuzione.
-            CaricaTabFinalizzaService _finalizza = new CaricaTabFinalizzaService();
+            //CaricaTabFinalizzaService _finalizza = new CaricaTabFinalizzaService();
+            var repo = new CaricaTabRepository<CaricaTabFinalizza>("pvpmo_origine", "origine");
+
+            var dati = await repo.GetAllAsync();
             bool Bol = false;
 
-            foreach (var n in _finalizza.caricaTabFin) 
-            {
-                string? azione = n.Azione.ToString();
-                string? tabProd = n.TabConfronto.ToString();
-                string? colProd = n.ColConfronto.ToString();
-                string? tabUptd = n.TabTestare.ToString();
-                string? colUptd = n.ColDaTestare.ToString();
-                string? dbProd = n.DbTabConfronto.ToString();
-                string? dbUptd = n.DbTabTest.ToString();
-                Bol = await TestFileExlImp(azione, tabProd, colProd, tabUptd, colUptd, dbProd, dbUptd);
-            }
+            //foreach (var n in _finalizza.caricaTabFin) 
+            //{
+            //    string? azione = n.Azione.ToString();
+            //    string? tabProd = n.TabConfronto.ToString();
+            //    string? colProd = n.ColConfronto.ToString();
+            //    string? tabUptd = n.TabTestare.ToString();
+            //    string? colUptd = n.ColDaTestare.ToString();
+            //    string? dbProd = n.DbTabConfronto.ToString();
+            //    string? dbUptd = n.DbTabTest.ToString();
+            //    Bol = await TestFileExlImp(azione, tabProd, colProd, tabUptd, colUptd, dbProd, dbUptd);
+            //}
             return Bol;
         }
         // Eseguo i test sui file exl di update importati in pmo_origine.
