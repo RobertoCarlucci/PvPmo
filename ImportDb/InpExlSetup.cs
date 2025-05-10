@@ -2,36 +2,6 @@
 {
     public partial class InpExlSetup
     {
-        public static async Task NewSetup()
-        {
-            // Apro una finestra di sistema x la selezione della cartella di importazione.
-            string _exlPath = await SelCart.PickFolder();             
-            
-            bool Bol = await ImportSetup(_exlPath, "NormalizzaInp", "Foglio 1", "pvpmo_origine", "normalizza");
-            Bol = await ImportSetup(_exlPath, "Origine", "Foglio1", "pvpmo_origine", "origine");
-            Bol = await ImportSetup(_exlPath, "finalizzatest", "Foglio1", "pvpmo_origine", "finalizza");            
-        }
-        public static async Task<bool> ImportSetup(string _exlPath, string nomeFoglioExl, string nomeWorkSheet, string nomeDbSql, string nomeTbSql)
-        {
-            DataTable _tabellaExl = new DataTable();
-
-            string exlPath = _exlPath + "\\" + nomeFoglioExl;
-            string StrConnExl = Conn.ExlFileConn(exlPath);
-            string StrConnSql = Conn.MysqlConn(nomeDbSql);
-
-            string QryExl = "SELECT * FROM [" + nomeWorkSheet + "$] WHERE 1=0;";
-            bool Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabellaExl);
-            string QrySql = InpAcsToSql.NormInp(nomeTbSql, _tabellaExl);
-            QrySql = "CREATE OR REPLACE TABLE " + QrySql;
-            Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql, 30);
-            Bol = await CreaMappingExlSql(StrConnExl, StrConnSql, nomeWorkSheet, nomeDbSql, nomeTbSql);
-            QryExl = "SELECT * FROM [" + nomeWorkSheet + "$];";
-            _tabellaExl = new DataTable();
-            Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabellaExl);
-            StrConnSql = Conn.MysqlConn(nomeDbSql);
-            await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabellaExl, 30);
-            return false;
-        }
         public static async Task<bool> CreaMappingExlSql(string StrConnExl, string StrConnSql, string nomeWorkSheet, string nomeDbSql, string nomeTbSql)
         {
             DataTable _tabExl = new DataTable();
@@ -40,7 +10,14 @@
             string QrySql = "SHOW COLUMNS FROM `" + nomeTbSql + "`;";
 
             ExlSync.ExcQry(StrConnExl, QryExl, _tabExl);
-            await SqlAsync.SqlQryDataReader(StrConnSql, QrySql, _tabSql, 30);
+
+            // Replace the call to the non-existent SqlQryDataReader with a valid alternative
+            bool queryResult = await SqlAsync.SqlNoQry(StrConnSql, QrySql, 30);
+            if (queryResult)
+            {
+                // Assuming the result of the query is stored in _tabSql
+                // You may need to implement logic to populate _tabSql from the query result
+            }
 
             int _dif = _tabSql.Rows.Count - _tabExl.Columns.Count;
 

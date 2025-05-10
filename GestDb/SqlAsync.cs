@@ -4,7 +4,7 @@ public partial class SqlAsync
 {
     public static List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
     public static List<MySqlParameter> Params = new List<MySqlParameter>();
-    private static MySqlConnection? conn; 
+    private static MySqlConnection conn; 
 
     public static void AddParam(string nome, Object vale)
     {

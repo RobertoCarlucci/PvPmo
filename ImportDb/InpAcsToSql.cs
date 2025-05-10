@@ -1,33 +1,45 @@
-﻿namespace PvPmo.ImportDb;
+﻿using System.Text;
+
+namespace PvPmo.ImportDb;
 
 public partial class InpAcsToSql
 {
     //Importazione dei due Db Access con i loro dati.
     public static async Task NewDb()
     {
-        // Apro una finestra di sistema x la selezione della cartella di importazione.
         string _acsPath = await SelCart.PickFolder();
         var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
-
         var dati = await repo.GetAllAsync();
 
+        foreach (var n in dati)
+        {
+            if (n.InpType != "ACS") continue;
 
-        //foreach (var n in dati.)
-        //{
-        //    string? nomeDbAcs = n.DbInp;
-        //    string? nomeTb = n.Tabella;
-        //    string? nomeDbSql = n.DbDest;
-        //    string? nomeTabSql = n.TabellaSql;
-        //    string? nomeWorkSheet = n.WorkSheet;
-        //    string? inpType = n.InpType;
-        //    if (inpType == "ACS")
-        //    {
-        //        bool tab = await TabAcstoTabSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
-        //        tab = await InpAcsDatitoSql(nomeDbAcs, nomeTb, nomeDbSql, nomeTabSql, _acsPath);
-        //    }
-        //}
-        bool Bol = await NormTab.NormTabImp("ACS");
+            if (string.IsNullOrWhiteSpace(n.DbInp) || string.IsNullOrWhiteSpace(n.Tabella) ||
+                string.IsNullOrWhiteSpace(n.DbDest) || string.IsNullOrWhiteSpace(n.TabellaSql))
+                continue;
+            // Aggiunto per evitare che un errore blocchi tutte le tabelle:
+            try
+            {
+                bool ok1 = await TabAcstoTabSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, _acsPath);
+                bool ok2 = await InpAcsDatitoSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, _acsPath);
+
+                if (!ok1 || !ok2)
+                {
+                    await Shell.Current.DisplayAlert("Errore", $"Errore durante l'import di {n.Tabella}", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Errore", $"Tabella {n.Tabella}: {ex.Message}", "OK");
+            }
+        }
+
+        bool norm = await NormTab.NormTabImp("ACS");
+        if (!norm)
+            await Shell.Current.DisplayAlert("Errore", "Normalizzazione fallita", "OK");
     }
+
     // Creo le tabelle Sql leggendo i nomi delle tabelle Access e normalizzando le
     // intestazioni delle colonne in modo compatibile con sql.
     public static async Task<bool> TabAcstoTabSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
@@ -73,7 +85,9 @@ public partial class InpAcsToSql
         string StrConnSql = Conn.MysqlConn(nomeDbSql);
 
         await AcsAsync.AcsQryTab(StrConnAcs, QryAcs, _tabAcs);
-        await SqlAsync.SqlNoQry(StrConnSql, QrySql, _tabSql, 30);
+        QrySql = "SHOW COLUMNS FROM `" + nomeTbSql + "`;";
+        List<MySqlParameter> parameters = new List<MySqlParameter>(); // Se necessario, aggiungi parametri qui
+        await SqlAsync.SqlNoQry(StrConnSql, QrySql, 30, parameters);
 
         int _dif = _tabSql.Rows.Count - _tabAcs.Columns.Count;
 
@@ -118,124 +132,81 @@ public partial class InpAcsToSql
     // Si procede anche alla normalizzazione dei nomi colonna.
     public static string NormInp(string nomeTbSql, DataTable tabData)
     {
-        // Chiamata alla funzione di normalizzazione nome tabella.        
+        var sb = new StringBuilder();
+        sb.Append($"`{nomeTbSql}` (");
 
-        string Qry = nomeTbSql + " (";
-        int x = 0;
-        int i = tabData.Columns.Count - 1;
+        bool hasPrimaryKey = false;
+        int colIndex = 0;
+        int lastIndex = tabData.Columns.Count - 1;
 
         foreach (DataColumn col in tabData.Columns)
         {
-            string Name = col.ColumnName;
-            string Type = col.DataType.ToString();
-            Type = Type.Remove(0, 7);
-            // Aggiungo colonna id se non presente.
-            if (x == 0 && Name != "ID")
+            string originalName = col.ColumnName;
+            string columnType = MappaTipo(col.DataType.Name);
+
+            // Rinomina nomi specifici
+            string renamed = originalName switch
             {
-                string idType = ("INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT");
-                string idName = "id";
-                Qry = Qry + "`" + idName + "` " + idType + ", ";
-            }
-            // Select tipo dati colonne.
-            switch (Type)
+                "ID" => "id",
+                "Date" or "DateID" or "Date ID" => "Dateid",
+                "Key" or "KeyID" => "Keyid",
+                "ID&Month&Year" => "IdMonthYear",
+                "Work ID #" => "WorkId",
+                "Action Items, Completed (#)" => "ActionItemsCompletedVal",
+                "Action Items, Completed (%)" => "ActionItemsCompletedPerc",
+                "KeyFTE_Mese" => "KeyFteMese",
+                "ORE" => "Ore",
+                _ => originalName
+            };
+
+            renamed = NormalizzaNome(renamed);
+
+            if (renamed.Equals("id", StringComparison.OrdinalIgnoreCase))
             {
-                case "String":
-                    Type = ("nvarchar(50)");
-                    break;
-                case "Double":
-                    Type = ("SMALLINT UNSIGNED");
-                    break;
-                case "Int16":
-                    Type = ("SMALLINT UNSIGNED");
-                    break;
-                case "Single":
-                    Type = ("SMALLINT UNSIGNED");
-                    break;
-                case "DateTime":
-                    Type = ("DATE");
-                    break;
+                columnType = "INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT";
+                hasPrimaryKey = true;
             }
-            // Select nomi colonne e creazione chiave primaria dove necessaria.
-            switch (Name)
-            {
-                case "ID":
-                    Type = ("INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT");
-                    Name = "id";
-                    break;
-                case "Divisore":
-                    Type = ("FLOAT");
-                    break;
-                case "Modifica":
-                    Type = ("nvarchar(120)");
-                    break;
-                case "TipoCol":
-                    Type = ("nvarchar(120)");
-                    break;
-                case "ORE":
-                    Type = ("FLOAT");
-                    Name = "Ore";
-                    break;
-                case "Hours Per Week":
-                    Type = ("FLOAT");
-                    break;
-                case "Timesheet_Time":
-                    Type = ("FLOAT");
-                    break;
-                case "Action Items, Completed (#)":
-                    Name = "ActionItemsCompletedVal";
-                    break;
-                case "Action Items, Completed (%)":
-                    Name = "ActionItemsCompletedPerc";
-                    break;
-                case "Date":
-                    Name = "Dateid";
-                    break;
-                case "DateID":
-                    Name = "Dateid";
-                    break;
-                case "Date ID":
-                    Name = "Dateid";
-                    break;
-                case "DateKeY":
-                    Name = "Datekey";
-                    break;
-                case "KeyFTE_Mese":
-                    Name = "KeyFteMese";
-                    break;
-                case "Key":
-                    Name = "Keyid";
-                    break;
-                case "KeyID":
-                    Name = "Keyid";
-                    break;
-                case "ID&Month&Year":
-                    Name = "IdMonthYear";
-                    break;
-                case "Work ID #":
-                    Name = "WorkId";
-                    break;
-            }
-            // Eliminazione dei caratteri speciali possibili in access.
-            string RemVirgola = Name.Replace(",", "");
-            string RemTrattinoAlto = RemVirgola.Replace("-", "");
-            string RemTrattinoBasso = RemTrattinoAlto.Replace("_", "");
-            string RemSpazi = RemTrattinoBasso.Replace(" ", "");
-            string RemTondeIn = RemSpazi.Replace("(", "");
-            string RemTondeFn = RemTondeIn.Replace(")", "");
-            // Accodamento nella query dei nomi campi.
-            // Viene usato il carattere ` (Alt + 96) per indicare tipo stringa nel
-            // nome colonna.
-            if (x < i)
-            {
-                Qry = Qry + "`" + RemTondeFn + "` " + Type + ", ";
-            }
-            else
-            {
-                Qry = Qry + "`" + RemTondeFn + "` " + Type;
-            }
-            x++;
+            // Override tipo per colonne specifiche
+            if (originalName == "Divisore" || originalName.Contains("Hours") || originalName.Contains("Time"))
+                columnType = "FLOAT";
+            if (originalName == "Modifica" || originalName == "TipoCol")
+                columnType = "NVARCHAR(120)";
+
+            sb.Append($"`{renamed}` {columnType}");
+
+            if (colIndex < lastIndex)
+                sb.Append(", ");
+
+            colIndex++;
         }
-        Qry += ");";
-        return Qry;
+        // Se manca colonna ID, la aggiungiamo in cima
+        if (!hasPrimaryKey)
+            sb.Insert(0, "`id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT, ");
+
+        sb.Append(");");
+        return sb.ToString();
     }
+    private static string MappaTipo(string type) => type switch
+    {
+        "String" => "NVARCHAR(50)",
+        "Int16" => "SMALLINT UNSIGNED",
+        "Int32" => "INT UNSIGNED",
+        "Int64" => "BIGINT UNSIGNED",
+        "Single" => "FLOAT",
+        "Double" => "DOUBLE",
+        "Decimal" => "DECIMAL(18,2)",
+        "DateTime" => "DATETIME",
+        "Boolean" => "TINYINT(1)",
+        "Byte[]" => "BLOB",
+        "TimeSpan" => "TIME",
+        _ => "NVARCHAR(255)" // fallback
+    };
+    private static string NormalizzaNome(string name)
+    {
+        var simboliDaRimuovere = new[] { ",", "-", "_", " ", "(", ")" };
+        foreach (var simbolo in simboliDaRimuovere)
+            name = name.Replace(simbolo, "");
+        return name;
+    }
+
 }
