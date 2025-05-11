@@ -65,7 +65,7 @@
 	  <MauiCss Remove="Archivio\ExportXLSX\**" />
 	  <MauiXaml Remove="Archivio\ExportXLSX\**" />
 	  <None Remove="Archivio\ExportXLSX\**" />
-	</ItemGroup>
+	</ItemGroup>	
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="11.1.0" />

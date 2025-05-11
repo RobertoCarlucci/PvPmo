@@ -2,86 +2,68 @@
 {
     public class AcsAsync
     {
-        public static async Task<DataTable> AcsQryTab(string StrConn, string Qry, DataTable _tabella)
+        private static OleDbConnection conn;
+        public static async Task<DataTable> AcsQryTab(string strConn, string qry, DataTable tabella)
         {
             try
             {
-                var _connAcs = new OleDbConnection(StrConn);
-                _connAcs.Open();
-                var _cmdAcs = new OleDbCommand(Qry, _connAcs);                
-                var _adapter = new OleDbDataAdapter(_cmdAcs);
+                var conn = new OleDbConnection(strConn);
+                conn.Open();
+                var cmd = new OleDbCommand(qry, conn);                
+                var _adapter = new OleDbDataAdapter(cmd);
                 //await Task.Run(() => _adapter.Fill(_tabella));                
-                int ContaRecord = _adapter.Fill(_tabella);
-                return _tabella;
+                int ContaRecord = _adapter.Fill(tabella);
+                return tabella;
             }
             catch (OleDbException ex)
             {
-                await Shell.Current.DisplayAlert
-                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
-                return _tabella;
+                // gestisci a livello superiore (es: logger/VM)
+                throw;
             }
             finally
             {
-                if (ConnectionState.Open != ConnectionState.Closed) { };
+                if (conn != null && conn.State == ConnectionState.Open) // Fixed condition
+                {
+                    await conn.CloseAsync();
+                }
             }
         }
-        public static async Task<DataTable> AcsQryDataReader(string StrConn, string Qry, DataTable _tabella)
+        public static async Task<DataTable> AcsQryDataReader(string strConn, string qry, DataTable tabella)
         {
             try
             {
-                var _connAcs = new OleDbConnection(StrConn);
-                _connAcs.Open();
+                var conn = new OleDbConnection(strConn);
+                conn.Open();
                 string[] restrictions = new string[4];
-                var _cmdAcs = new OleDbCommand(Qry, _connAcs);
-                OleDbDataReader _datareader = _cmdAcs.ExecuteReader();
-                _tabella.Load(_datareader);
+                var cmd = new OleDbCommand(qry, conn);
+                OleDbDataReader _datareader = cmd.ExecuteReader();
+                tabella.Load(_datareader);
                 _datareader.Close();                
-                return _tabella;
+                return tabella;
             }
             catch (OleDbException ex)
             {
-                await Shell.Current.DisplayAlert
-                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
-                return _tabella;
+                // gestisci a livello superiore (es: logger/VM)
+                throw;
             }
             finally
             {
-                if (ConnectionState.Open != ConnectionState.Closed) { };
+                if (conn != null && conn.State == ConnectionState.Open) // Fixed condition
+                {
+                    await conn.CloseAsync();
+                }
             }
         }
-        //public static async Task<DataTable> AcsQryDataReader(string StrConn, string Qry, DataTable _tabella)
-        //{
-        //    try
-        //    {
-        //        var _connAcs = new OleDbConnection(StrConn);
-        //        _connAcs.Open();
-        //        string[] restrictions = new string[4];
-        //        var _cmdAcs = new OleDbCommand(Qry, _connAcs);
-        //        OleDbDataReader _datareader = _cmdAcs.ExecuteReader();
-        //        _tabella.Load(_datareader);
-        //        _datareader.Close();
-        //        return _tabella;
-        //    }
-        //    catch (OleDbException ex)
-        //    {
-        //        await Shell.Current.DisplayAlert
-        //            ("Errore MariaDb", $"Codice: {ex}", "Ok");
-        //        return _tabella;
-        //    }
-        //    finally
-        //    {
-        //        if (ConnectionState.Open != ConnectionState.Closed) { };
-        //    }
-        //}
-        public static async Task<bool> AcsDelifExist(string StrConn, string tableDel)
+        
+        public static async Task<bool> AcsDelifExist(string strConn, string tableDel)
         {
             string tableToDelete = tableDel;   //table name
             bool tableExists = false;
             try
             {
-                var _connAcs = new OleDbConnection(StrConn);
-                _connAcs.Open();
-                DataTable dt = _connAcs.GetSchema("tables");
+                var conn = new OleDbConnection(strConn);
+                conn.Open();
+                DataTable dt = conn.GetSchema("tables");
                 foreach (DataRow row in dt.Rows)
                 {
                     if (row["TABLE_NAME"].ToString() == tableToDelete)
@@ -92,7 +74,7 @@
                 }
                 if (tableExists)
                 {
-                    using (OleDbCommand cmd = new OleDbCommand(string.Format("DROP TABLE {0}", tableToDelete), _connAcs))
+                    using (OleDbCommand cmd = new OleDbCommand(string.Format("DROP TABLE {0}", tableToDelete), conn))
                     {
                         cmd.ExecuteNonQuery();                        
                     }
@@ -101,13 +83,15 @@
             }
             catch (OleDbException ex)
             {
-                await Shell.Current.DisplayAlert
-                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
-                return tableExists;
+                // gestisci a livello superiore (es: logger/VM)
+                throw;
             }
             finally
             {
-                if (ConnectionState.Open != ConnectionState.Closed) { };
+                if (conn != null && conn.State == ConnectionState.Open) // Fixed condition
+                {
+                    await conn.CloseAsync();
+                }
             }
         }
     }

@@ -1,102 +1,74 @@
-﻿namespace PvPmo.UpdateDb;
+﻿using PvPmo.ImportDb;
 
-public partial class InpExlToSql
+namespace PvPmo.UpdateDb
 {
-    //Importo i File Excel per l'aggiornamento mensile.    
-    public static async Task InpExl()
+    public partial class InpExlToSql
     {
-        // Apro una finestra di sistema x la selezione della cartella di importazione.
-        string _exlPath = await SelCart.PickFolder();
-        var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
-
-        var dati = await repo.GetAllAsync();
-        
-        bool Bol = false;
-
-        //foreach (var n in _leggitabdborigine.CaricaTabOrigini)
-        //{
-        //    string? nomeDbAcs = n.DbInp;
-        //    string? nomeTb = n.Tabella;
-        //    string? nomeDbSql = n.DbDest;
-        //    string? nomeTabSql = n.TabellaSql;
-        //    string? nomeWorkSheet = n.WorkSheet;
-        //    string? inpType = n.InpType;
-        //    if (inpType == "EXL")
-        //    {
-        //        string? exlPath = _exlPath + "\\" + nomeTb;
-        //        Bol = await NomeColFileExltoTabSql(nomeWorkSheet, nomeDbSql, nomeTabSql, exlPath);
-        //        Bol = await DatiFileExltoTabSql(nomeWorkSheet, nomeDbSql, nomeTabSql, exlPath);
-        //    }                        
-        //}
-        Bol= await NormTab.NormTabImp("EXL");
-        //Bol = await TestDateImpExl.FinalizzaUptd();
-    }
-    
-    // Creo le tabelle nel Db Sql per importare i dati dai file Excel.
-    public static async Task<bool> NomeColFileExltoTabSql(string nomeFoglioExl, string nomeDbSql, string nomeTbSql, string exlPath)
-    {
-        DataTable _tabellaExl = new DataTable();        
-        string StrConnExl = Conn.ExlFileConn(exlPath);
-        string StrConnSql = Conn.MysqlConn(nomeDbSql);
-        string QryExl = "SELECT * FROM [" + nomeFoglioExl + "$] WHERE 1=0;";        
-        bool Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabellaExl);
-        string QrySql = InpExl(nomeTbSql, _tabellaExl);        
-        QrySql = "CREATE OR REPLACE TABLE " + QrySql;
-        Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql, 30);                        
-        return true;
-    }
-    // Inserisco i dati nelle opportune tabelle colonne.
-    public static async Task<bool> DatiFileExltoTabSql(string nomeFoglio, string nomeDbSql, string nomeTbSql, string exlPath)
-    {
-        DataTable _tabella = new DataTable();
-        string StrConnExl = Conn.ExlFileConn(exlPath);
-        string QryExl = "SELECT * FROM [" + nomeFoglio + "$];";
-        bool Bol = ExlSync.ExcQry(StrConnExl, QryExl, _tabella);
-        string StrConnSql = Conn.MysqlConn(nomeDbSql);
-        await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella, 120);
-        return Bol;            
-    }
-    // Normalizzo il tipo di dati da importare alle necessità di Sql.
-    public static string InpExl(string nomeTabDb, DataTable tabData)
-    {
-        string Qry = nomeTabDb + " (";
-        int x = 0;
-        int i = tabData.Columns.Count - 1;
-
-        foreach (DataColumn col in tabData.Columns)
+        // Importazione file Excel per aggiornamento mensile
+        public static async Task InpExl()
         {
-            string Name = col.ColumnName;
-            string Type = col.DataType.ToString();
-            Type = Type.Remove(0, 7);            
-            switch (Type)
+            string? exlPath = await SelCart.PickFolder();
+            if (string.IsNullOrWhiteSpace(exlPath)) return;
+
+            var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
+            var dati = await repo.GetAllAsync();
+
+            foreach (var n in dati)
             {
-                case "String":
-                    Type = ("nvarchar(50)");
-                    break;
-                case "Double":
-                    Type = ("SMALLINT UNSIGNED");
-                    break;
-                case "Int16":
-                    Type = ("SMALLINT UNSIGNED");
-                    break;
-                case "Single":
-                    Type = ("SMALLINT UNSIGNED");
-                    break;
-                case "DateTime":                    
-                    Type = ("DATE");
-                    break;
+                if (n.InpType != "EXL") continue;
+
+                string? nomeTb = n.Tabella;
+                string? dbDest = n.DbDest;
+                string? nomeTabSql = n.TabellaSql;
+                string? workSheet = n.WorkSheet;
+
+                if (string.IsNullOrWhiteSpace(nomeTb) || string.IsNullOrWhiteSpace(dbDest) ||
+                    string.IsNullOrWhiteSpace(nomeTabSql) || string.IsNullOrWhiteSpace(workSheet))
+                    continue;
+
+                string filePath = Path.Combine(exlPath, nomeTb);
+
+                bool ok1 = await NomeColFileExltoTabSql(workSheet, dbDest, nomeTabSql, filePath);
+                bool ok2 = await DatiFileExltoTabSql(workSheet, dbDest, nomeTabSql, filePath);
+
+                if (!ok1 || !ok2)
+                {
+                    await Shell.Current.DisplayAlert("Errore", $"Errore su tabella: {nomeTabSql}", "OK");
+                }
             }
-            if (x < i)
-            {
-                Qry = Qry + "`" + Name + "` " + Type + ", ";
-            }
-            else
-            {
-                Qry = Qry + "`" + Name + "` " + Type;
-            }
-            x++;
+
+            await NormTab.NormTabImp("EXL");
+            await TestDateImpExl.FinalizzaUptd();
         }
-        Qry += ");";
-        return Qry;
+
+        // Crea tabella SQL da file Excel (solo struttura)
+        public static async Task<bool> NomeColFileExltoTabSql(string nomeFoglioExl, string nomeDbSql, string nomeTbSql, string exlPath)
+        {
+            DataTable tabellaExl = new();
+            string strConnExl = Conn.ExlFileConn(exlPath);
+            string strConnSql = Conn.MysqlConn(nomeDbSql);
+            string qryExl = $"SELECT * FROM [{nomeFoglioExl}$] WHERE 1=0;";
+
+            bool ok = await ExlAsync.ExcQry(strConnExl, qryExl, tabellaExl);
+            if (!ok || tabellaExl.Columns.Count == 0)
+                return false;
+
+            string ddl = "CREATE OR REPLACE TABLE " + InpAcsToSql.NormInp(nomeTbSql, tabellaExl);
+            return await SqlAsync.SqlNoQry(strConnSql, ddl, 30);
+        }
+
+        // Copia i dati dal file Excel alla tabella SQL
+        public static async Task<bool> DatiFileExltoTabSql(string nomeFoglio, string nomeDbSql, string nomeTbSql, string exlPath)
+        {
+            DataTable tabella = new();
+            string strConnExl = Conn.ExlFileConn(exlPath);
+            string qryExl = $"SELECT * FROM [{nomeFoglio}$];"; // Carica dati reali
+            bool ok = await ExlAsync.ExcQry(strConnExl, qryExl, tabella);
+            if (!ok || tabella.Rows.Count == 0)
+                return false;
+
+            string strConnSql = Conn.MysqlConn(nomeDbSql);
+            return await SqlAsync.SqlBulkCopy(strConnSql, nomeTbSql, tabella, 120);
+        }
     }
 }
