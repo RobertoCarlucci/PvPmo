@@ -48,7 +48,8 @@ public partial class InpAcsToSql
     {
         string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
         DataTable _tabella = new DataTable();
-        string Qry = $"SELECT * FROM [{nomeTbAcs}$] WHERE 1=0;";
+        string Qry = $"SELECT * FROM [{nomeTbAcs}];";
+        //string Qry = "SELECT * FROM [" + nomeTbAcs + "] WHERE 1=0";
         await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
         Qry = NormInp(nomeTbSql, _tabella);
         Qry = "CREATE OR REPLACE TABLE " + Qry;
@@ -75,22 +76,6 @@ public partial class InpAcsToSql
         await AcsAsync.AcsQryTab(connAcs, qry, tabella);
         return await SqlAsync.SqlBulkCopy(connSql, nomeTbSql, tabella, 180);
     }
-
-    //public static async Task<bool> InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
-    //{
-    //    bool Bol = await CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, acsPath);
-    //    if (Bol == true)
-    //    {
-    //        string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
-    //        DataTable _tabella = new DataTable();
-    //        string Qry = "SELECT * FROM [" + nomeTbAcs + "]";
-    //        await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
-    //        string StrConnSql = Conn.MysqlConn(nomeDbSql);
-    //        await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella, 180);            
-    //    }
-    //    return Bol;
-    //}
-
     // Vengono lette le intestazioni delle colonne Access e Sql per creare il mapping
     // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
     // AddMapping all'interno della cartella GestDb classe gestione Sql.
@@ -129,63 +114,7 @@ public partial class InpAcsToSql
             "Si", "No");
 
         return conferma;
-    }
-
-
-    //public static async Task<bool> CreaMappingAcsSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
-    //{
-    //    DataTable _tabAcs = new DataTable();
-    //    DataTable _tabSql = new DataTable();
-    //    string QryAcs = "SELECT * FROM [" + nomeTbAcs + "] WHERE 1=0;";
-    //    string QrySql = "SHOW COLUMNS FROM `" + nomeTbSql + "`;";
-
-    //    string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
-    //    string StrConnSql = Conn.MysqlConn(nomeDbSql);
-
-    //    await AcsAsync.AcsQryTab(StrConnAcs, QryAcs, _tabAcs);
-    //    QrySql = "SHOW COLUMNS FROM `" + nomeTbSql + "`;";
-    //    List<MySqlParameter> parameters = new List<MySqlParameter>(); // Se necessario, aggiungi parametri qui
-    //    await SqlAsync.SqlNoQry(StrConnSql, QrySql, 30, parameters);
-
-    //    int _dif = _tabSql.Rows.Count - _tabAcs.Columns.Count;
-
-    //    if (_dif == 0)
-    //    {
-    //        DataRow[] _rowSql = _tabAcs.Select();
-    //        for (int x = 1; x < _tabSql.Rows.Count; x++)
-    //        {
-    //            int SourceOrdinal = x;
-    //            string? DestinationColumn = _tabSql.Rows[x]["Field"].ToString();
-    //            SqlAsync.AddMapping(SourceOrdinal, DestinationColumn);
-    //        }
-    //        return true;
-    //    }
-    //    else if (_dif == 1)
-    //    {
-    //        DataRow[] _rowSql = _tabAcs.Select();
-    //        for (int x = 1; x < _tabSql.Rows.Count; x++)
-    //        {
-    //            int SourceOrdinal = x - 1;
-    //            string? DestinationColumn = _tabSql.Rows[x]["Field"].ToString();
-    //            SqlAsync.AddMapping(SourceOrdinal, DestinationColumn);
-    //        }
-    //        return true;
-    //    }
-    //    else if (_dif < 0 || _dif > 1)
-    //    {
-    //        var Conf = await Shell.Current.DisplayAlert
-    //            ("Errore nel numero di Colonne delle Tabelle.", "La Tabella Access: "
-    //            + _tabAcs + " Ha un numero di colonne diverso dalla tabella Sql: "
-    //            + _tabSql + " Vuoi continuare ad importare le altre tabelle residue ? "
-    //            , "Si", "No");
-    //        if (Conf == true)
-    //            return true;
-    //        else
-
-    //            return false;
-    //    }
-    //    return false;
-    //}
+    }    
     // Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
     // Si procede anche alla normalizzazione dei nomi colonna.
     public static string NormInp(string nomeTbSql, DataTable tabData)
@@ -202,6 +131,17 @@ public partial class InpAcsToSql
             string originalName = col.ColumnName;
             string columnType = MappaTipo(col.DataType.Name);
 
+            // Se manca colonna ID, la aggiungiamo in cima
+            // Se la colonna è ID e non è la prima colonna, non la consideriamo
+            
+            if (colIndex == 0 && !originalName.Equals("id", StringComparison.OrdinalIgnoreCase))
+            {
+                if (hasPrimaryKey == false)
+                {
+                    sb.Append("`id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT, ");
+                    hasPrimaryKey = true;
+                }                
+            }            
             // Rinomina nomi specifici
             string renamed = originalName switch
             {
@@ -221,11 +161,15 @@ public partial class InpAcsToSql
 
             if (renamed.Equals("id", StringComparison.OrdinalIgnoreCase))
             {
-                columnType = "INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT";
-                hasPrimaryKey = true;
+                if (hasPrimaryKey == false)
+                {
+                    columnType = "INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT";
+                    hasPrimaryKey = true;
+                }                
             }
             // Override tipo per colonne specifiche
-            if (originalName == "Divisore" || originalName.Contains("Hours") || originalName.Contains("Time"))
+            if (originalName == "Divisore" || originalName == ("Hours Per Week")
+                || originalName == ("Timesheet_Time") || originalName == ("ORE"))
                 columnType = "FLOAT";
             if (originalName == "Modifica" || originalName == "TipoCol")
                 columnType = "NVARCHAR(120)";
@@ -233,14 +177,16 @@ public partial class InpAcsToSql
             sb.Append($"`{renamed}` {columnType}");
 
             if (colIndex < lastIndex)
+            {
                 sb.Append(", ");
-
+            }
+            else 
+            {
+                sb.Append("");
+            }
             colIndex++;
+                           
         }
-        // Se manca colonna ID, la aggiungiamo in cima
-        if (!hasPrimaryKey)
-            sb.Insert(0, "`id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT, ");
-
         sb.Append(");");
         return sb.ToString();
     }

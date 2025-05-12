@@ -11,7 +11,7 @@
             string qryExl = $"SELECT * FROM [{nomeWorkSheet}$] WHERE 1=0;";
             string qrySql = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
 
-            ExlSync.ExcQry(strConnExl, qryExl, tabExl);
+            await ExlAsync.ExcQry(strConnExl, qryExl, tabExl);
             await SqlAsync.SqlQryDataTable(strConnSql, qrySql, tabSql, 30);
 
             int dif = tabSql.Rows.Count - tabExl.Columns.Count;
@@ -30,15 +30,13 @@
 
                 return true;
             }
-
                 // Differenza colonne > 1 → alert utente
                 var conferma = await Shell.Current.DisplayAlert(
                     "Errore colonne",
                     $"Excel: {tabExl.Columns.Count} col.\nMySQL: {tabSql.Rows.Count} col.\nVuoi continuare con le altre tabelle?",
                     "Si", "No");
 
-                return conferma;
-           
+                return conferma;           
     }
 
 

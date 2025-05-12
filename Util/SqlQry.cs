@@ -32,11 +32,11 @@ public class SqlQry
         bool Bol = await SqlAsync.SqlNoQry(StrConnSql, QrySql, 30);
         return Bol;
     }
-    public static Boolean DelRecSql(string nomeDb, string tabella)
+    public static async Task<bool> DelRecSql(string nomeDb, string tabella)
     {
         string StrConn = Conn.MysqlConn(nomeDb);
         string QrySql = "DELETE FROM " + tabella + ";";
-        Boolean Bol = SqlSync.SqlNoQry(QrySql, StrConn);
+        bool Bol = await SqlAsync.SqlNoQry(QrySql, StrConn);
         return Bol;
     }
     public static async Task<bool> RinColSql(string StrConnSql, string nomeTabSql, string oldNomeColSql, string newwNomeColSql, string typeColSql)

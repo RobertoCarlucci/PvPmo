@@ -8,37 +8,37 @@ namespace PvPmo.UpdateDb
         public static async Task InpExl()
         {
             string? exlPath = await SelCart.PickFolder();
-            if (string.IsNullOrWhiteSpace(exlPath)) return;
-
-            var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
-            var dati = await repo.GetAllAsync();
-
-            foreach (var n in dati)
+            if (!string.IsNullOrEmpty(exlPath))
             {
-                if (n.InpType != "EXL") continue;
+                var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
+                var dati = await repo.GetAllAsync();
 
-                string? nomeTb = n.Tabella;
-                string? dbDest = n.DbDest;
-                string? nomeTabSql = n.TabellaSql;
-                string? workSheet = n.WorkSheet;
-
-                if (string.IsNullOrWhiteSpace(nomeTb) || string.IsNullOrWhiteSpace(dbDest) ||
-                    string.IsNullOrWhiteSpace(nomeTabSql) || string.IsNullOrWhiteSpace(workSheet))
-                    continue;
-
-                string filePath = Path.Combine(exlPath, nomeTb);
-
-                bool ok1 = await NomeColFileExltoTabSql(workSheet, dbDest, nomeTabSql, filePath);
-                bool ok2 = await DatiFileExltoTabSql(workSheet, dbDest, nomeTabSql, filePath);
-
-                if (!ok1 || !ok2)
+                foreach (var n in dati)
                 {
-                    await Shell.Current.DisplayAlert("Errore", $"Errore su tabella: {nomeTabSql}", "OK");
-                }
-            }
+                    if (n.InpType != "EXL") continue;
 
-            await NormTab.NormTabImp("EXL");
-            await TestDateImpExl.FinalizzaUptd();
+                    string? nomeTb = n.Tabella;
+                    string? dbDest = n.DbDest;
+                    string? nomeTabSql = n.TabellaSql;
+                    string? workSheet = n.WorkSheet;
+
+                    if (string.IsNullOrWhiteSpace(nomeTb) || string.IsNullOrWhiteSpace(dbDest) ||
+                        string.IsNullOrWhiteSpace(nomeTabSql) || string.IsNullOrWhiteSpace(workSheet))
+                        continue;
+
+                    string filePath = Path.Combine(exlPath, nomeTb);
+
+                    bool ok1 = await NomeColFileExltoTabSql(workSheet, dbDest, nomeTabSql, filePath);
+                    bool ok2 = await DatiFileExltoTabSql(workSheet, dbDest, nomeTabSql, filePath);
+
+                    if (!ok1 || !ok2)
+                    {
+                        await Shell.Current.DisplayAlert("Errore", $"Errore su tabella: {nomeTabSql}", "OK");
+                    }
+                }
+                await NormTab.NormTabImp("EXL");
+                await TestDateImpExl.FinalizzaUptd();
+            }            
         }
 
         // Crea tabella SQL da file Excel (solo struttura)

@@ -17,6 +17,8 @@
             }
             catch (OleDbException ex)
             {
+                await Shell.Current.DisplayAlert
+                    ("Errore MariaDb", $"Codice: {ex}", "Ok");
                 // gestisci a livello superiore (es: logger/VM)
                 throw;
             }

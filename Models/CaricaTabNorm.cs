@@ -12,13 +12,13 @@
 
         public void FromReader(MySqlDataReader reader)
         {
-            Azione = reader["azione"]?.ToString();
-            ColDaMod = reader["coldamod"]?.ToString();
-            Modifica = reader["modifica"]?.ToString();
-            TipoCol = reader["tipocol"]?.ToString();
-            TabellaMod = reader["tabellamod"]?.ToString();
-            DbDest = reader["dbdest"]?.ToString();
-            InpType = reader["inptype"]?.ToString();
+            Azione = reader["Azione"]?.ToString();
+            ColDaMod = reader["ColDaMod"]?.ToString();
+            Modifica = reader["Modifica"]?.ToString();
+            TipoCol = reader["TipoCol"]?.ToString();
+            TabellaMod = reader["TabellaMod"]?.ToString();
+            DbDest = reader["DbDest"]?.ToString();
+            InpType = reader["InpType"]?.ToString();
         }
     }
 }
