@@ -8,7 +8,11 @@ namespace PvPmo.UpdateDb
         public static async Task InpExl()
         {
             string? exlPath = await SelCart.PickFolder();
-            if (!string.IsNullOrEmpty(exlPath))
+            if (string.IsNullOrWhiteSpace(exlPath))
+            {
+                return;
+            }
+            else
             {
                 var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
                 var dati = await repo.GetAllAsync();
@@ -17,23 +21,18 @@ namespace PvPmo.UpdateDb
                 {
                     if (n.InpType != "EXL") continue;
 
-                    string? nomeTb = n.Tabella;
-                    string? dbDest = n.DbDest;
-                    string? nomeTabSql = n.TabellaSql;
-                    string? workSheet = n.WorkSheet;
-
-                    if (string.IsNullOrWhiteSpace(nomeTb) || string.IsNullOrWhiteSpace(dbDest) ||
-                        string.IsNullOrWhiteSpace(nomeTabSql) || string.IsNullOrWhiteSpace(workSheet))
+                    if (string.IsNullOrWhiteSpace(n.Tabella) || string.IsNullOrWhiteSpace(n.DbDest) ||
+                        string.IsNullOrWhiteSpace(n.TabellaSql) || string.IsNullOrWhiteSpace(n.WorkSheet))
                         continue;
 
-                    string filePath = Path.Combine(exlPath, nomeTb);
+                    string filePath = Path.Combine(exlPath, n.Tabella);
 
-                    bool ok1 = await NomeColFileExltoTabSql(workSheet, dbDest, nomeTabSql, filePath);
-                    bool ok2 = await DatiFileExltoTabSql(workSheet, dbDest, nomeTabSql, filePath);
+                    bool ok1 = await NomeColFileExltoTabSql(n.WorkSheet, n.DbDest, n.TabellaSql, filePath);
+                    bool ok2 = await DatiFileExltoTabSql(n.WorkSheet, n.DbDest, n.TabellaSql, filePath);
 
                     if (!ok1 || !ok2)
                     {
-                        await Shell.Current.DisplayAlert("Errore", $"Errore su tabella: {nomeTabSql}", "OK");
+                        await Shell.Current.DisplayAlert("Errore", $"Errore su tabella: {n.TabellaSql}", "OK");
                     }
                 }
                 await NormTab.NormTabImp("EXL");
@@ -53,7 +52,7 @@ namespace PvPmo.UpdateDb
             if (!ok || tabellaExl.Columns.Count == 0)
                 return false;
 
-            string ddl = "CREATE OR REPLACE TABLE " + InpAcsToSql.NormInp(nomeTbSql, tabellaExl);
+            string ddl = "CREATE OR REPLACE TABLE " + NormTab.NormInp(nomeTbSql, tabellaExl);
             return await SqlAsync.SqlNoQry(strConnSql, ddl, 30);
         }
 
