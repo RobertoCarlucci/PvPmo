@@ -39,7 +39,6 @@ namespace PvPmo.Repositories
                     InpType = reader["inptype"]?.ToString()
                 });
             }
-
             return result;
         }
     }
