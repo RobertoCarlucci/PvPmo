@@ -8,6 +8,7 @@ namespace PvPmo.Util
         //        // utilizzando dalla cartella Service il servizio "CaricaTabNorm" che mi
         //        // fornisce la mappatura delle colonne da modificare e se necessario anche la
         //        // stringa da inserire nel comando Sql CONCAT
+
         public static async Task<bool> NormTabImp(string tipoImportazione)
         {
             // Carico la tabella con le azioni da svolgere dal Service
@@ -42,9 +43,11 @@ namespace PvPmo.Util
             "IdMonthYear" => await SqlQry.CreaIdMonthYear(conn, n.TabellaMod, n.ColDaMod, n.Modifica),
             "Keyid" => await SqlQry.CreaKeyId(conn, n.TabellaMod, n.ColDaMod, n.Modifica),_ => true
         };
+
         // Vengono lette le intestazioni delle colonne Access e Sql per creare il mapping
         // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
         // AddMapping all'interno della cartella GestDb classe gestione Sql.
+
         public static async Task<bool> CreaMappingAcsSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
         {
             DataTable tabAcs = new();
@@ -76,6 +79,46 @@ namespace PvPmo.Util
             // Colonne diverse > 1 → conferma da utente
             var conferma = await Shell.Current.DisplayAlert("Errore colonne", 
                 $"Le colonne in Access ({tabAcs.Columns.Count}) e in SQL ({tabSql.Rows.Count}) non coincidono.\nVuoi continuare con le altre tabelle?",
+                "Si", "No");
+
+            return conferma;
+        }
+
+        // uguale alla precedente con la differenza che vengono lette le intestazioni delle colonne
+        // Excel e Sql per creare il mapping.
+        public static async Task<bool> CreaMappingExlSql(string strConnExl, string strConnSql, string nomeWorkSheet, string nomeDbSql, string nomeTbSql)
+        {
+            DataTable tabExl = new();
+            DataTable tabSql = new();
+
+            string qryExl = $"SELECT * FROM [{nomeWorkSheet}$] WHERE 1=0;";
+            string qrySql = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
+
+            await ExlAsync.ExcQry(strConnExl, qryExl, tabExl);
+            await SqlAsync.SqlQryDataTable(strConnSql, qrySql, tabSql, 30);
+
+            int dif = tabSql.Rows.Count - tabExl.Columns.Count;
+            //int totcolexl = tabExl.Columns.Count;
+
+            if (dif == 0 || dif == 1)
+            {
+                SqlAsync.Mappings.Clear(); // Reset mapping statico
+
+                int offset = dif == 1 ? 1 : 0;
+
+                for (int i = 0; i < tabExl.Columns.Count && (i + offset) < tabSql.Rows.Count; i++)
+                //for (int i = 0; i < totcolexl + offset; i++)
+                {
+                    string? destCol = tabSql.Rows[i + offset]["Field"]?.ToString();
+                    SqlAsync.AddMapping(i, destCol ?? $"Col{i + offset}");
+                }
+
+                return true;
+            }
+            // Differenza colonne > 1 → alert utente
+            var conferma = await Shell.Current.DisplayAlert(
+                "Errore colonne",
+                $"Excel: {tabExl.Columns.Count} col.\nMySQL: {tabSql.Rows.Count} col.\nVuoi continuare con le altre tabelle?",
                 "Si", "No");
 
             return conferma;

@@ -1,11 +1,11 @@
 ﻿using PvPmo.View;
-using System;
+using PvPmo.UpdateDb;
 
 namespace PvPmo.ViewModel
 {
     public partial class MainViewModel : BaseViewModel
-    {        
-        public MainViewModel() 
+    {
+        public MainViewModel()
         {
             Title = "Home Page";
         }
@@ -16,80 +16,73 @@ namespace PvPmo.ViewModel
         [RelayCommand]
         async Task BtnGesAcs()
         {
-            if (IsBusy)
-                return;
+            if (IsBusy) return;
 
             IsBusy = true;
-
             await Shell.Current.GoToAsync(nameof(GesAcs));
-
             IsBusy = false;
-            return;
         }
 
         [RelayCommand]
-        async Task BtnAgData() 
+        async Task BtnAgData()
         {
-            if (IsBusy)
-                return;
+            if (IsBusy) return;
 
             IsBusy = true;
-
             await Shell.Current.GoToAsync(nameof(ModData));
-
             IsBusy = false;
-            return;
         }
 
         [RelayCommand]
         async Task BtnAgDb()
         {
-            if (IsBusy)
-                return;
+            if (IsBusy) return;
 
             IsBusy = true;
+            //StartProgress(); // imposta a 0, visibile
 
-            await UpdateDb.InpExlToSql.InpExl();
+            //var progress = new Progress<double>(value =>
+            //{
+            //    ProgressValue = value;
+            //});
+            //await InpExlToSql.InpExl(progress);
+            await InpExlToSql.InpExl();
 
-            await Shell.Current.DisplayAlert
-                ("Hai premuto BtnAgDb !", $"Non ci posso credere.", "Ok");
+            //ResetProgress();            
 
             IsBusy = false;
-            return;
         }
+
         [RelayCommand]
         async Task BtnTest()
         {
-            if (IsBusy)
-                return;
+            if (IsBusy) return;
 
             IsBusy = true;
 
-            //await UpdateDb.TestDateImpExl.FinalizzaUptd();
-            //await ImportDb.Renata.ExpAcs();
-
-            await Shell.Current.DisplayAlert
-                ("Fine Test !", $"Rientro da procedura.", "Ok");
+            await Shell.Current.DisplayAlert("Fine Test!", "Rientro da procedura.", "OK");
 
             IsBusy = false;
-            return;
         }
 
         [RelayCommand]
         async Task BtnEnd()
         {
-            if (IsBusy)
-                return;
+            if (IsBusy) return;
 
             IsBusy = true;
 
-            var Conf = await Shell.Current.DisplayAlert
-                ("Chiudi ed Esci.", "Vuoi chiudere l'aplicazione ?", "Si", "No");
-            if (Conf == true)
+            var confirm = await Shell.Current.DisplayAlert(
+                "Chiudi ed Esci", "Vuoi chiudere l'applicazione?", "Si", "No");
+
+            if (confirm)
+            {
                 Environment.Exit(0);
+            }
             else
-                IsBusy = false;            
-            return;
+            {
+                IsBusy = false;
+            }
         }
     }
 }

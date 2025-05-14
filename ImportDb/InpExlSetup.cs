@@ -39,11 +39,11 @@
                 bool schemaOk = await ExlAsync.ExcQry(connExl, qrySchema, schema);
                 if (!schemaOk) return false;
 
-                string ddl = "CREATE OR REPLACE TABLE " + InpAcsToSql.NormInp(tabSql, schema);
+                string ddl = "CREATE OR REPLACE TABLE " + NormTab.NormInp(tabSql, schema);
                 bool ddlOk = await SqlAsync.SqlNoQry(connSql, ddl, 30);
                 if (!ddlOk) return false;
 
-                bool mappingOk = await MappingExlSql.CreaMappingExlSql(connExl, connSql, workSheet, dbSql, tabSql);
+                bool mappingOk = await NormTab.CreaMappingExlSql(connExl, connSql, workSheet, dbSql, tabSql);
                 if (!mappingOk) return false;
 
                 string qryData = $"SELECT * FROM [{workSheet}$];";

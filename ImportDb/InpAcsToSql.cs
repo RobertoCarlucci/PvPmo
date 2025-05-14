@@ -42,8 +42,15 @@ public partial class InpAcsToSql
             }
         }        
         bool norm = await NormTab.NormTabImp("ACS");
-        if (!norm)
+        if (!norm) 
+        {
             await Shell.Current.DisplayAlert("Errore", "Normalizzazione fallita", "OK");
+        }
+        else
+        {
+            await Shell.Current.DisplayAlert("Hai completato l'importazione dei dati nel Db !",
+                    $"Importazione de dati da Access completata .", "Ok");
+        }        
     }
 
     // Creo le tabelle Sql leggendo i nomi delle tabelle Access e normalizzando le

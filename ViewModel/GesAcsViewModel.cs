@@ -4,20 +4,6 @@ namespace PvPmo.ViewModel
 {
     public partial class GesAcsViewModel : BaseViewModel
     {
-        private string _tabellaCorrente;
-        public string TabellaCorrente
-        {
-            get => _tabellaCorrente;
-            set => SetProperty(ref _tabellaCorrente, value);
-        }
-
-        private double _avanzamentoPercentuale;
-        public double AvanzamentoPercentuale
-        {
-            get => _avanzamentoPercentuale;
-            set => SetProperty(ref _avanzamentoPercentuale, value);
-        }
-
         public GesAcsViewModel()
         {
             Title = "Gestione Db Access.";
@@ -34,11 +20,7 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            await InpAcsToSql.NewDb();
-
-            await Shell.Current.DisplayAlert
-                ("Hai completato l'importazione dei dati nel Db !",
-                $"Importazione de dati da Access completata .", "Ok");
+            await InpAcsToSql.NewDb();            
 
             IsBusy = false;
             return;
