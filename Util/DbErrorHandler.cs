@@ -11,9 +11,9 @@ public static class DbErrorHandler
 
         await Shell.Current.DisplayAlert(title, msg, "OK");
 
-        // ✅ Facoltativo: logga nel file locale o su un DB di log
-        // await LogManager.LogAsync("DB_ERROR", msg);
+        await LogManager.LogAsync("MySQL_ERROR", $"[{context}] Codice: {ex.Number} - {ex.Message}");
     }
+
     public static async Task ShowOleDbErrorAsync(OleDbException ex, string? context = null)
     {
         var title = "Errore Access/Excel (OleDb)";
@@ -23,7 +23,7 @@ public static class DbErrorHandler
 
         await Shell.Current.DisplayAlert(title, msg, "OK");
 
-        // 📝 Log facoltativo
-        // await LogManager.LogAsync("OLEDB_ERROR", msg);
+        await LogManager.LogAsync("OLEDB_ERROR", $"[{context}] Codice: {ex.ErrorCode} - {ex.Message}");
     }
+
 }

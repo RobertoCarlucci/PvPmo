@@ -45,22 +45,25 @@ namespace PvPmo.ViewModel
         }
 
         [RelayCommand]
-        async Task BtnExpExl()
+        async Task BtnApriLog()
         {
-            if (IsBusy)
-                return;
+            try
+            {
+                var latestLog = LogManager.GetLatestLogFilePath();
 
-            IsBusy = true;
-            DataTable dt = new DataTable();
-            string _exlPath = await SelCart.PickFolder();
-            ExportDt.LoadDt(dt);
-            //ExportDt.ExportDataSet(dt, _exlPath);
-            await Shell.Current.DisplayAlert
-                ("Hai esportato il file !",
-                $"Esportazione de dati completata .", "Ok");
-
-            IsBusy = false;
-            return;
+                if (!string.IsNullOrEmpty(latestLog) && File.Exists(latestLog))
+                {
+                    await Launcher.Default.OpenAsync(new OpenFileRequest("Visualizza Log", new ReadOnlyFile(latestLog)));
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Log", "Nessun file di log trovato.", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Errore apertura log", ex.Message, "OK");
+            }
         }
 
         [RelayCommand]

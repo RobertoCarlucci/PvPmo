@@ -59,7 +59,7 @@ public partial class InpAcsToSql
     {
         string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
         DataTable _tabella = new DataTable();
-        string Qry = $"SELECT * FROM [{nomeTbAcs}];";        
+        string Qry = $"SELECT * FROM [{nomeTbAcs}] WHERE 1=0;";        
         await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
         Qry = NormTab.NormInp(nomeTbSql, _tabella);
         Qry = "CREATE OR REPLACE TABLE " + Qry;

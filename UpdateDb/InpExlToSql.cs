@@ -3,7 +3,7 @@
     public partial class InpExlToSql
     {
         // Importazione file Excel per aggiornamento mensile
-        public static async Task InpExl(IProgress<double> progress = null)
+        public static async Task InpExl(IProgress<double>? progress = null)
         {
             string? exlPath = await SelCart.PickFolder();
             if (string.IsNullOrWhiteSpace(exlPath))
@@ -20,6 +20,8 @@
 
                 foreach (var n in dati)
                 {
+                    //index++;
+
                     if (n.InpType != "EXL") continue;
 
                     if (string.IsNullOrWhiteSpace(n.Tabella) || string.IsNullOrWhiteSpace(n.DbDest) ||

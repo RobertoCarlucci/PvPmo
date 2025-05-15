@@ -65,7 +65,7 @@ public partial class SqlAsync
         catch (MySqlException ex)
         {
             await DbErrorHandler.ShowErrorAsync(ex, "Esecuzione SQL");
-            return tabella;
+            throw;
         }
         finally
         {

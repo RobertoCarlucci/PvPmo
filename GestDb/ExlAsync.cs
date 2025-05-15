@@ -3,7 +3,7 @@
     public class ExlAsync
     {
         private static OleDbConnection? conn;
-        private static int count;
+        
         public static async Task<int> ExcQry(string strConn, string qry)
         {
             try
@@ -15,14 +15,14 @@
                     using var adapter = new OleDbDataAdapter(cmd);
                     var tabella = new DataTable();
                     conn.Open();
-                    count = adapter.Fill(tabella);
+                    int count = adapter.Fill(tabella);
                     return count;
                 });
             }
             catch (OleDbException ex)
             {
                 await DbErrorHandler.ShowOleDbErrorAsync(ex, "Importazione Excel");
-                return count = 0;
+                throw;
             }
             finally
             {

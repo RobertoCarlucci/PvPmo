@@ -8,6 +8,8 @@ namespace PvPmo.ViewModel
         public MainViewModel()
         {
             Title = "Home Page";
+            ProgressValue = 0.5;
+            IsProgressVisible = true;
         }
 
         [ObservableProperty]
@@ -39,19 +41,19 @@ namespace PvPmo.ViewModel
             if (IsBusy) return;
 
             IsBusy = true;
-            //StartProgress(); // imposta a 0, visibile
+            StartProgress();
 
-            //var progress = new Progress<double>(value =>
-            //{
-            //    ProgressValue = value;
-            //});
-            //await InpExlToSql.InpExl(progress);
-            await InpExlToSql.InpExl();
+            var progress = new Progress<double>(value =>
+            {
+                ProgressValue = value;
+            });
 
-            //ResetProgress();            
+            await InpExlToSql.InpExl(progress); // passa la progress
 
+            ResetProgress();
             IsBusy = false;
         }
+
 
         [RelayCommand]
         async Task BtnTest()

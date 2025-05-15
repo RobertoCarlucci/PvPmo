@@ -32,19 +32,19 @@
                    Style="{StaticResource MyButton}"  
                    Command="{Binding BtnImpSetupCommand}"  
                    IsEnabled="{Binding IsNotBusy}"  
-                   Grid.Row="0"  
-                   Grid.Column="1"  
-                   Margin="40"/>  
-
-           <Button Text="Esporta PV_Total."  
-                   Style="{StaticResource MyButton}"  
-                   Command="{Binding BtnExpExlCommand}"  
-                   IsEnabled="{Binding IsNotBusy}"  
                    Grid.Row="1"  
-                   Grid.Column="1"  
-                   Margin="40"/>  
+                   Grid.Column="0"  
+                   Margin="40"/>
 
-           <Button Text="Torna Home Page."  
+            <Button Text="Apri Log"
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnApriLogCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Margin="40"/>
+
+            <Button Text="Torna Home Page."  
                    Style="{StaticResource MyButton}"  
                    Command="{Binding BtnAnnullaEsciCommand}"  
                    IsEnabled="{Binding IsNotBusy}"  

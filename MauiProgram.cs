@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using PvPmo.View;
+using System.Diagnostics;
 
 namespace PvPmo
 {
@@ -33,7 +34,21 @@ namespace PvPmo
 
             builder.Services.AddPvPmoServices();
 
+            EnsureLogFolderExists();
+
             return builder.Build();
+        }
+        private static void EnsureLogFolderExists()
+        {
+            var logPath = Path.Combine(AppContext.BaseDirectory, "Archivio", "Logs");
+            try
+            {
+                Directory.CreateDirectory(logPath);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ Errore creazione cartella log: {ex.Message}");
+            }
         }
     }
 }

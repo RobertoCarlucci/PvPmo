@@ -1,4 +1,4 @@
-﻿namespace PvPmo.Util
+﻿namespace PvPmo.GestDb
 {
     public class SqlQry
     {

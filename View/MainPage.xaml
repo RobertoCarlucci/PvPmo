@@ -10,7 +10,7 @@
         
         <Grid
             ColumnDefinitions="*,*,*"             
-            RowDefinitions="*,*,*"
+            RowDefinitions="*,*,*,Auto"
             RowSpacing="0">
 
             <Image x:Name="backgroundImage"
@@ -61,7 +61,7 @@
                     Grid.Column="2"
                     Margin="40"/>
 
-            <!--<StackLayout Orientation="Horizontal"
+            <StackLayout Orientation="Horizontal"
                          Grid.Row="3"
                          Grid.ColumnSpan="3"
                          Padding="10"
@@ -69,7 +69,8 @@
                          BackgroundColor="{StaticResource LightBackground}"
                          IsVisible="{Binding IsProgressVisible}">
 
-                <ProgressBar Progress="{Binding ProgressValue}"
+                <ProgressBar Style="{StaticResource MyProgressBar}"
+                             Progress="{Binding ProgressValue}"
                              HeightRequest="20"
                              HorizontalOptions="Center"
                              VerticalOptions="Center"/>
@@ -85,7 +86,7 @@
                        HorizontalOptions="Start"
                        Margin="0,0,10,0"/>
 
-            </StackLayout>-->
+            </StackLayout>
 
             <ActivityIndicator  IsVisible="{Binding IsBusy}"
                                 IsRunning="{Binding IsBusy}"
