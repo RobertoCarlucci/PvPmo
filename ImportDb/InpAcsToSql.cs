@@ -41,7 +41,7 @@ public partial class InpAcsToSql
                 }
             }
         }        
-        bool norm = await NormTab.NormTabImp("ACS");
+        bool norm = await NormTab.NormTabImp("ACS", "pmo");
         if (!norm) 
         {
             await Shell.Current.DisplayAlert("Errore", "Normalizzazione fallita", "OK");

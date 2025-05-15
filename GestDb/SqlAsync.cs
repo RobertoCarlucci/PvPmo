@@ -1,12 +1,10 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-
-namespace PvPmo.GestDb;
+﻿namespace PvPmo.GestDb;
 
 public partial class SqlAsync
 {
     public static List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
     //public static List<MySqlParameter> Params = new List<MySqlParameter>();
-    private static MySqlConnection conn;
+    private static MySqlConnection? conn;
 
     //public static void AddParam(string nome, Object vale)
     //{
@@ -36,8 +34,8 @@ public partial class SqlAsync
         }
         catch (MySqlException ex)
         {
-            // gestisci a livello superiore (es: logger/VM)
-            throw;
+            await DbErrorHandler.ShowErrorAsync(ex, "Esecuzione SQL");
+            return false;
         }
         finally
         {
@@ -66,8 +64,8 @@ public partial class SqlAsync
         }
         catch (MySqlException ex)
         {
-            // gestisci a livello superiore (es: logger/VM)
-            throw;
+            await DbErrorHandler.ShowErrorAsync(ex, "Esecuzione SQL");
+            return tabella;
         }
         finally
         {
@@ -103,8 +101,8 @@ public partial class SqlAsync
         }
         catch (MySqlException ex)
         {
-            // gestisci a livello superiore (es: logger/VM)
-            throw;
+            await DbErrorHandler.ShowErrorAsync(ex, "Esecuzione SQL");
+            return false;
         }
         finally
         {

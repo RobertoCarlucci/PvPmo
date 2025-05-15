@@ -2,7 +2,8 @@
 {
     public class ExlAsync
     {
-        private static OleDbConnection conn;
+        private static OleDbConnection? conn;
+        private static int count;
         public static async Task<int> ExcQry(string strConn, string qry)
         {
             try
@@ -14,14 +15,14 @@
                     using var adapter = new OleDbDataAdapter(cmd);
                     var tabella = new DataTable();
                     conn.Open();
-                    int count = adapter.Fill(tabella);
+                    count = adapter.Fill(tabella);
                     return count;
                 });
             }
             catch (OleDbException ex)
             {
-                // gestisci a livello superiore (es: logger/VM)
-                throw;
+                await DbErrorHandler.ShowOleDbErrorAsync(ex, "Importazione Excel");
+                return count = 0;
             }
             finally
             {
@@ -48,8 +49,8 @@
             }
             catch (OleDbException ex)
             {
-                // gestisci a livello superiore (es: logger/VM)
-                throw;
+                await DbErrorHandler.ShowOleDbErrorAsync(ex, "Importazione Excel");
+                return false;
             }
             finally
             {

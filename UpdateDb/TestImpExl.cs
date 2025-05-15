@@ -98,12 +98,14 @@
 
                         if (dataUptd.Rows.Count != dataProd.Rows.Count)
                         {
-                            await Shell.Current.DisplayAlert("Test colonne", "Numero colonne diverso tra produzione e uptd.", "OK");
+                            await Shell.Current.DisplayAlert("Test colonne",
+                                $"Numero colonne diverso tra produzione e uptd tabella: ({tabProd}).", "OK");
                             return false;
                         }
                         break;                        
                 }
-                return true;
+                bool uptdOk = await FinalizzaUpdateProdDb.ApplicaUptd();                
+                return uptdOk;
             }
             catch (Exception ex)
             {

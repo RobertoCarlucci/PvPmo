@@ -9,7 +9,7 @@ namespace PvPmo.Util
         //        // fornisce la mappatura delle colonne da modificare e se necessario anche la
         //        // stringa da inserire nel comando Sql CONCAT
 
-        public static async Task<bool> NormTabImp(string tipoImportazione)
+        public static async Task<bool> NormTabImp(string tipoImportazione, string dblavoro)
         {
             // Carico la tabella con le azioni da svolgere dal Service
             var repo = new CaricaTabRepository<CaricaTabNorm>("pvpmo_origine", "normalizza");
@@ -20,7 +20,7 @@ namespace PvPmo.Util
             foreach (var n in dati)
             {
                 // "tipoImportazione" identifica il tipo di file da lavorare ACS o EXL
-                if (n.InpType != tipoImportazione)
+                if (n.InpType != tipoImportazione && n.DbDest != dblavoro)
                     continue;
 
                 string connStr = Conn.MysqlConn(n.DbDest);
@@ -182,6 +182,8 @@ namespace PvPmo.Util
                     columnType = "FLOAT";
                 if (originalName == "Modifica" || originalName == "TipoCol")
                     columnType = "NVARCHAR(120)";
+                if (originalName == "Res_Start_Date" || originalName == "Res_Finish_Date")
+                    columnType = "DATETIME";
 
                 sb.Append($"`{renamed}` {columnType}");
 

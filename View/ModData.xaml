@@ -20,8 +20,8 @@
                 Source="wallpaper_dl.png"
                 Grid.RowSpan="2"
                 Grid.ColumnSpan="2"
-                HorizontalOptions="CenterAndExpand"
-                VerticalOptions="CenterAndExpand"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
                 Aspect="AspectFill"/>
 
             <Button Text="Esci senza modifiche."

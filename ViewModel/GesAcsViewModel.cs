@@ -9,8 +9,12 @@ namespace PvPmo.ViewModel
             Title = "Gestione Db Access.";
         }
 
-        [ObservableProperty]
-        bool isRefreshing;
+        private bool isRefreshing;
+        public bool IsRefreshing
+        {
+            get => isRefreshing;
+            set => SetProperty(ref isRefreshing, value);
+        }
 
         [RelayCommand]
         async Task BtnImpAcs()
@@ -20,7 +24,7 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            await InpAcsToSql.NewDb();            
+            await InpAcsToSql.NewDb();
 
             IsBusy = false;
             return;
@@ -34,7 +38,7 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            await InpExlSetup.NewSetup();            
+            await InpExlSetup.NewSetup();
 
             IsBusy = false;
             return;

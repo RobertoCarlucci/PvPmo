@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.InkML;
-using PvPmo.ImportDb;
-
-namespace PvPmo.UpdateDb
+﻿namespace PvPmo.UpdateDb
 {
     public partial class InpExlToSql
     {
@@ -37,23 +33,31 @@ namespace PvPmo.UpdateDb
 
                     if (!ok1 || !ok2)
                     {
-                        await Shell.Current.DisplayAlert("Errore", $"Errore su tabella: {n.TabellaSql}", "OK");
+                        await Shell.Current.DisplayAlert("Errore !", $"Errore su tabella: {n.TabellaSql}", "OK");
                     }
                     current++;
                     progress?.Report(current / (double)total); // ✅ AGGIORNATO QUI
                 }
-                bool norm = await NormTab.NormTabImp("EXL");
-                if (!norm)
+                bool normok = await NormTab.NormTabImp("EXL", "pvpmo_origine");
+                if (!normok)
                 {
-                    await Shell.Current.DisplayAlert("Errore", "Normalizzazione fallita", "OK");
+                    await Shell.Current.DisplayAlert("Errore !", "Normalizzazione fallita.", "OK");
+                    return;
+                }                
+                bool tabok = await TestDateImpExl.FinalizzaUptd();
+                if (!tabok)
+                {
+                    await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti.", "OK");
                     return;
                 }
-                else 
+                bool uptdOk = await TestDateImpExl.FinalizzaUptd();
+                if (!uptdOk)
                 {
-                    await TestDateImpExl.FinalizzaUptd();
-                }                
+                    await Shell.Current.DisplayAlert("Errore !", "Errore nell'aggiornamento delle tabelle.", "OK");
+                    return;
+                }
             }
-            await Shell.Current.DisplayAlert("Aggiornamento DB", "Aggiornamento mensile completato!", "OK");
+            await Shell.Current.DisplayAlert("Aggiornamento DB.", "Aggiornamento mensile completato!", "OK");
         }
 
         // Crea tabella SQL da file Excel (solo struttura)
