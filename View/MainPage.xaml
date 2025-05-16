@@ -9,13 +9,20 @@
     <RefreshView Command="{Binding IsRefreshing}">
         
         <Grid
-            ColumnDefinitions="*,*,*"             
-            RowDefinitions="*,*,*,Auto"
+            ColumnDefinitions="*,*,*"           
             RowSpacing="0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="40" />                 
+            </Grid.RowDefinitions>
+
 
             <Image x:Name="backgroundImage"
                    Source="wallpaper_dl.png"
-                   Grid.RowSpan="3"
+                   Grid.RowSpan="4"
                    Grid.ColumnSpan="3"
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
@@ -61,32 +68,16 @@
                     Grid.Column="2"
                     Margin="40"/>
 
-            <StackLayout Orientation="Horizontal"
+            <Label Text="{Binding ProgressText}"
+                   FontSize="14"
+                   Grid.Row="2" 
+                   Grid.Column="1"/>
+
+            <ProgressBar Progress="{Binding ProgressValue}"
+                         Style="{StaticResource MyProgressBar}"
                          Grid.Row="3"
-                         Grid.ColumnSpan="3"
-                         Padding="10"
-                         Spacing="10"
-                         BackgroundColor="{StaticResource LightBackground}"
-                         IsVisible="{Binding IsProgressVisible}">
-
-                <ProgressBar Style="{StaticResource MyProgressBar}"
-                             Progress="{Binding ProgressValue}"
-                             HeightRequest="20"
-                             HorizontalOptions="Center"
-                             VerticalOptions="Center"/>
-
-                <Label Text="{Binding ProgressText}"
-                       FontSize="14"
-                       VerticalOptions="Center"
-                       Margin="10,0,0,0"/>
-
-                <Label Text="{Binding TabellaCorrente}"
-                       FontSize="14"
-                       VerticalOptions="Center"
-                       HorizontalOptions="Start"
-                       Margin="0,0,10,0"/>
-
-            </StackLayout>
+                         Grid.ColumnSpan="3"                            
+                         IsVisible="{Binding IsProgressVisible}" />             
 
             <ActivityIndicator  IsVisible="{Binding IsBusy}"
                                 IsRunning="{Binding IsBusy}"

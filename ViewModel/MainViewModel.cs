@@ -1,5 +1,6 @@
 ﻿using PvPmo.View;
 using PvPmo.UpdateDb;
+using System.Diagnostics;
 
 namespace PvPmo.ViewModel
 {
@@ -8,8 +9,8 @@ namespace PvPmo.ViewModel
         public MainViewModel()
         {
             Title = "Home Page";
-            ProgressValue = 0.5;
-            IsProgressVisible = true;
+            //ProgressValue = 1.0;
+            //IsProgressVisible = true;
         }
 
         [ObservableProperty]
@@ -42,9 +43,10 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
             StartProgress();
-
+            
             var progress = new Progress<double>(value =>
             {
+                Debug.WriteLine($"🔥 Avanzamento: {value:P0}");
                 ProgressValue = value;
             });
 
