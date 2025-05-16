@@ -65,7 +65,7 @@
                 <Setter Property="BackgroundColor" Value="#EEEEEE" />
                 <Setter Property="ProgressColor" Value="red" />                
                 <Setter Property="Margin" Value="10" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+                <Setter Property="HorizontalOptions" Value="Fill" />
                 <Setter Property="VerticalOptions" Value="Center" />
             </Style>
 

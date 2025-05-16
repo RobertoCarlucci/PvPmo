@@ -3,64 +3,58 @@
     public partial class InpExlToSql
     {
         // Importazione file Excel per aggiornamento mensile
-        public static async Task InpExl(IProgress<double>? progress = null)
+
+        public static async Task InpExl(string type, IProgress<(double percent, string tableName)>? progress = null)
         {
             string? exlPath = await SelCart.PickFolder();
-            if (string.IsNullOrWhiteSpace(exlPath))
+            if (string.IsNullOrWhiteSpace(exlPath)) return;
+
+            var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
+            var dati = await repo.GetAllAsync();
+
+            var validi = dati.Where(n =>
+                n.InpType == type &&
+                !string.IsNullOrWhiteSpace(n.Tabella) &&
+                !string.IsNullOrWhiteSpace(n.DbDest) &&
+                !string.IsNullOrWhiteSpace(n.TabellaSql) &&
+                !string.IsNullOrWhiteSpace(n.WorkSheet)).ToList();
+
+            int total = validi.Count * 2;
+            int current = 0;
+
+            foreach (var n in validi)
             {
+                string filePath = Path.Combine(exlPath, n.Tabella!);
+
+                bool ok1 = await NomeColFileExltoTabSql(n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath);
+                current++;
+                progress?.Report((current / (double)total, $"Struttura: {n.TabellaSql}"));
+
+                bool ok2 = await DatiFileExltoTabSql(n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath);
+                current++;
+                progress?.Report((current / (double)total, $"Dati: {n.TabellaSql}"));
+
+                if (!ok1 || !ok2)
+                {
+                    await Shell.Current.DisplayAlert("Errore !", $"Errore su tabella: {n.TabellaSql}", "OK");
+                }
+            }
+
+            if (!await NormTab.NormTabImp("EXL", "pvpmo_origine"))
+            {
+                await Shell.Current.DisplayAlert("Errore !", "Normalizzazione fallita.", "OK");
                 return;
             }
-            else
+
+            if (!await TestDateImpExl.FinalizzaUptd())
             {
-                var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
-                var dati = await repo.GetAllAsync();
-
-                int total = dati.Count;
-                int current = 0;
-
-                foreach (var n in dati)
-                {
-                    //index++;
-
-                    if (n.InpType != "EXL") continue;
-
-                    if (string.IsNullOrWhiteSpace(n.Tabella) || string.IsNullOrWhiteSpace(n.DbDest) ||
-                        string.IsNullOrWhiteSpace(n.TabellaSql) || string.IsNullOrWhiteSpace(n.WorkSheet))
-                        continue;
-
-                    string filePath = Path.Combine(exlPath, n.Tabella);
-
-                    bool ok1 = await NomeColFileExltoTabSql(n.WorkSheet, n.DbDest, n.TabellaSql, filePath);
-                    bool ok2 = await DatiFileExltoTabSql(n.WorkSheet, n.DbDest, n.TabellaSql, filePath);
-
-                    if (!ok1 || !ok2)
-                    {
-                        await Shell.Current.DisplayAlert("Errore !", $"Errore su tabella: {n.TabellaSql}", "OK");
-                    }
-                    current++;
-                    progress?.Report(current / (double)total); // ✅ AGGIORNATO QUI
-                }
-                bool normok = await NormTab.NormTabImp("EXL", "pvpmo_origine");
-                if (!normok)
-                {
-                    await Shell.Current.DisplayAlert("Errore !", "Normalizzazione fallita.", "OK");
-                    return;
-                }                
-                bool tabok = await TestDateImpExl.FinalizzaUptd();
-                if (!tabok)
-                {
-                    await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti.", "OK");
-                    return;
-                }
-                bool uptdOk = await TestDateImpExl.FinalizzaUptd();
-                if (!uptdOk)
-                {
-                    await Shell.Current.DisplayAlert("Errore !", "Errore nell'aggiornamento delle tabelle.", "OK");
-                    return;
-                }
+                await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti.", "OK");
+                return;
             }
-            await Shell.Current.DisplayAlert("Aggiornamento DB.", "Aggiornamento mensile completato!", "OK");
+
+            await Shell.Current.DisplayAlert("Aggiornamento DB", "Aggiornamento mensile completato!", "OK");
         }
+
 
         // Crea tabella SQL da file Excel (solo struttura)
         public static async Task<bool> NomeColFileExltoTabSql(string workSheet, string nomeDbSql, string nomeTbSql, string exlPath)

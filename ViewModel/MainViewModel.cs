@@ -1,6 +1,5 @@
 ﻿using PvPmo.View;
 using PvPmo.UpdateDb;
-using System.Diagnostics;
 
 namespace PvPmo.ViewModel
 {
@@ -9,18 +8,14 @@ namespace PvPmo.ViewModel
         public MainViewModel()
         {
             Title = "Home Page";
-            //ProgressValue = 1.0;
-            //IsProgressVisible = true;
         }
 
-        [ObservableProperty]
-        bool isRefreshing;
+        
 
         [RelayCommand]
         async Task BtnGesAcs()
         {
             if (IsBusy) return;
-
             IsBusy = true;
             await Shell.Current.GoToAsync(nameof(GesAcs));
             IsBusy = false;
@@ -30,7 +25,6 @@ namespace PvPmo.ViewModel
         async Task BtnAgData()
         {
             if (IsBusy) return;
-
             IsBusy = true;
             await Shell.Current.GoToAsync(nameof(ModData));
             IsBusy = false;
@@ -43,29 +37,35 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
             StartProgress();
-            
-            var progress = new Progress<double>(value =>
+
+            var progress = new Progress<(double, string)>(p =>
             {
-                Debug.WriteLine($"🔥 Avanzamento: {value:P0}");
-                ProgressValue = value;
+                ProgressValue = p.Item1;
+                TabellaCorrente = p.Item2;
+                ProgressText = $"{p.Item1:P0}";
             });
 
-            await InpExlToSql.InpExl(progress); // passa la progress
+            try
+            {
+                await InpExlToSql.InpExl("EXL", progress);
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Errore", ex.Message, "OK");
+            }
 
+            await Task.Delay(500);
             ResetProgress();
+
             IsBusy = false;
         }
-
 
         [RelayCommand]
         async Task BtnTest()
         {
             if (IsBusy) return;
-
             IsBusy = true;
-
-            await Shell.Current.DisplayAlert("Fine Test!", "Rientro da procedura.", "OK");
-
+            await Shell.Current.DisplayAlert("Test", "Rientro da procedura", "OK");
             IsBusy = false;
         }
 
@@ -73,20 +73,13 @@ namespace PvPmo.ViewModel
         async Task BtnEnd()
         {
             if (IsBusy) return;
-
             IsBusy = true;
 
-            var confirm = await Shell.Current.DisplayAlert(
-                "Chiudi ed Esci", "Vuoi chiudere l'applicazione?", "Si", "No");
-
+            var confirm = await Shell.Current.DisplayAlert("Esci", "Vuoi chiudere?", "Si", "No");
             if (confirm)
-            {
                 Environment.Exit(0);
-            }
-            else
-            {
-                IsBusy = false;
-            }
+
+            IsBusy = false;
         }
     }
 }

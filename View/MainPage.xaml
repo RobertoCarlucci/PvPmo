@@ -66,18 +66,29 @@
                     IsEnabled="{Binding IsNotBusy}"
                     Grid.Row="2"
                     Grid.Column="2"
-                    Margin="40"/>
-
-            <Label Text="{Binding ProgressText}"
-                   FontSize="14"
-                   Grid.Row="2" 
-                   Grid.Column="1"/>
+                    Margin="40"/>            
 
             <ProgressBar Progress="{Binding ProgressValue}"
                          Style="{StaticResource MyProgressBar}"
                          Grid.Row="3"
                          Grid.ColumnSpan="3"                            
-                         IsVisible="{Binding IsProgressVisible}" />             
+                         IsVisible="{Binding IsProgressVisible}" />
+
+            
+            <Label Text="{Binding ProgressText}"
+                    FontSize="14"
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    HorizontalOptions="Start"
+                    TextColor="{StaticResource Dark}" />
+            
+            <Label Text="{Binding TabellaCorrente}"
+                    FontSize="14"
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    HorizontalOptions="Start"
+                    TextColor="{StaticResource Dark}" />
+            
 
             <ActivityIndicator  IsVisible="{Binding IsBusy}"
                                 IsRunning="{Binding IsBusy}"
