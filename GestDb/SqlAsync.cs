@@ -76,7 +76,12 @@ public partial class SqlAsync
         }
     }
 
-    public static async Task<bool> SqlBulkCopy(string strConn, string tableName, DataTable data, int timeoutSec = 30)
+    public static async Task<bool> SqlBulkCopy(
+    string strConn,
+    string tableName,
+    DataTable data,
+    int timeoutSec = 30,
+    IProgress<(double, string)>? progress = null)
     {
         try
         {
@@ -90,19 +95,33 @@ public partial class SqlAsync
                 DestinationTableName = tableName
             };
 
-            Mappings.ForEach(_mapping => { bulk.ColumnMappings.Add(_mapping); });
+            Mappings.ForEach(m => bulk.ColumnMappings.Add(m));
             Mappings.Clear();
 
-            //if (mappings != null)
-            //    mappings.ForEach(m => bulk.ColumnMappings.Add(m));
+            int totalRows = data.Rows.Count;
+            int batchSize = 500;
+            int copied = 0;
 
-            await bulk.WriteToServerAsync(data);
+            for (int offset = 0; offset < totalRows; offset += batchSize)
+            {
+                var batch = data.Clone();
+                int toCopy = Math.Min(batchSize, totalRows - offset);
+                for (int i = 0; i < toCopy; i++)
+                    batch.ImportRow(data.Rows[offset + i]);
+
+                await bulk.WriteToServerAsync(batch);
+                copied += toCopy;
+
+                double percent = copied / (double)totalRows;
+                progress?.Report((percent, tableName));
+            }
+
             return true;
         }
         catch (MySqlException ex)
         {
             await DbErrorHandler.ShowErrorAsync(ex, "Esecuzione SQL");
-            return false;
+            throw;
         }
         finally
         {
@@ -112,6 +131,45 @@ public partial class SqlAsync
             }
         }
     }
+
+
+
+    //public static async Task<bool> SqlBulkCopy(string strConn, string tableName, DataTable data, int timeoutSec = 30)
+    //{
+    //    try
+    //    {
+    //        strConn += "AllowLoadLocalInfile=true;";
+    //        await using var conn = new MySqlConnection(strConn);
+    //        await conn.OpenAsync();
+
+    //        var bulk = new MySqlBulkCopy(conn)
+    //        {
+    //            BulkCopyTimeout = timeoutSec,
+    //            DestinationTableName = tableName
+    //        };
+
+    //        Mappings.ForEach(_mapping => { bulk.ColumnMappings.Add(_mapping); });
+    //        Mappings.Clear();
+
+    //        //if (mappings != null)
+    //        //    mappings.ForEach(m => bulk.ColumnMappings.Add(m));
+
+    //        await bulk.WriteToServerAsync(data);
+    //        return true;
+    //    }
+    //    catch (MySqlException ex)
+    //    {
+    //        await DbErrorHandler.ShowErrorAsync(ex, "Esecuzione SQL");
+    //        return false;
+    //    }
+    //    finally
+    //    {
+    //        if (conn != null && conn.State == ConnectionState.Open) // Fixed condition
+    //        {
+    //            await conn.CloseAsync();
+    //        }
+    //    }
+    //}
     //public static async Task<bool> SqlBulkCopy(
     //string strConn,
     //string tableName,

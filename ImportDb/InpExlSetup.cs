@@ -15,6 +15,7 @@
             allOk &= await ImportSetup(exlPath, "NormalizzaInp", "Foglio 1", "pvpmo_origine", "normalizza");
             allOk &= await ImportSetup(exlPath, "Origine", "Foglio1", "pvpmo_origine", "origine");
             allOk &= await ImportSetup(exlPath, "finalizzatest", "Foglio1", "pvpmo_origine", "finalizza");
+            allOk &= await ImportSetup(exlPath, "progress_descrizione", "Foglio1", "pvpmo_origine", "progress_descrizione");
 
             if (!allOk)
             {
