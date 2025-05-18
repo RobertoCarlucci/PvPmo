@@ -83,10 +83,12 @@ public partial class SqlAsync
     int timeoutSec = 30,
     IProgress<(double, string)>? progress = null)
     {
+        MySqlConnection? conn = null;
+
         try
         {
             strConn += "AllowLoadLocalInfile=true;";
-            await using var conn = new MySqlConnection(strConn);
+            conn = new MySqlConnection(strConn);
             await conn.OpenAsync();
 
             var bulk = new MySqlBulkCopy(conn)
@@ -106,6 +108,7 @@ public partial class SqlAsync
             {
                 var batch = data.Clone();
                 int toCopy = Math.Min(batchSize, totalRows - offset);
+
                 for (int i = 0; i < toCopy; i++)
                     batch.ImportRow(data.Rows[offset + i]);
 
@@ -113,7 +116,7 @@ public partial class SqlAsync
                 copied += toCopy;
 
                 double percent = copied / (double)totalRows;
-                progress?.Report((percent, tableName));
+                progress?.Report((percent, $"Write: {tableName}"));
             }
 
             return true;
@@ -125,12 +128,68 @@ public partial class SqlAsync
         }
         finally
         {
-            if (conn != null && conn.State == ConnectionState.Open) // Fixed condition
+            if (conn != null && conn.State == ConnectionState.Open)
             {
                 await conn.CloseAsync();
             }
         }
     }
+
+    //public static async Task<bool> SqlBulkCopy(
+    //string strConn,
+    //string tableName,
+    //DataTable data,
+    //int timeoutSec = 30,
+    //IProgress<(double, string)>? progress = null)
+    //{
+    //    try
+    //    {
+    //        strConn += "AllowLoadLocalInfile=true;";
+    //        await using var conn = new MySqlConnection(strConn);
+    //        await conn.OpenAsync();
+
+    //        var bulk = new MySqlBulkCopy(conn)
+    //        {
+    //            BulkCopyTimeout = timeoutSec,
+    //            DestinationTableName = tableName
+    //        };
+
+    //        Mappings.ForEach(m => bulk.ColumnMappings.Add(m));
+    //        Mappings.Clear();
+
+    //        int totalRows = data.Rows.Count;
+    //        int batchSize = 500;
+    //        int copied = 0;
+
+    //        for (int offset = 0; offset < totalRows; offset += batchSize)
+    //        {
+    //            var batch = data.Clone();
+    //            int toCopy = Math.Min(batchSize, totalRows - offset);
+    //            for (int i = 0; i < toCopy; i++)
+    //                batch.ImportRow(data.Rows[offset + i]);
+
+    //            await bulk.WriteToServerAsync(batch);
+    //            copied += toCopy;
+
+    //            double percent = copied / (double)totalRows;
+    //            progress?.Report((percent, tableName));
+    //        }
+
+    //        return true;
+    //    }
+    //    catch (MySqlException ex)
+    //    {
+    //        await DbErrorHandler.ShowErrorAsync(ex, "Esecuzione SQL");
+    //        throw;
+    //    }
+    //    finally
+    //    {
+    //        if (conn != null && conn.State == ConnectionState.Open) // Fixed condition
+    //        {
+    //            await conn.CloseAsync();
+    //        }
+    //    }
+    //}
 
 
 
