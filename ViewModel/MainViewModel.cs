@@ -8,9 +8,7 @@ namespace PvPmo.ViewModel
         public MainViewModel()
         {
             Title = "Home Page";
-        }
-
-        
+        }        
 
         [RelayCommand]
         async Task BtnGesAcs()
@@ -38,13 +36,10 @@ namespace PvPmo.ViewModel
             IsBusy = true;
             StartProgress();
 
-            var progress = new Progress<(double, string)>(p =>
-            {
-                ProgressValue = p.Item1;
-                TabellaCorrente = p.Item2;
-                ProgressText = $"{p.Item1:P0}";
+            var progress = new Progress<string>(label =>
+            {                
+                TabellaCorrente = label;                
             });
-
             try
             {
                 await InpExlToSql.InpExl("EXL", progress);

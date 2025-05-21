@@ -10,5 +10,9 @@
         Title="Home"
         ContentTemplate="{DataTemplate view:MainPage}"
         Route="MainPage" />
+    <ShellContent
+        Title="Modifica Date"
+        ContentTemplate="{DataTemplate view:ModData}"
+        Route="ModData" />
 
 </Shell>

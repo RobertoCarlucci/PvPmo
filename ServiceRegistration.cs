@@ -14,7 +14,8 @@
             services.AddScoped<ICaricaTabFinalizzaService, CaricaTabFinalizzaService>();
 
             services.AddScoped<ICaricaTabDataRepository, CaricaTabDataRepository>();
-            services.AddScoped<ICaricaTabDataService, CaricaTabDataService>();
+            services.AddScoped<ICaricaTabDataService, CaricaTabDataService>();           
+
         }
     }
 

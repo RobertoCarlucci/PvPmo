@@ -24,11 +24,11 @@ namespace PvPmo
             //Wiews
 
             builder.Services.AddSingleton<MainPage>();
-            builder.Services.AddSingleton<MainViewModel>();
-            builder.Services.AddTransient<ModData>();
-            builder.Services.AddTransient<ModDataViewModel>();
+            builder.Services.AddSingleton<MainViewModel>();            
             builder.Services.AddTransient<GesAcs>();
             builder.Services.AddTransient<GesAcsViewModel>();
+            builder.Services.AddTransient<ModData>();
+            builder.Services.AddTransient<ModDataViewModel>();
 
             //Services
 

@@ -6,16 +6,7 @@ namespace PvPmo.ViewModel
     public partial class BaseViewModel
     {
         [ObservableProperty]
-        double progressValue;
-
-        [ObservableProperty]
-        string tabellaCorrente;
-
-        [ObservableProperty]
-        string progressText;
-
-        [ObservableProperty]
-        bool isProgressVisible;
+        string tabellaCorrente;        
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsNotBusy))]
@@ -27,19 +18,13 @@ namespace PvPmo.ViewModel
         public bool IsNotBusy => !IsBusy;
 
         public void StartProgress()
-        {
-            ProgressValue = 0;
-            ProgressText = "0%";
-            TabellaCorrente = string.Empty;
-            IsProgressVisible = true;
+        {            
+            TabellaCorrente = string.Empty;            
         }
 
         public void ResetProgress()
-        {
-            ProgressValue = 0;
-            ProgressText = string.Empty;
-            TabellaCorrente = string.Empty;
-            IsProgressVisible = false;
+        {            
+            TabellaCorrente = string.Empty;            
         }
     }
 }

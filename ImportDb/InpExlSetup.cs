@@ -6,7 +6,8 @@
         {
             string? exlPath = await SelCart.PickFolder();
             if (string.IsNullOrWhiteSpace(exlPath))
-            {                
+            {
+                await Shell.Current.DisplayAlert("Errore selezione cartella !", "Non è stata effettuata alcuna selezione.", "OK");
                 return;
             }
 
@@ -19,11 +20,11 @@
 
             if (!allOk)
             {
-                await Shell.Current.DisplayAlert("Errore importazione", "Uno o più file non sono stati importati correttamente.", "OK");
+                await Shell.Current.DisplayAlert("Errore importazione !", "Uno o più file non sono stati importati correttamente.", "OK");
             }
             else
             {
-                await Shell.Current.DisplayAlert("Importazione completata", "Tutti i file sono stati importati correttamente.", "OK");
+                await Shell.Current.DisplayAlert("Importazione completata !", "Tutti i file sono stati importati correttamente.", "OK");
             }
         }
 
@@ -31,7 +32,8 @@
         {
             try
             {
-                string fullPath = Path.Combine(exlPath, nomeFile);
+                string fullPath = $"{exlPath}\\{nomeFile}";
+                //string fullPath = Path.Combine(exlPath, nomeFile);
                 string connExl = Conn.ExlFileConn(fullPath);
                 string connSql = Conn.MysqlConn(dbSql);
 

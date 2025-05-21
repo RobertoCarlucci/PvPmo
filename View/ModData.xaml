@@ -2,52 +2,71 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PvPmo.View.ModData"
+             x:Name="ModDataPage"
              xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
              x:DataType="viewmodel:ModDataViewModel"
              Title="{Binding Title}">
-    
-    <RefreshView Command="{Binding IsRefreshing}">        
 
-            <Grid 
-                ColumnDefinitions="*,*"             
-                RowDefinitions="*,*"
-                RowSpacing="0">
+    <RefreshView Command="{Binding IsRefreshing}">
+        <Grid ColumnDefinitions="*,*"
+              RowDefinitions="*,*"
+              RowSpacing="0">
+
+            <!--<Image x:Name="backgroundImage"
+                   Source="wallpaper_dl.png"
+                   Grid.RowSpan="2"
+                   Grid.ColumnSpan="2"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Aspect="AspectFill" />-->
+
             <CollectionView Grid.Column="1"
-                            ItemsSource="{Binding _inpData}">
-                
+                            ItemsSource="{Binding DateRows}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewmodel:DateRowViewModel">
+                        <VerticalStackLayout Padding="5" Spacing="10">
+                            <Label Text="ID:" FontAttributes="Bold"/>
+                            <Label Text="{Binding Id}"/>
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Fields}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid ColumnDefinitions="Auto,*" Padding="5,2">
+                                            <Label Text="{Binding Key}" FontSize="14" VerticalOptions="Center"/>
+                                            <Entry Text="{Binding Value}" FontSize="14" VerticalOptions="Center"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
             </CollectionView>
-            <Image x:Name="backgroundImage"
-                Source="wallpaper_dl.png"
-                Grid.RowSpan="2"
-                Grid.ColumnSpan="2"
-                HorizontalOptions="Center"
-                VerticalOptions="Center"
-                Aspect="AspectFill"/>
 
             <Button Text="Esci senza modifiche."
-                Style="{StaticResource MyButton}"
-                Command="{Binding BtnAnnullaEsciCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                VerticalOptions="Center"
-                Grid.Row="0"
-                Grid.Column="0"
-                Margin="40"/>
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnAnnullaEsciCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    VerticalOptions="Center"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Margin="40" />
 
             <Button Text="Salva Modifiche ed Esci."
-                Style="{StaticResource MyButton}"
-                Command="{Binding BtnSalvaEsciCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                VerticalOptions="Center"
-                Grid.Row="1"
-                Grid.Column="0"
-                Margin="40"/>
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnSalvaEsciCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    VerticalOptions="Center"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="40" />
 
             <ActivityIndicator IsVisible="{Binding IsBusy}"
-                IsRunning="{Binding IsBusy}"
-                HorizontalOptions="FillAndExpand"
-                VerticalOptions="CenterAndExpand"                               
-                Grid.RowSpan="2"
-                Grid.ColumnSpan="2"/>
-        </Grid>         
+                               IsRunning="{Binding IsBusy}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Grid.RowSpan="2"
+                               Grid.ColumnSpan="2"/>
+        </Grid>
     </RefreshView>
 </ContentPage>

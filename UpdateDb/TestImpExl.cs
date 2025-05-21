@@ -1,4 +1,6 @@
-﻿namespace PvPmo.UpdateDb
+﻿using PvPmo.View;
+
+namespace PvPmo.UpdateDb
 {
     public partial class TestDateImpExl
     {
@@ -69,6 +71,7 @@
                         if (countUptd != countProd)
                         {
                             await Shell.Current.DisplayAlert("Test righe data", "Numero righe diverso tra produzione e uptd.", "OK");
+                            await Shell.Current.GoToAsync("//MainPage");
                             return false;
                         }
 
@@ -80,8 +83,23 @@
 
                         if (!valoriProd.SetEquals(valoriUptd))
                         {
-                            await Shell.Current.DisplayAlert("Test valori data", "Valori delle date non corrispondono.", "OK");
-                            return false;
+                            bool correzione = await Shell.Current.DisplayAlert(
+                                "Date non corrispondenti",
+                                "I valori delle date tra produzione e aggiornamento non corrispondono.\nVuoi correggerli manualmente?",
+                                "Sì", "No");
+
+                            if (!correzione)
+                            {
+                                await Shell.Current.GoToAsync("//MainPage");
+                                return false;
+                            }
+                            else
+                            {
+                                var vm = ServiceHelper.GetService<ModDataViewModel>();
+                                //await vm.LoadDatiAsync();
+                                await Shell.Current.GoToAsync(nameof(ModData));
+                                return false; // fermiamo il test corrente, verrà rieseguito dopo la modifica
+                            }
                         }
                         break;
 

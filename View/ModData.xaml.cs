@@ -2,10 +2,10 @@ namespace PvPmo.View;
 
 public partial class ModData : ContentPage
 {
-	public ModData(ModDataViewModel ViewModel)
+	public ModData(ModDataViewModel viewModel)
 	{
 		InitializeComponent();
-		BindingContext = ViewModel;
+		BindingContext = viewModel;
 	}
     protected override void OnNavigatedTo(NavigatedToEventArgs args)
     {
