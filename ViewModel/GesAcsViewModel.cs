@@ -1,4 +1,5 @@
 ﻿using PvPmo.ImportDb;
+using PvPmo.UpdateDb;
 
 namespace PvPmo.ViewModel
 {
@@ -9,12 +10,12 @@ namespace PvPmo.ViewModel
             Title = "Gestione Db Access.";
         }
 
-        private bool isRefreshing;
-        public bool IsRefreshing
-        {
-            get => isRefreshing;
-            set => SetProperty(ref isRefreshing, value);
-        }
+        //private bool isRefreshing;
+        //public bool IsRefreshing
+        //{
+        //    get => isRefreshing;
+        //    set => SetProperty(ref isRefreshing, value);
+        //}
 
         [RelayCommand]
         async Task BtnImpAcs()
@@ -23,8 +24,23 @@ namespace PvPmo.ViewModel
                 return;
 
             IsBusy = true;
+            StartProgress();
 
-            await InpAcsToSql.NewDb();
+            var progress = new Progress<string>(label =>
+            {
+                TabellaCorrente = label;
+            });
+            try
+            {
+                await InpAcsToSql.NewDb("ACS", progress);
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Errore", ex.Message, "OK");
+            }
+
+            await Task.Delay(500);
+            ResetProgress();
 
             IsBusy = false;
             return;

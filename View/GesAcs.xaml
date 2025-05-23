@@ -8,11 +8,17 @@
 
    <RefreshView Command="{Binding IsRefreshing}">  
        <Grid   
-           ColumnDefinitions="*,*,*"               
-           RowDefinitions="*,*,*"  
-           RowSpacing="0">  
+           ColumnDefinitions="*,*,*"             
+           RowSpacing="0">
 
-           <Image x:Name="backgroundImage"  
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="40" />
+            </Grid.RowDefinitions>
+
+            <Image x:Name="backgroundImage"  
                    Source="wallpaper_dl.png"  
                    Grid.RowSpan="3"  
                    Grid.ColumnSpan="3"  
@@ -49,9 +55,17 @@
                    Command="{Binding BtnAnnullaEsciCommand}"  
                    IsEnabled="{Binding IsNotBusy}"  
                    VerticalOptions="Center"  
-                   Grid.Row="3"  
+                   Grid.Row="2"  
                    Grid.Column="3"  
                    Margin="40"/>
+
+            <Label Text="{Binding TabellaCorrente}"
+                   FontSize="14"
+                   Grid.Row="3"
+                   Grid.Column="1"
+                   HorizontalOptions="Start"
+                   TextColor="{StaticResource Dark}" 
+                   IsVisible="{Binding IsProgressVisible}"/>
 
             <ProgressBar Progress="{Binding ProgressValue}"
                          HeightRequest="20"

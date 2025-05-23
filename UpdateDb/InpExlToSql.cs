@@ -1,10 +1,10 @@
 ﻿namespace PvPmo.UpdateDb
 {
-    public partial class InpExlToSql
+    public partial class InpExlToSql()
     {
         // Importazione file Excel per aggiornamento mensile
 
-        public static async Task InpExl(string type, IProgress<string>? progress )
+        public static async Task InpExl(string type, IProgress<string>? progress)
         {
             string? exlPath = await SelCart.PickFolder();
             if (string.IsNullOrWhiteSpace(exlPath)) return;

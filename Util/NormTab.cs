@@ -98,8 +98,7 @@ namespace PvPmo.Util
             await SqlAsync.SqlQryDataTable(strConnSql, qrySql, tabSql, 30);
 
             int dif = tabSql.Rows.Count - tabExl.Columns.Count;
-            //int totcolexl = tabExl.Columns.Count;
-
+            
             if (dif == 0 || dif == 1)
             {
                 SqlAsync.Mappings.Clear(); // Reset mapping statico

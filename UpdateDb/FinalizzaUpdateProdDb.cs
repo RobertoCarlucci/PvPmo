@@ -2,62 +2,49 @@
 
 public static class FinalizzaUpdateProdDb
 {
-    public static async Task<bool> ApplicaUptd()
+    public static async Task<bool> ApplicaUptd(string type)
     {
         var repo = new CaricaTabRepository<CaricaTabFinalizza>("pvpmo_origine", "finalizza");
-        var tabFinalizza = await repo.GetAllAsync();
-
+        var dati = await repo.GetAllAsync();
+        
         bool tuttoOk = true;
 
-        foreach (var n in tabFinalizza)
-        {
-            string tabProd = n.TabConfronto ?? "";
-            string tabUptd = n.TabTestare ?? "";
-            string dbProd = n.DbTabConfronto ?? "";
-            string dbUptd = n.DbTabTest ?? "";
-            string colMatch = n.ColConfronto ?? "";
+        var validi = dati.Where(n => n.Azione == type);
 
-            string connProd = Conn.MysqlConn(dbProd);
-            string connUptd = Conn.MysqlConn(dbUptd);
-            switch (n.Azione)
+        foreach (var n in validi)
+        {            
+            string connProd = Conn.MysqlConn(n.DbTabConfronto + ";Convert Zero Datetime=True");                        
+            string connUptd = Conn.MysqlConn(n.DbTabTest + ";Convert Zero Datetime=True");                        
+
+            if (n.TabConfronto is "pv_total" or "global_timesheet_extract")
             {
-                case "UPTD":
-                    try
-                    {
-                        if (tabProd is "pv_total" or "global_timesheet_extract")
-                        {
-                            // 1. Elimina righe dalla produzione dove il DateId coincide
-                            string deleteSql = $@"
-                        DELETE FROM `{tabProd}` 
-                        WHERE `{colMatch}` IN (SELECT DISTINCT `{colMatch}` FROM `{tabUptd}`);";
+                // 1. Elimina righe dalla produzione dove il DateId coincide
+                string deleteSql = $@"
+                DELETE `{n.TabConfronto}`.* FROM `{n.TabConfronto}` INNER JOIN `{n.TabTestare}` ON
+                `{n.TabConfronto}`.`{n.ColConfronto}` = `{n.TabTestare}`.`{n.ColDaTestare}`;";
+                bool delOk = await SqlAsync.SqlNoQry(connProd, deleteSql, 60);
 
-                            await SqlAsync.SqlNoQry(connProd, deleteSql, 60);
+                // 2. Leggi tabella da importare
+                string loadSql = $@"SELECT * FROM `{n.TabConfronto}`;";
+                DataTable dt = new DataTable();
+                await SqlAsync.SqlQryDataTable(connUptd, loadSql, dt, 60);
 
-                            // 2. Inserisci le nuove righe dalla tabella di update
-                            string insertSql = $@"
-                        INSERT INTO `{tabProd}`
-                        SELECT * FROM `{dbUptd}`.`{tabUptd}`;";
-                            await SqlAsync.SqlNoQry(connProd, insertSql, 180);
-                        }
-                        else if (tabProd is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month")
-                        {
-                            string truncateSql = $"TRUNCATE TABLE `{tabProd}`;";
-                            string insertSql = $@"
-                        INSERT INTO `{tabProd}`
-                        SELECT * FROM `{dbUptd}`.`{tabUptd}`;";
+                // 3. Inserisci le nuove righe dalla tabella di update                        
+                bool bulkOk = await SqlAsync.SqlBulkCopy(connProd, n.TabConfronto, dt, 180);
+            }
+            else if (n.TabConfronto is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month")
+            {
+                string loadSql = $@"SELECT * FROM `{n.TabConfronto}`;";
+                DataTable dt = new DataTable();
+                await SqlAsync.SqlQryDataTable(connUptd, loadSql, dt, 60);
 
-                            await SqlAsync.SqlNoQry(connProd, truncateSql, 30);
-                            await SqlAsync.SqlNoQry(connProd, insertSql, 180);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        await Shell.Current.DisplayAlert("Errore aggiornamento !", ex.Message, "OK");
-                        tuttoOk = false;
-                    }
-                    break;
-            }            
-        }        
+                string truncateSql = $"TRUNCATE TABLE `{n.TabConfronto}`;";
+                await SqlAsync.SqlNoQry(connProd, truncateSql, 30);
+                        
+                await SqlAsync.SqlBulkCopy(connProd, n.TabConfronto, dt, 180);
+            }      
+        }
         return tuttoOk;
-    }
+    }       
 }
+

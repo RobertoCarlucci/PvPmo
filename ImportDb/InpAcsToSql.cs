@@ -2,44 +2,63 @@
 
 namespace PvPmo.ImportDb;
 
-public partial class InpAcsToSql
+public partial class InpAcsToSql()
 {
     //Importazione dei due Db Access con i loro dati.
-    public static async Task NewDb()
+    public static async Task NewDb(string type, IProgress<string>? progress)
     {
         string? acsPath = await SelCart.PickFolder();
-        if (string.IsNullOrWhiteSpace(acsPath))
-        {
-            return;
-        }
-        else
-        {
-            var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
-            var dati = await repo.GetAllAsync();
+        if (string.IsNullOrWhiteSpace(acsPath)) return;
+        
+        var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(Conn.MysqlConn("pvpmo_origine"));
 
-            foreach (var n in dati)
+        var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
+        var dati = await repo.GetAllAsync();
+
+        // Aggiunto per evitare che un errore blocchi tutte le tabelle:
+
+        var validi = dati.Where(n =>
+                n.InpType == type &&
+                !string.IsNullOrWhiteSpace(n.DbInp) &&
+                !string.IsNullOrWhiteSpace(n.Tabella) &&
+                !string.IsNullOrWhiteSpace(n.DbDest) &&
+                !string.IsNullOrWhiteSpace(n.TabellaSql)).ToList();
+
+        int total = validi.Count * 2;
+        int current = 0;
+
+        foreach (var n in validi)
+        {
+            var db = string.IsNullOrWhiteSpace(n.DbDest) ? "default" : n.DbDest;
+            var key = $"{n.TabellaSql}|{db}";
+            var label = descrizioni.TryGetValue(key, out var desc) ? desc : $"{n.TabellaSql} ({db})";
+
+            try
             {
-                if (n.InpType != "ACS") continue;
-
-                if (string.IsNullOrWhiteSpace(n.DbInp) || string.IsNullOrWhiteSpace(n.Tabella) ||
-                    string.IsNullOrWhiteSpace(n.DbDest) || string.IsNullOrWhiteSpace(n.TabellaSql))
-                    continue;
-                // Aggiunto per evitare che un errore blocchi tutte le tabelle:
-                try
+                bool ok1 = await TabAcstoTabSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath);
+                if (ok1)
                 {
-                    bool ok1 = await TabAcstoTabSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath);
-                    bool ok2 = await InpAcsDatitoSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath);
-
-                    if (!ok1 || !ok2)
-                    {
-                        await Shell.Current.DisplayAlert("Errore", $"Errore durante l'import di {n.Tabella}", "OK");
-                    }
+                    current++;
+                    progress?.Report($"Read: {label}");
                 }
-                catch (Exception ex)
+
+                bool ok2 = await InpAcsDatitoSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath);
+                if (ok2)
                 {
-                    await Shell.Current.DisplayAlert("Errore", $"Tabella {n.Tabella}: {ex.Message}", "OK");
+                    current++;
+                    progress?.Report($"Write: {label}");
+                }
+
+                if (!ok1 || !ok2)
+                {
+                    await Shell.Current.DisplayAlert("Errore", $"Errore durante l'import di {n.Tabella}", "OK");
                 }
             }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Errore", $"Tabella {n.Tabella}: {ex.Message}", "OK");
+            }
+            
         }        
         bool norm = await NormTab.NormTabImp("ACS", "pmo");
         if (!norm) 
