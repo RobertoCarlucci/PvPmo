@@ -1,4 +1,6 @@
-﻿namespace PvPmo.UpdateDb;
+﻿using DocumentFormat.OpenXml.InkML;
+
+namespace PvPmo.UpdateDb;
 
 public static class FinalizzaUpdateProdDb
 {
@@ -18,30 +20,43 @@ public static class FinalizzaUpdateProdDb
 
             if (n.TabConfronto is "pv_total" or "global_timesheet_extract")
             {
+                List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
+
                 // 1. Elimina righe dalla produzione dove il DateId coincide
                 string deleteSql = $@"
                 DELETE `{n.TabConfronto}`.* FROM `{n.TabConfronto}` INNER JOIN `{n.TabTestare}` ON
                 `{n.TabConfronto}`.`{n.ColConfronto}` = `{n.TabTestare}`.`{n.ColDaTestare}`;";
                 bool delOk = await SqlAsync.SqlNoQry(connProd, deleteSql, 60);
 
+                // 2. Crea Mapping tra le colonne della tabella di produzione e quella di update.
+                Mappings = await NormTab.CreaMappingSql(connUptd, connUptd, n.TabConfronto, n.TabConfronto);
+
+                // 3. Leggi tabella da importare
+                string loadSql = $@"SELECT * FROM `{n.TabConfronto}`;";
+                DataTable dt = new DataTable();
+                await SqlAsync.SqlQryDataTable(connUptd, loadSql, dt, 60);
+
+                // 4. Inserisci le nuove righe dalla tabella di update                        
+                bool bulkOk = await SqlAsync.SqlBulkCopy(connProd, n.TabConfronto, dt, Mappings, 180);
+            }
+            else if (n.TabConfronto is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month")
+            {
+                List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
+
+                // 1. Crea Mapping tra le colonne della tabella di produzione e quella di update.
+                Mappings = await NormTab.CreaMappingSql(connUptd, connUptd, n.TabConfronto, n.TabConfronto);
+
                 // 2. Leggi tabella da importare
                 string loadSql = $@"SELECT * FROM `{n.TabConfronto}`;";
                 DataTable dt = new DataTable();
                 await SqlAsync.SqlQryDataTable(connUptd, loadSql, dt, 60);
 
-                // 3. Inserisci le nuove righe dalla tabella di update                        
-                bool bulkOk = await SqlAsync.SqlBulkCopy(connProd, n.TabConfronto, dt, 180);
-            }
-            else if (n.TabConfronto is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month")
-            {
-                string loadSql = $@"SELECT * FROM `{n.TabConfronto}`;";
-                DataTable dt = new DataTable();
-                await SqlAsync.SqlQryDataTable(connUptd, loadSql, dt, 60);
-
+                // 3. Cancella i dati esistenti nella tabella di produzione.
                 string truncateSql = $"TRUNCATE TABLE `{n.TabConfronto}`;";
                 await SqlAsync.SqlNoQry(connProd, truncateSql, 30);
-                        
-                await SqlAsync.SqlBulkCopy(connProd, n.TabConfronto, dt, 180);
+
+                // 4. Inserisci le nuove righe dalla tabella di update
+                await SqlAsync.SqlBulkCopy(connProd, n.TabConfronto, dt, Mappings, 180);
             }      
         }
         return tuttoOk;

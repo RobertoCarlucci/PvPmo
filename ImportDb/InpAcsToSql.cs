@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using DocumentFormat.OpenXml.InkML;
+using System.Collections.Generic;
+using System.Text;
 
 namespace PvPmo.ImportDb;
 
@@ -34,20 +36,12 @@ public partial class InpAcsToSql()
             var label = descrizioni.TryGetValue(key, out var desc) ? desc : $"{n.TabellaSql} ({db})";
 
             try
-            {
-                bool ok1 = await TabAcstoTabSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath);
-                if (ok1)
-                {
-                    current++;
-                    progress?.Report($"Read: {label}");
-                }
+            {                
+                bool ok1 = await TabAcstoTabSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath, progress, label);
+                if (ok1) { current++; }
 
-                bool ok2 = await InpAcsDatitoSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath);
-                if (ok2)
-                {
-                    current++;
-                    progress?.Report($"Write: {label}");
-                }
+                bool ok2 = await InpAcsDatitoSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath, progress, label);
+                if (ok2) { current++; }
 
                 if (!ok1 || !ok2)
                 {
@@ -74,15 +68,18 @@ public partial class InpAcsToSql()
 
     // Creo le tabelle Sql leggendo i nomi delle tabelle Access e normalizzando le
     // intestazioni delle colonne in modo compatibile con sql.
-    public static async Task<bool> TabAcstoTabSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
+    public static async Task<bool> TabAcstoTabSql(
+        string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath, IProgress<string>? progress, string label)
     {
         string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
         DataTable _tabella = new DataTable();
-        string Qry = $"SELECT * FROM [{nomeTbAcs}] WHERE 1=0;";        
+        string Qry = $"SELECT * FROM [{nomeTbAcs}] WHERE 1=0;";
+        progress?.Report($"Read: {label}");
         await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
         Qry = NormTab.NormInp(nomeTbSql, _tabella);
         Qry = "CREATE OR REPLACE TABLE " + Qry;
         string StrConnSql = Conn.MysqlConn(nomeDbSql);
+        progress?.Report($"Create: {label}");
         bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry, 30);
         return Bol;
     }
@@ -90,11 +87,14 @@ public partial class InpAcsToSql()
     // Importo i dati all'interno del Db andando a popolare con i valori le tabelle
     // colonne precedentemente create.
 
-    public static async Task<bool> InpAcsDatitoSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
+    public static async Task<bool> InpAcsDatitoSql(
+        string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath, IProgress<string>? progress, string label)
     {
-        bool mappingOk = await NormTab.CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, acsPath);
+        List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
+        progress?.Report($"Stuct: {label}");
+        Mappings = await NormTab.CreaMappingAcsSql(nomeDbAcs, nomeTbAcs, nomeDbSql, nomeTbSql, acsPath);
 
-        if (!mappingOk)
+        if (Mappings == null)
             return false;
 
         string connAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
@@ -104,6 +104,7 @@ public partial class InpAcsToSql()
         string qry = $"SELECT * FROM [{nomeTbAcs}]";
 
         await AcsAsync.AcsQryTab(connAcs, qry, tabella);
-        return await SqlAsync.SqlBulkCopy(connSql, nomeTbSql, tabella, 180);
+        progress?.Report($"Write: {label}");
+        return await SqlAsync.SqlBulkCopy(connSql, nomeTbSql, tabella, Mappings, 180);
     }    
 }

@@ -1,9 +1,17 @@
-﻿using System.Text;
+﻿using DocumentFormat.OpenXml.InkML;
+using System.Text;
 
 namespace PvPmo.Util
 {
     public static class NormTab
     {
+        public static List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
+        public static void AddMapping(int sourceOrdinal, string destinationColumn)
+        {
+            var NewMapping = new MySqlBulkCopyColumnMapping(sourceOrdinal, destinationColumn);
+            Mappings.Add(NewMapping);
+        }
+
         // Viene caricata la tabella "normalizza" dal Db "pvpmo_origine"
         //        // utilizzando dalla cartella Service il servizio "CaricaTabNorm" che mi
         //        // fornisce la mappatura delle colonne da modificare e se necessario anche la
@@ -48,7 +56,8 @@ namespace PvPmo.Util
         // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
         // AddMapping all'interno della cartella GestDb classe gestione Sql.
 
-        public static async Task<bool> CreaMappingAcsSql(string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
+        public static async Task<List<MySqlBulkCopyColumnMapping>> CreaMappingAcsSql(
+            string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
         {
             DataTable tabAcs = new();
             DataTable tabSql = new();
@@ -66,27 +75,28 @@ namespace PvPmo.Util
 
             if (dif == 0 || dif == 1)
             {
-                SqlAsync.Mappings.Clear(); // reset mappings statici
+                Mappings.Clear(); // reset mappings statici
                 int offset = dif == 1 ? 1 : 0;
 
                 for (int i = 0; i < tabAcs.Columns.Count && (i + offset) < tabSql.Rows.Count; i++)
                 {
                     string? destCol = tabSql.Rows[i + offset]["Field"]?.ToString();
-                    SqlAsync.AddMapping(i, destCol ?? $"Col{i + offset}");
+                    AddMapping(i, destCol ?? $"Col{i + offset}");
                 }
-                return true;
+                return Mappings;
             }
             // Colonne diverse > 1 → conferma da utente
             var conferma = await Shell.Current.DisplayAlert("Errore colonne", 
                 $"Le colonne in Access ({tabAcs.Columns.Count}) e in SQL ({tabSql.Rows.Count}) non coincidono.\nVuoi continuare con le altre tabelle?",
                 "Si", "No");
 
-            return conferma;
+            return Mappings;
         }
 
         // uguale alla precedente con la differenza che vengono lette le intestazioni delle colonne
         // Excel e Sql per creare il mapping.
-        public static async Task<bool> CreaMappingExlSql(string strConnExl, string strConnSql, string nomeWorkSheet, string nomeDbSql, string nomeTbSql)
+        public static async Task<List<MySqlBulkCopyColumnMapping>> CreaMappingExlSql(
+            string strConnExl, string strConnSql, string nomeWorkSheet, string nomeTbSql)
         {
             DataTable tabExl = new();
             DataTable tabSql = new();
@@ -101,7 +111,7 @@ namespace PvPmo.Util
             
             if (dif == 0 || dif == 1)
             {
-                SqlAsync.Mappings.Clear(); // Reset mapping statico
+                Mappings.Clear(); // Reset mapping statico
 
                 int offset = dif == 1 ? 1 : 0;
 
@@ -109,10 +119,10 @@ namespace PvPmo.Util
                 //for (int i = 0; i < totcolexl + offset; i++)
                 {
                     string? destCol = tabSql.Rows[i + offset]["Field"]?.ToString();
-                    SqlAsync.AddMapping(i, destCol ?? $"Col{i + offset}");
+                    AddMapping(i, destCol ?? $"Col{i + offset}");
                 }
 
-                return true;
+                return Mappings;
             }
             // Differenza colonne > 1 → alert utente
             var conferma = await Shell.Current.DisplayAlert(
@@ -120,7 +130,44 @@ namespace PvPmo.Util
                 $"Excel: {tabExl.Columns.Count} col.\nMySQL: {tabSql.Rows.Count} col.\nVuoi continuare con le altre tabelle?",
                 "Si", "No");
 
-            return conferma;
+            return Mappings;
+        }
+        public static async Task<List<MySqlBulkCopyColumnMapping>> CreaMappingSql(
+            string strConnUptd, string strConnProd, string nomeTabUptd, string nomeTbProd)
+        {
+            DataTable tabUptd = new();
+            DataTable tabProd = new();
+
+            string qryUptd = $"SHOW COLUMNS FROM `{nomeTabUptd}`;";
+            string qryProd = $"SHOW COLUMNS FROM `{nomeTbProd}`;";
+
+            await SqlAsync.SqlQryDataTable(strConnUptd, qryUptd, tabUptd, 30);
+            await SqlAsync.SqlQryDataTable(strConnProd, qryProd, tabProd, 30);
+
+            int dif = tabProd.Rows.Count - tabUptd.Columns.Count;
+
+            if (dif == 0 || dif == 1)
+            {
+                Mappings.Clear(); // Reset mapping statico
+
+                int offset = dif == 1 ? 1 : 0;
+
+                for (int i = 0; i < tabUptd.Columns.Count && (i + offset) < tabProd.Rows.Count; i++)
+                //for (int i = 0; i < totcolexl + offset; i++)
+                {
+                    string? destCol = tabProd.Rows[i + offset]["Field"]?.ToString();
+                    AddMapping(i, destCol ?? $"Col{i + offset}");
+                }
+
+                return Mappings;
+            }
+            // Differenza colonne > 1 → alert utente
+            var conferma = await Shell.Current.DisplayAlert(
+                "Errore colonne",
+                $"Excel: {tabUptd.Columns.Count} col.\nMySQL: {tabProd.Rows.Count} col.\nVuoi continuare con le altre tabelle?",
+                "Si", "No");
+
+            return Mappings;
         }
 
         // Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.

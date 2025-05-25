@@ -32,8 +32,7 @@
         {
             try
             {
-                string fullPath = $"{exlPath}\\{nomeFile}";
-                //string fullPath = Path.Combine(exlPath, nomeFile);
+                string fullPath = $"{exlPath}\\{nomeFile}";                
                 string connExl = Conn.ExlFileConn(fullPath);
                 string connSql = Conn.MysqlConn(dbSql);
 
@@ -46,15 +45,16 @@
                 bool ddlOk = await SqlAsync.SqlNoQry(connSql, ddl, 30);
                 if (!ddlOk) return false;
 
-                bool mappingOk = await NormTab.CreaMappingExlSql(connExl, connSql, workSheet, dbSql, tabSql);
-                if (!mappingOk) return false;
+                List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
+                Mappings = await NormTab.CreaMappingExlSql(connExl, connSql, workSheet, tabSql);
+                if (Mappings == null) return false;
 
                 string qryData = $"SELECT * FROM [{workSheet}$];";
                 DataTable dati = new();
                 bool dataOk = await ExlAsync.ExcQry(connExl, qryData, dati);
                 if (!dataOk || dati.Rows.Count == 0) return false;
 
-                bool insertOk = await SqlAsync.SqlBulkCopy(connSql, tabSql, dati, 30);
+                bool insertOk = await SqlAsync.SqlBulkCopy(connSql, tabSql, dati, Mappings, 30);
                 return insertOk;
             }
             catch (Exception ex)

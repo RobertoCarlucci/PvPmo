@@ -73,6 +73,7 @@
             string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, IProgress<string>? progress = null)
         {
             DataTable schema = new();
+            bool mappingOk = true;
 
             string strConnExl = Conn.ExlFileConn(exlPath);
             string strConnSql = Conn.MysqlConn(nomeDbSql);
@@ -85,8 +86,9 @@
             bool ddlOk = await SqlAsync.SqlNoQry(strConnSql, ddl, 30);
             if (!ddlOk) return false;
 
-            bool mappingOk = await NormTab.CreaMappingExlSql(strConnExl, strConnSql, workSheet, nomeDbSql, nomeTbSql);
-            if (!mappingOk) return false;
+            List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
+            Mappings = await NormTab.CreaMappingExlSql(strConnExl, strConnSql, workSheet, nomeTbSql);
+            if (Mappings == null) mappingOk = false;
 
             return mappingOk;
         }

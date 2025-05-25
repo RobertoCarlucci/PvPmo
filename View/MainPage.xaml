@@ -69,11 +69,12 @@
                     Margin="40"/>            
                         
             <Label Text="{Binding TabellaCorrente}"
-                   FontSize="14"
+                   FontSize="18"
+                   FontAttributes="Bold"
                    Grid.Row="3"
                    Grid.Column="1"
                    HorizontalOptions="Start"
-                   TextColor="{StaticResource Dark}" 
+                   TextColor="Red" 
                    IsVisible="{Binding IsProgressVisible}"/>
             
 
