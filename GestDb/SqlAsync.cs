@@ -2,15 +2,15 @@
 
 public partial class SqlAsync
 {    
-    public static List<MySqlParameter> Params = new List<MySqlParameter>();
-    public static void AddParam(string nome, Object vale)
-    {
-        var NewParam = new MySqlParameter(nome, vale);
-        Params.Add(NewParam);
-    }
+    //public static List<MySqlParameter> Params = new List<MySqlParameter>();
+    //public static void AddParam(string nome, Object vale)
+    //{
+    //    var NewParam = new MySqlParameter(nome, vale);
+    //    Params.Add(NewParam);
+    //}
     
     public static async Task<bool> SqlNoQry(
-        string strConn, string qry, int timeoutSec = 30, List<MySqlParameter>? parameters = null)
+        string strConn, string qry, int timeoutSec = 0, List<MySqlParameter>? parameters = null)
     {
         await using var conn = new MySqlConnection(strConn);
         try
@@ -37,7 +37,7 @@ public partial class SqlAsync
         }
     }
     public static async Task<DataTable> SqlQryDataTable(
-        string strConn, string qry, DataTable tabella, int timeoutSec = 30, List<MySqlParameter>? parameters = null)
+        string strConn, string qry, DataTable tabella, int timeoutSec = 0, List<MySqlParameter>? parameters = null)
     {
         await using var conn = new MySqlConnection(strConn);
         try
@@ -66,7 +66,7 @@ public partial class SqlAsync
     }
 
     public static async Task<bool> SqlBulkCopy(
-        string strConn, string tableName, DataTable data, List<MySqlBulkCopyColumnMapping>? Mappings = null, int timeoutSec = 30)
+        string strConn, string tableName, DataTable data, List<MySqlBulkCopyColumnMapping>? Mappings = null, int timeoutSec = 0)
     {
         strConn += "AllowLoadLocalInfile=true;";
         await using var conn = new MySqlConnection(strConn);
@@ -78,11 +78,9 @@ public partial class SqlAsync
                 BulkCopyTimeout = timeoutSec,
                 DestinationTableName = tableName
             };
-            if (Mappings != null) 
-            {
+            if (Mappings != null)                 
                 Mappings.ForEach(_mapping => { bulk.ColumnMappings.Add(_mapping); });
-                Mappings.Clear();
-            }
+                Mappings.Clear();            
             
             await bulk.WriteToServerAsync(data);
             return true;
@@ -105,7 +103,7 @@ public partial class SqlAsync
     // utilizzando una tabella di staging temporanea.    
    
     public static async Task<bool> SqlBulkUpsertAsync(
-        string strConn, string tableName, DataTable data, int timeoutSec = 60)
+        string strConn, string tableName, DataTable data, int timeoutSec = 0)
     {
         strConn += "AllowLoadLocalInfile=true;";
         //var connBulk = new MySqlConnection(strConn);

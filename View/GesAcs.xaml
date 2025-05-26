@@ -63,18 +63,11 @@
                    FontSize="18"
                    FontAttributes="Bold"
                    Grid.Row="3"
-                   Grid.Column="1"
-                   HorizontalOptions="Start"
+                   Grid.ColumnSpan="3"
+                   HorizontalOptions="Center"
                    TextColor="Red" 
                    IsVisible="{Binding IsProgressVisible}"/>
-
-            <ProgressBar Progress="{Binding ProgressValue}"
-                         HeightRequest="20"
-                         Grid.Row="3"
-                         Grid.ColumnSpan="3"
-                         IsVisible="{Binding IsBusy}" />
-
-
+                        
             <ActivityIndicator IsVisible="{Binding IsBusy}"  
                                IsRunning="{Binding IsBusy}"  
                                HorizontalOptions="Fill"  

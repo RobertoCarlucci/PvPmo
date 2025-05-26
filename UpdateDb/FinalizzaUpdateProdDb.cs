@@ -29,7 +29,7 @@ public static class FinalizzaUpdateProdDb
                 bool delOk = await SqlAsync.SqlNoQry(connProd, deleteSql, 60);
 
                 // 2. Crea Mapping tra le colonne della tabella di produzione e quella di update.
-                Mappings = await NormTab.CreaMappingSql(connUptd, connUptd, n.TabConfronto, n.TabConfronto);
+                Mappings = await NormTab.CreaMapping("SQL", "NotUsed", "NotUsed", "NotUsed", n.DbTabTest, n.TabConfronto, "NotUsed");
 
                 // 3. Leggi tabella da importare
                 string loadSql = $@"SELECT * FROM `{n.TabConfronto}`;";
@@ -44,7 +44,7 @@ public static class FinalizzaUpdateProdDb
                 List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
 
                 // 1. Crea Mapping tra le colonne della tabella di produzione e quella di update.
-                Mappings = await NormTab.CreaMappingSql(connUptd, connUptd, n.TabConfronto, n.TabConfronto);
+                Mappings = await NormTab.CreaMapping("SQL", "NotUsed", "NotUsed", "NotUsed", n.DbTabTest, n.TabConfronto, "NotUsed");
 
                 // 2. Leggi tabella da importare
                 string loadSql = $@"SELECT * FROM `{n.TabConfronto}`;";

@@ -32,21 +32,10 @@
 
                 string filePath = Path.Combine(exlPath, n.Tabella!);                
 
-                bool ok1 = await NomeColFileExltoTabSql(n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath);
-                if (ok1)
-                {
-                    current++;
-                    progress?.Report($"Read: {label}");                    
-                }
+                bool inprtOk = await impFileExltoTabSql(n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath, label, progress);
+                if (inprtOk) { current++; }              
 
-                bool ok2 = await DatiFileExltoTabSql(n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath);
-                if (ok2)
-                {
-                    current++;
-                    progress?.Report($"Write: {label}");                    
-                }
-
-                if (!ok1 || !ok2)
+                if (!inprtOk)
                 {
                     await Shell.Current.DisplayAlert("Errore !", $"Errore su tabella: {n.TabellaSql}", "OK");
                 }
@@ -65,13 +54,13 @@
             }
 
             await Shell.Current.DisplayAlert("Aggiornamento DB", "Aggiornamento mensile completato!", "OK");
-        }
+        }              
 
-        // Crea tabella SQL da file Excel (solo struttura)        
-
-        public static async Task<bool> NomeColFileExltoTabSql(
-            string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, IProgress<string>? progress = null)
+        public static async Task<bool> impFileExltoTabSql(
+            string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, string label, IProgress<string>? progress = null )
         {
+            // Crea tabella SQL da file Excel (solo struttura)  
+
             DataTable schema = new();
             bool mappingOk = true;
 
@@ -79,37 +68,32 @@
             string strConnSql = Conn.MysqlConn(nomeDbSql);
 
             string qrySchema = $"SELECT * FROM [{workSheet}$] WHERE 1=0;";
+            progress?.Report($"Struct: {label}");
             bool schemaOk = await ExlAsync.ExcQry(strConnExl, qrySchema, schema);
             if (!schemaOk || schema.Columns.Count == 0) return false;
 
             string ddl = "CREATE OR REPLACE TABLE " + NormTab.NormInp(nomeTbSql, schema);
-            bool ddlOk = await SqlAsync.SqlNoQry(strConnSql, ddl, 30);
+            progress?.Report($"Struct: {label}");
+            bool ddlOk = await SqlAsync.SqlNoQry(strConnSql, ddl, 60);
             if (!ddlOk) return false;
 
             List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
-            Mappings = await NormTab.CreaMappingExlSql(strConnExl, strConnSql, workSheet, nomeTbSql);
-            if (Mappings == null) mappingOk = false;
+            progress?.Report($"Struct: {label}");
+            Mappings = await NormTab.CreaMapping("EXL", "NotUsed", "NotUsed", workSheet, nomeDbSql, nomeTbSql, exlPath);
+            if (Mappings == null) return false;
 
-            return mappingOk;
-        }
+            // Copia i dati dal file Excel alla tabella SQL
 
-        // Copia i dati dal file Excel alla tabella SQL
-
-        public static async Task<bool> DatiFileExltoTabSql(
-            string nomeFoglio, string nomeDbSql, string nomeTbSql, string exlPath, IProgress<string>? progress = null)
-        {
             DataTable _tabella = new DataTable();
-            string StrConnExl = Conn.ExlFileConn(exlPath);
-            string QryExl = $"SELECT * FROM [{nomeFoglio}$]";
 
-            bool letturaOk = await ExlAsync.ExcQry(StrConnExl, QryExl, _tabella);
-            if (!letturaOk || _tabella.Rows.Count == 0)
-                return false;
+            string QryExl = $"SELECT * FROM [{workSheet}$]";
+            progress?.Report($"Load: {label}");
+            bool letturaOk = await ExlAsync.ExcQry(strConnExl, QryExl, _tabella);
+            if (!letturaOk || _tabella.Rows.Count == 0) return false;
 
-            string StrConnSql = Conn.MysqlConn(nomeDbSql);
-
-            bool bulkOk = await SqlAsync.SqlBulkCopy(StrConnSql, nomeTbSql, _tabella);
-            return bulkOk;
-        }       
+            progress?.Report($"Write: {label}");
+            bool bulkOk = await SqlAsync.SqlBulkCopy(strConnSql, nomeTbSql, _tabella, Mappings, 60);
+            return bulkOk;            
+        }
     }
 }

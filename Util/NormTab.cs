@@ -5,7 +5,7 @@ namespace PvPmo.Util
 {
     public static class NormTab
     {
-        public static List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
+        private static List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
         public static void AddMapping(int sourceOrdinal, string destinationColumn)
         {
             var NewMapping = new MySqlBulkCopyColumnMapping(sourceOrdinal, destinationColumn);
@@ -56,119 +56,90 @@ namespace PvPmo.Util
         // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
         // AddMapping all'interno della cartella GestDb classe gestione Sql.
 
-        public static async Task<List<MySqlBulkCopyColumnMapping>> CreaMappingAcsSql(
-            string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath)
+        public static async Task<List<MySqlBulkCopyColumnMapping>> CreaMapping(
+            string select, string nomeDbAcs, string nomeTbUptd, string nomeWorkSheet, string nomeDbSql, string nomeTbSql, string filePath)
         {
-            DataTable tabAcs = new();
-            DataTable tabSql = new();
+            DataTable tabUptd = new();
+            DataTable tabProd = new();
+            int dif = 0;
 
-            string qryAcs = $"SELECT * FROM [{nomeTbAcs}] WHERE 1=0;";
-            string qrySql = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
+            if (select == "ACS")
+            {
+                string qryAcs = $"SELECT * FROM [{nomeTbUptd}] WHERE 1=0;";
+                string qrySql = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
 
-            string connAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
-            string connSql = Conn.MysqlConn(nomeDbSql);
+                string connSql = Conn.MysqlConn(nomeDbSql);
+                string connAcs = Conn.AcsDbConn(nomeDbAcs, filePath);
+                
+                await AcsAsync.AcsQryTab(connAcs, qryAcs, tabUptd);
+                await SqlAsync.SqlQryDataTable(connSql, qrySql, tabProd, 30); // CORRETTO: usa DataTable non NoQry
+            }
+            else if (select == "EXL")
+            {
+                string strConnExl = Conn.ExlFileConn(filePath);
+                string connSql = Conn.MysqlConn(nomeDbSql);
 
-            await AcsAsync.AcsQryTab(connAcs, qryAcs, tabAcs);
-            await SqlAsync.SqlQryDataTable(connSql, qrySql, tabSql, 30); // CORRETTO: usa DataTable non NoQry
+                string qryExl = $"SELECT * FROM [{nomeWorkSheet}$] WHERE 1=0;";
+                string qrySql = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
 
-            int dif = tabSql.Rows.Count - tabAcs.Columns.Count;
+                await ExlAsync.ExcQry(strConnExl, qryExl, tabUptd);
+                await SqlAsync.SqlQryDataTable(connSql, qrySql, tabProd, 30);
+            }
+            else if (select == "SQL")
+            {
+                string connProd = Conn.MysqlConn("pmo");
+                string qryProd = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
+                await SqlAsync.SqlQryDataTable(connProd, qryProd, tabProd);
+                
+                string connSql = Conn.MysqlConn(nomeDbSql);
+                string qryUptd = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
+                await SqlAsync.SqlQryDataTable(connSql, qryUptd, tabUptd);
+
+                dif = tabProd.Rows.Count - tabUptd.Rows.Count;
+
+                if (dif == 0)
+                {
+                    Mappings.Clear(); // reset mappings statici
+                    
+                    for (int i = 0; i < tabUptd.Rows.Count && i < tabProd.Rows.Count; i++)
+                    {
+                        if (tabProd.Rows[i]["Field"].ToString() != "id")
+                        {
+                            string? destCol = tabProd.Rows[i]["Field"]?.ToString();
+                            AddMapping(i, destCol ?? $"Row{i}");
+                        }
+                    }
+                    return Mappings;
+                }
+                // Colonne diverse > 1 → conferma da utente
+                var confermaOk = await Shell.Current.DisplayAlert("Errore colonne",
+                    $"Le colonne in Access ({tabUptd.Columns.Count}) e in SQL ({tabProd.Rows.Count}) non coincidono.\nVuoi continuare con le altre tabelle?",
+                    "Si", "No");
+
+                return Mappings;
+            }
+
+            dif = tabProd.Rows.Count - tabUptd.Columns.Count;
 
             if (dif == 0 || dif == 1)
             {
                 Mappings.Clear(); // reset mappings statici
                 int offset = dif == 1 ? 1 : 0;
 
-                for (int i = 0; i < tabAcs.Columns.Count && (i + offset) < tabSql.Rows.Count; i++)
+                for (int i = 0; i < tabUptd.Columns.Count && (i + offset) < tabProd.Rows.Count; i++)
                 {
-                    string? destCol = tabSql.Rows[i + offset]["Field"]?.ToString();
+                    string? destCol = tabProd.Rows[i + offset]["Field"]?.ToString();
                     AddMapping(i, destCol ?? $"Col{i + offset}");
                 }
                 return Mappings;
             }
             // Colonne diverse > 1 → conferma da utente
             var conferma = await Shell.Current.DisplayAlert("Errore colonne", 
-                $"Le colonne in Access ({tabAcs.Columns.Count}) e in SQL ({tabSql.Rows.Count}) non coincidono.\nVuoi continuare con le altre tabelle?",
+                $"Le colonne in Access ({tabUptd.Columns.Count}) e in SQL ({tabProd.Rows.Count}) non coincidono.\nVuoi continuare con le altre tabelle?",
                 "Si", "No");
 
             return Mappings;
-        }
-
-        // uguale alla precedente con la differenza che vengono lette le intestazioni delle colonne
-        // Excel e Sql per creare il mapping.
-        public static async Task<List<MySqlBulkCopyColumnMapping>> CreaMappingExlSql(
-            string strConnExl, string strConnSql, string nomeWorkSheet, string nomeTbSql)
-        {
-            DataTable tabExl = new();
-            DataTable tabSql = new();
-
-            string qryExl = $"SELECT * FROM [{nomeWorkSheet}$] WHERE 1=0;";
-            string qrySql = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
-
-            await ExlAsync.ExcQry(strConnExl, qryExl, tabExl);
-            await SqlAsync.SqlQryDataTable(strConnSql, qrySql, tabSql, 30);
-
-            int dif = tabSql.Rows.Count - tabExl.Columns.Count;
-            
-            if (dif == 0 || dif == 1)
-            {
-                Mappings.Clear(); // Reset mapping statico
-
-                int offset = dif == 1 ? 1 : 0;
-
-                for (int i = 0; i < tabExl.Columns.Count && (i + offset) < tabSql.Rows.Count; i++)
-                //for (int i = 0; i < totcolexl + offset; i++)
-                {
-                    string? destCol = tabSql.Rows[i + offset]["Field"]?.ToString();
-                    AddMapping(i, destCol ?? $"Col{i + offset}");
-                }
-
-                return Mappings;
-            }
-            // Differenza colonne > 1 → alert utente
-            var conferma = await Shell.Current.DisplayAlert(
-                "Errore colonne",
-                $"Excel: {tabExl.Columns.Count} col.\nMySQL: {tabSql.Rows.Count} col.\nVuoi continuare con le altre tabelle?",
-                "Si", "No");
-
-            return Mappings;
-        }
-        public static async Task<List<MySqlBulkCopyColumnMapping>> CreaMappingSql(
-            string strConnUptd, string strConnProd, string nomeTabUptd, string nomeTbProd)
-        {
-            DataTable tabUptd = new();
-            DataTable tabProd = new();
-
-            string qryUptd = $"SHOW COLUMNS FROM `{nomeTabUptd}`;";
-            string qryProd = $"SHOW COLUMNS FROM `{nomeTbProd}`;";
-
-            await SqlAsync.SqlQryDataTable(strConnUptd, qryUptd, tabUptd, 30);
-            await SqlAsync.SqlQryDataTable(strConnProd, qryProd, tabProd, 30);
-
-            int dif = tabProd.Rows.Count - tabUptd.Columns.Count;
-
-            if (dif == 0 || dif == 1)
-            {
-                Mappings.Clear(); // Reset mapping statico
-
-                int offset = dif == 1 ? 1 : 0;
-
-                for (int i = 0; i < tabUptd.Columns.Count && (i + offset) < tabProd.Rows.Count; i++)
-                //for (int i = 0; i < totcolexl + offset; i++)
-                {
-                    string? destCol = tabProd.Rows[i + offset]["Field"]?.ToString();
-                    AddMapping(i, destCol ?? $"Col{i + offset}");
-                }
-
-                return Mappings;
-            }
-            // Differenza colonne > 1 → alert utente
-            var conferma = await Shell.Current.DisplayAlert(
-                "Errore colonne",
-                $"Excel: {tabUptd.Columns.Count} col.\nMySQL: {tabProd.Rows.Count} col.\nVuoi continuare con le altre tabelle?",
-                "Si", "No");
-
-            return Mappings;
-        }
+        }      
 
         // Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
         // Si procede anche alla normalizzazione dei nomi colonna.
@@ -230,6 +201,9 @@ namespace PvPmo.Util
                     columnType = "NVARCHAR(120)";
                 if (originalName == "Res_Start_Date" || originalName == "Res_Finish_Date")
                     columnType = "DATETIME";
+                if (originalName == "Disapproved Timesheets" || originalName == ("Overdue Timesheets")
+                    || originalName == ("Resource Depth") || originalName == ("Resource Quantity"))
+                    columnType = "DOUBLE";
 
                 sb.Append($"`{renamed}` {columnType}");
 
@@ -264,7 +238,7 @@ namespace PvPmo.Util
         };
         private static string NormalizzaNome(string name)
         {
-            var simboliDaRimuovere = new[] { ",", "-", "_", " ", "(", ")", "#" };
+            var simboliDaRimuovere = new[] {".", ",", "-", "_", " ", "(", ")", "#" };
             foreach (var simbolo in simboliDaRimuovere)
                 name = name.Replace(simbolo, "");
             return name;

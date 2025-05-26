@@ -72,8 +72,8 @@
                    FontSize="18"
                    FontAttributes="Bold"
                    Grid.Row="3"
-                   Grid.Column="1"
-                   HorizontalOptions="Start"
+                   Grid.ColumnSpan="3"
+                   HorizontalOptions="Center"
                    TextColor="Red" 
                    IsVisible="{Binding IsProgressVisible}"/>
             

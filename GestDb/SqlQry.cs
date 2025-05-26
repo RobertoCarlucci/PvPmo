@@ -45,7 +45,8 @@
         public static async Task<DataTable> NomiColSql(string conn, string tab, DataTable schema)
         {
             string qry = $"SHOW COLUMNS FROM `{tab}`;";
-            return await SqlAsync.SqlQryDataTable(conn, qry, schema, 60);
+            await SqlAsync.SqlQryDataTable(conn, qry, schema);
+            return schema;
         }
     }
     public class ExlQry
