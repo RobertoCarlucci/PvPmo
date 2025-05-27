@@ -137,7 +137,6 @@ namespace PvPmo.Util
             var conferma = await Shell.Current.DisplayAlert("Errore colonne", 
                 $"Le colonne in Access ({tabUptd.Columns.Count}) e in SQL ({tabProd.Rows.Count}) non coincidono.\nVuoi continuare con le altre tabelle?",
                 "Si", "No");
-
             return Mappings;
         }      
 

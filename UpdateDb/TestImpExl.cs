@@ -7,13 +7,16 @@ namespace PvPmo.UpdateDb
         // Test delle tabelle di Uptd prima di procedere all'aggiornamento
         // del Db di produzione.
 
-        public static async Task<bool> FinalizzaUptd()
+        public static async Task<bool> FinalizzaUptd(IProgress<string>? progress)
         {
+            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(Conn.MysqlConn("pvpmo_origine"));
+
             //    // Carico il File dall'archivio con la sequenza da svolgere
             //    // e provvedo all'esecuzione.
 
             var repo = new CaricaTabRepository<CaricaTabFinalizza>("pvpmo_origine", "finalizza");
             var dati = await repo.GetAllAsync();
+            string passLabel = string.Empty;
 
             bool tuttoOk = true;
 
@@ -22,18 +25,23 @@ namespace PvPmo.UpdateDb
 
             foreach (var n in dati)
             {
+                var db = string.IsNullOrWhiteSpace(n.DbTabConfronto) ? "default" : n.DbTabConfronto;
+                var key = $"{n.TabConfronto}|{db}";
+                var label = descrizioni.TryGetValue(key, out var desc) ? desc : $"{n.TabConfronto} ({db})";
+                passLabel = label.ToString();
+
                 bool test = await TestFileExlImp(n.Azione, n.TabConfronto, n.ColConfronto, n.TabTestare,
-                                                 n.ColDaTestare, n.DbTabConfronto, n.DbTabTest);
+                                                 n.ColDaTestare, n.DbTabConfronto, n.DbTabTest, label, progress);
 
                 if (!test) tuttoOk = false;
             }
-            tuttoOk = await FinalizzaUpdateProdDb.ApplicaUptd("UPTD");
+            tuttoOk = await FinalUpdtProdDb.ApplicaUptd("UPTD", passLabel, progress);
             return tuttoOk;
         }
 
         // Eseguo i test sui file exl di update importati in pmo_origine
         public static async Task<bool> TestFileExlImp(string azione, string tabProd, 
-            string colProd, string tabUptd, string colUptd, string dbProd, string dbUptd)
+            string colProd, string tabUptd, string colUptd, string dbProd, string dbUptd, string label, IProgress<string>? progress = null)
         {
             bool tuttoOk = true;
 
@@ -56,6 +64,8 @@ namespace PvPmo.UpdateDb
                     string qProd = $"SELECT `{colProd}` FROM `{tabProd}` ORDER BY `{colProd}` ASC;";
                     string qUptd = $"SELECT DISTINCT `{colUptd}` FROM `{tabUptd}` ORDER BY `{colUptd}` ASC;";
 
+                    progress?.Report($"Struct: {label}");
+
                     await SqlAsync.SqlQryDataTable(connProd, qProd, dataProd, 60);
                     await SqlAsync.SqlQryDataTable(connUptd, qUptd, dataUptd, 60);
 
@@ -66,14 +76,16 @@ namespace PvPmo.UpdateDb
                         .Where(r => !string.IsNullOrWhiteSpace(r[colProd]?.ToString()))
                         .CopyToDataTable();
 
+                    progress?.Report($"Test: {label}");
+
                     int countProd = dataProd.Rows.Count;
                     int countUptd = dataUptd.Rows.Count;
 
                     if (countUptd != countProd)
                     {
                         await Shell.Current.DisplayAlert("Test righe data", "Numero righe diverso tra produzione e uptd.", "OK");
-                        await Shell.Current.GoToAsync("//MainPage");
-                        tuttoOk = false;
+                        return false;
+                        //await Shell.Current.GoToAsync("//MainPage");                        
                     }
 
                     // Viene testato il valore delle date se corrispondenti.
@@ -91,14 +103,15 @@ namespace PvPmo.UpdateDb
 
                         if (!correzione)
                         {
-                            await Shell.Current.GoToAsync("//MainPage");
-                            tuttoOk = false;
+                            //tuttoOk = false;
+                            await Shell.Current.GoToAsync("//MainPage");                            
                         }
                         else
                         {
                             var vm = ServiceHelper.GetService<ModDataViewModel>();                                
                             await Shell.Current.GoToAsync(nameof(ModData));
-                            tuttoOk = false; // fermiamo il test corrente, verrà rieseguito dopo la modifica
+                            //await Shell.Current.GoToAsync("//MainPage");
+                            return false; // fermiamo il test corrente, verrà rieseguito dopo la modifica
                         }
                     }
                     break;
@@ -111,6 +124,8 @@ namespace PvPmo.UpdateDb
                     string showProd = $"SHOW COLUMNS FROM `{tabProd}`;";
                     string showUptd = $"SHOW COLUMNS FROM `{tabUptd}`;";
 
+                    progress?.Report($"Test: {label}");
+
                     await SqlAsync.SqlQryDataTable(connProd, showProd, dataProd, 30);
                     await SqlAsync.SqlQryDataTable(connUptd, showUptd, dataUptd, 30);
 
@@ -118,7 +133,8 @@ namespace PvPmo.UpdateDb
                     {
                         await Shell.Current.DisplayAlert("Test colonne",
                             $"Numero colonne diverso tra produzione e uptd tabella: ({tabProd}).", "OK");
-                        tuttoOk = false;
+                        return false;
+                        //await Shell.Current.GoToAsync("//MainPage");
                     }
                     break;                        
             }

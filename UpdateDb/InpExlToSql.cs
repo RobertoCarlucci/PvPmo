@@ -4,7 +4,7 @@
     {
         // Importazione file Excel per aggiornamento mensile
 
-        public static async Task InpExl(string type, IProgress<string>? progress)
+        public static async Task InpExl(string type, IProgress<string>? progress = null)
         {
             string? exlPath = await SelCart.PickFolder();
             if (string.IsNullOrWhiteSpace(exlPath)) return;
@@ -37,27 +37,35 @@
 
                 if (!inprtOk)
                 {
-                    await Shell.Current.DisplayAlert("Errore !", $"Errore su tabella: {n.TabellaSql}", "OK");
+                    await Shell.Current.DisplayAlert("Errore su tabella!", $"Errore su: {n.TabellaSql} " +
+                        $"non è possibile proseguire.", "OK");
+                    await Shell.Current.GoToAsync("//MainPage");
                 }
             }
 
             if (!await NormTab.NormTabImp("EXL", "pvpmo_origine"))
             {
                 await Shell.Current.DisplayAlert("Errore !", "Normalizzazione fallita.", "OK");
-                return;
+                await Shell.Current.GoToAsync("//MainPage");
             }
 
-            if (!await TestDateImpExl.FinalizzaUptd())
+            if (!await TestDateImpExl.FinalizzaUptd(progress))
             {
                 await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti.", "OK");
-                return;
+                await Shell.Current.GoToAsync("//MainPage");
+            }
+
+            if (!await FinalUpdtProdDb.UptdKey(progress))
+            {
+                await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti.", "OK");
+                await Shell.Current.GoToAsync("//MainPage");
             }
 
             await Shell.Current.DisplayAlert("Aggiornamento DB", "Aggiornamento mensile completato!", "OK");
         }              
 
         public static async Task<bool> impFileExltoTabSql(
-            string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, string label, IProgress<string>? progress = null )
+            string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, string label, IProgress<string>? progress = null)
         {
             // Crea tabella SQL da file Excel (solo struttura)  
 
@@ -78,7 +86,7 @@
             if (!ddlOk) return false;
 
             List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
-            progress?.Report($"Struct: {label}");
+            progress?.Report($"Mapping: {label}");
             Mappings = await NormTab.CreaMapping("EXL", "NotUsed", "NotUsed", workSheet, nomeDbSql, nomeTbSql, exlPath);
             if (Mappings == null) return false;
 

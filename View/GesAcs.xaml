@@ -20,7 +20,7 @@
 
             <Image x:Name="backgroundImage"  
                    Source="wallpaper_dl.png"  
-                   Grid.RowSpan="3"  
+                   Grid.RowSpan="4"  
                    Grid.ColumnSpan="3"  
                    HorizontalOptions="Center"  
                    VerticalOptions="Center"  
