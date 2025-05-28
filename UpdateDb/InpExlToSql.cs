@@ -39,13 +39,14 @@
                 {
                     await Shell.Current.DisplayAlert("Errore su tabella!", $"Errore su: {n.TabellaSql} " +
                         $"non è possibile proseguire.", "OK");
-                    await Shell.Current.GoToAsync("//MainPage");
+                    break;
+                    //await Shell.Current.GoToAsync("//MainPage");
                 }
             }
 
             if (!await NormTab.NormTabImp("EXL", "pvpmo_origine"))
             {
-                await Shell.Current.DisplayAlert("Errore !", "Normalizzazione fallita.", "OK");
+                await Shell.Current.DisplayAlert("Errore !", "Normalizzazione fallita.", "OK");                
                 await Shell.Current.GoToAsync("//MainPage");
             }
 
@@ -70,8 +71,7 @@
             // Crea tabella SQL da file Excel (solo struttura)  
 
             DataTable schema = new();
-            bool mappingOk = true;
-
+            
             string strConnExl = Conn.ExlFileConn(exlPath);
             string strConnSql = Conn.MysqlConn(nomeDbSql);
 
