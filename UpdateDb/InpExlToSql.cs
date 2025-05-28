@@ -62,6 +62,10 @@
                 await Shell.Current.GoToAsync("//MainPage");
             }
 
+            if (!await FinalUpdtProdDb.UptdOuts("pmo", progress)) 
+            { 
+            
+            }
             await Shell.Current.DisplayAlert("Aggiornamento DB", "Aggiornamento mensile completato!", "OK");
         }              
 

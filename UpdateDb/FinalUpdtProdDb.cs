@@ -1,4 +1,6 @@
-﻿namespace PvPmo.UpdateDb;
+﻿using Windows.Media.AppBroadcasting;
+
+namespace PvPmo.UpdateDb;
 
 public static class FinalUpdtProdDb
 {
@@ -45,27 +47,7 @@ public static class FinalUpdtProdDb
                 progress?.Report($"Write: {label}");
                 tuttoOk = await SqlAsync.SqlBulkCopy(connProd, n.TabConfronto, dt, Mappings, 180);
                 if (!tuttoOk) return false;
-
-                if (n.TabConfronto == "pv_total" && tuttoOk == true)
-                {
-                    string selSql = $"SELECT pv_total.SubOrgOBS, pv_total.CompetencePrimaryValue, pv_total.JobLocationRegion," +
-                        $"pv_total.Dateid, pv_total.ResourceTypes, pv_total.ResourceName, pv_total.JobLocationCountry, " +
-                        $"pv_total.TeamOBS, pv_total.WorkLocation, pv_total.ShortName FROM pvpmo_origine.pv_total " +
-                        $"WHERE pv_total.ShortName LIKE \"9%\";";
-                    DataTable dp = new DataTable();
-                    progress?.Report($"Struct: {label}");
-                    await SqlAsync.SqlQryDataTable(connUptd, selSql, dp, 60, null);
-                    if (dp.Rows.Count == 0) return false;
-
-                    deleteSql = $@"
-                        DELETE `pv_total_outs_ore_mese`.* FROM `pv_total_outs_ore_mese` INNER JOIN `{n.TabTestare}` ON
-                        `pv_total_outs_ore_mese`.`DateKeY` = `{n.TabTestare}`.`{n.ColDaTestare}`;";
-                    progress?.Report($"Struct: {label}");
-                    tuttoOk = await SqlAsync.SqlNoQry(connProd, deleteSql, 60);
-                    if (!tuttoOk) return false;
-
-
-                }
+                
             }
             else if (n.TabConfronto is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month")
             {
@@ -145,6 +127,41 @@ public static class FinalUpdtProdDb
         if (!keyOk) return false;
 
         return keyOk;
+    }
+    public static async Task<bool> UptdOuts(string conn, IProgress<string>? progress)
+    {
+        string connProd = Conn.MysqlConn(conn);
+
+        string dropSql = $@"DROP TABLE IF EXISTS pv_total_outs;";
+        await SqlAsync.SqlNoQry(connProd, dropSql, 10, null);
+
+        string createSql = $@"CREATE TABLE pv_total_outs (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+            SubOrgOBS VARCHAR(50), CompetencePrimaryValue VARCHAR(50), JobLocationRegion VARCHAR(50), Dateid DATE, 
+            ResourceTypes VARCHAR(50), ResourceName VARCHAR(50), JobLocationCountry VARCHAR(50), TeamOBS VARCHAR(50), 
+            WorkLocation VARCHAR(50), ShortName VARCHAR(50));";
+        await SqlAsync.SqlNoQry(connProd, createSql, 10, null);
+
+        string selSql = $@"INSERT INTO pv_total_outs (SubOrgOBS, CompetencePrimaryValue, JobLocationRegion, Dateid, 
+            ResourceTypes, ResourceName, JobLocationCountry, TeamOBS, WorkLocation, ShortName) SELECT pv_total.SubOrgOBS, 
+            pv_total.CompetencePrimaryValue, pv_total.JobLocationRegion, pv_total.Dateid, pv_total.ResourceTypes, 
+            pv_total.ResourceName, pv_total.JobLocationCountry, pv_total.TeamOBS, pv_total.WorkLocation, pv_total.ShortName 
+            FROM pmo.pv_total WHERE pv_total.ShortName LIKE '9%' AND pv_total.OrganizationOBS = 'Outsourcing';";
+        await SqlAsync.SqlNoQry(connProd, selSql, 60, null);
+
+        dropSql = $@"DROP TABLE IF EXISTS outs_ore_mese;";
+        await SqlAsync.SqlNoQry(connProd, dropSql, 10, null);
+
+        createSql = $@"CREATE TABLE outs_ore_mese (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, GEC VARCHAR(50),
+            Anno INT, Mese INT, Dateid DATE, ORE FLOAT);";
+        await SqlAsync.SqlNoQry(connProd, createSql, 10, null);
+
+        string insSql = $@"INSERT INTO outs_ore_mese (GEC, Anno, Mese, Dateid, ORE) SELECT GEC, YEAR(TimesheetDate) AS Anno, 
+            MONTH(TimesheetDate) AS Mese, STR_TO_DATE(CONCAT(YEAR(TimesheetDate), '-', LPAD(MONTH(TimesheetDate), 2, '0'), '-01'), 
+            '%Y-%m-%d'), SUM(TimesheetTime) FROM global_timesheet_extract WHERE GEC LIKE '9%' AND Organization = 'Outsourcing'
+            GROUP BY GEC, Anno, Mese;";
+        await SqlAsync.SqlNoQry(connProd, insSql, 10, null);
+
+        return false;
     }
 }
 
