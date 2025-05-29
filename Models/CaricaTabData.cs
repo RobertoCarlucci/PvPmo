@@ -2,14 +2,14 @@
 {
     public class CaricaTabData : ICaricabileDaDataReader
     {
-        public DateTime? PV_TotalData { get; set; }
-        public DateTime? GlobalTimesheetExtractData { get; set; }
-        public DateTime? PV_MeseSuAnno { get; set; }
+        public DateOnly? PV_TotalData { get; set; }
+        public DateOnly? GlobalTimesheetExtractData { get; set; }
+        public DateOnly? PV_MeseSuAnno { get; set; }
         public void FromReader(MySqlDataReader reader)
         {
-            PV_TotalData = reader["PV_TotalData"] as DateTime?;
-            GlobalTimesheetExtractData = reader["GlobalTimesheetExtractData"] as DateTime?;
-            PV_MeseSuAnno = reader["PV_MeseSuAnno"] as DateTime?;
+            PV_TotalData = reader["PV_TotalData"] as DateOnly?;
+            GlobalTimesheetExtractData = reader["GlobalTimesheetExtractData"] as DateOnly?;
+            PV_MeseSuAnno = reader["PV_MeseSuAnno"] as DateOnly?;
         }
     }    
 }

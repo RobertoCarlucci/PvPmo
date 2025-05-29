@@ -229,7 +229,7 @@ namespace PvPmo.Util
             "Single" => "FLOAT",
             "Double" => "DOUBLE",
             "Decimal" => "DECIMAL(18,2)",
-            "DateTime" => "DATETIME",
+            "DateTime" => "DATE",
             "Boolean" => "TINYINT(1)",
             "Byte[]" => "BLOB",
             "TimeSpan" => "TIME",

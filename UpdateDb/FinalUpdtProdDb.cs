@@ -130,38 +130,69 @@ public static class FinalUpdtProdDb
     }
     public static async Task<bool> UptdOuts(string conn, IProgress<string>? progress)
     {
-        string connProd = Conn.MysqlConn(conn);
+        string connProd = Conn.MysqlConn(conn);        
 
-        string dropSql = $@"DROP TABLE IF EXISTS pv_total_outs;";
-        await SqlAsync.SqlNoQry(connProd, dropSql, 10, null);
+        string dropSql = $@"DROP TABLE IF EXISTS outs_ore_mese;";
+        bool dropSqlOk = await SqlAsync.SqlNoQry(connProd, dropSql, 10, null);
+        if (!dropSqlOk) return false;
 
-        string createSql = $@"CREATE TABLE pv_total_outs (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+        string createSql = $@"CREATE TABLE outs_ore_mese (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, GEC VARCHAR(50),
+            timesheetyear INT, timesheetmonth INT, Dateid DATE, ORE FLOAT);";
+        await SqlAsync.SqlNoQry(connProd, createSql, 10, null);
+
+        string insSql = $@"INSERT INTO outs_ore_mese (GEC, timesheetyear, timesheetmonth, Dateid, ORE) SELECT GEC, 
+            YEAR(TimesheetDate), MONTH(TimesheetDate), STR_TO_DATE(CONCAT(YEAR(TimesheetDate), '-', LPAD(MONTH(TimesheetDate), 2, '0'), 
+            '-01'), '%Y-%m-%d'), SUM(TimesheetTime) FROM global_timesheet_extract WHERE GEC LIKE '9%' 
+            AND Organization = 'Outsourcing' GROUP BY GEC, timesheetyear, timesheetmonth;";
+        bool insSqlOk = await SqlAsync.SqlNoQry(connProd, insSql, 60, null);
+        if (!insSqlOk) return false;
+
+        dropSql = $@"DROP TABLE IF EXISTS pv_total_outs;";
+        dropSqlOk =await SqlAsync.SqlNoQry(connProd, dropSql, 10, null);
+        if (!dropSqlOk) return false;
+
+        createSql = $@"CREATE TABLE pv_total_outs (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, 
             SubOrgOBS VARCHAR(50), CompetencePrimaryValue VARCHAR(50), JobLocationRegion VARCHAR(50), Dateid DATE, 
             ResourceTypes VARCHAR(50), ResourceName VARCHAR(50), JobLocationCountry VARCHAR(50), TeamOBS VARCHAR(50), 
             WorkLocation VARCHAR(50), ShortName VARCHAR(50));";
-        await SqlAsync.SqlNoQry(connProd, createSql, 10, null);
+        bool createSqlOk = await SqlAsync.SqlNoQry(connProd, createSql, 10, null);
+        if (!createSqlOk) return false;
 
-        string selSql = $@"INSERT INTO pv_total_outs (SubOrgOBS, CompetencePrimaryValue, JobLocationRegion, Dateid, 
+        insSql = $@"INSERT INTO pv_total_outs (SubOrgOBS, CompetencePrimaryValue, JobLocationRegion, Dateid, 
             ResourceTypes, ResourceName, JobLocationCountry, TeamOBS, WorkLocation, ShortName) SELECT pv_total.SubOrgOBS, 
             pv_total.CompetencePrimaryValue, pv_total.JobLocationRegion, pv_total.Dateid, pv_total.ResourceTypes, 
             pv_total.ResourceName, pv_total.JobLocationCountry, pv_total.TeamOBS, pv_total.WorkLocation, pv_total.ShortName 
             FROM pmo.pv_total WHERE pv_total.ShortName LIKE '9%' AND pv_total.OrganizationOBS = 'Outsourcing';";
-        await SqlAsync.SqlNoQry(connProd, selSql, 60, null);
+        insSqlOk = await SqlAsync.SqlNoQry(connProd, insSql, 60, null);
+        if (!insSqlOk) return false;
 
-        dropSql = $@"DROP TABLE IF EXISTS outs_ore_mese;";
-        await SqlAsync.SqlNoQry(connProd, dropSql, 10, null);
+        string alterSql = $@"ALTER TABLE `pv_total_outs` ADD COLUMN `VersionName` VARCHAR(50) DEFAULT 'Actual FTE';";
+        bool alterSqlOk = await SqlAsync.SqlNoQry(connProd, alterSql, 10, null);
+        if (!alterSqlOk) return false;
 
-        createSql = $@"CREATE TABLE outs_ore_mese (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, GEC VARCHAR(50),
-            Anno INT, Mese INT, Dateid DATE, ORE FLOAT);";
-        await SqlAsync.SqlNoQry(connProd, createSql, 10, null);
+        createSql = $@"CREATE OR REPLACE TABLE pv_total_outs_ore_mese SELECT Pv_Total_Outs.*,
+            Outs_Ore_Mese.ORE, Outs_Ore_Mese.timesheetyear, Outs_Ore_Mese.timesheetmonth FROM PV_Total_Outs INNER JOIN 
+            Outs_Ore_Mese ON (PV_Total_Outs.DateId = Outs_Ore_Mese.DateId) AND (PV_Total_Outs.ShortName = Outs_Ore_Mese.GEC);";
+        createSqlOk = await SqlAsync.SqlNoQry(connProd, createSql, 10, null);
+        if (!createSqlOk) return false;
 
-        string insSql = $@"INSERT INTO outs_ore_mese (GEC, Anno, Mese, Dateid, ORE) SELECT GEC, YEAR(TimesheetDate) AS Anno, 
-            MONTH(TimesheetDate) AS Mese, STR_TO_DATE(CONCAT(YEAR(TimesheetDate), '-', LPAD(MONTH(TimesheetDate), 2, '0'), '-01'), 
-            '%Y-%m-%d'), SUM(TimesheetTime) FROM global_timesheet_extract WHERE GEC LIKE '9%' AND Organization = 'Outsourcing'
-            GROUP BY GEC, Anno, Mese;";
-        await SqlAsync.SqlNoQry(connProd, insSql, 10, null);
+        alterSql = $@"ALTER TABLE pv_total_outs_ore_mese DROP COLUMN id;";
+        alterSqlOk = await SqlAsync.SqlNoQry(connProd, alterSql, 10, null);
+        if (!alterSqlOk) return false;
 
-        return false;
+        alterSql = $@"ALTER TABLE pv_total_outs_ore_mese ADD COLUMN id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;";
+        alterSqlOk = await SqlAsync.SqlNoQry(connProd, alterSql, 10, null);
+        if (!alterSqlOk) return false;
+
+        alterSql = $@"ALTER TABLE pv_total_outs_ore_mese ADD COLUMN `KeyFteMese` VARCHAR(50);";
+        alterSqlOk = await SqlAsync.SqlNoQry(connProd, alterSql, 10, null);
+        if (!alterSqlOk) return false;
+
+        string updateSql = $@"UPDATE pv_total_outs_ore_mese SET KeyFteMese = CONCAT(timesheetyear, LPAD(timesheetmonth, 2, '0'));";
+        bool updateSqlOk = await SqlAsync.SqlNoQry(connProd, updateSql, 10, null);
+        if (!updateSqlOk) return false;
+
+        return true;
     }
 }
 
