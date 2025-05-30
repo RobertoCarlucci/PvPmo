@@ -1,4 +1,6 @@
-﻿namespace PvPmo.UpdateDb
+﻿using DocumentFormat.OpenXml.Bibliography;
+
+namespace PvPmo.UpdateDb
 {
     public partial class InpExlToSql()
     {
@@ -39,8 +41,7 @@
                 {
                     await Shell.Current.DisplayAlert("Errore su tabella!", $"Errore su: {n.TabellaSql} " +
                         $"non è possibile proseguire.", "OK");
-                    break;
-                    //await Shell.Current.GoToAsync("//MainPage");
+                    break;                    
                 }
             }
 
@@ -56,7 +57,7 @@
                 await Shell.Current.GoToAsync("//MainPage");
             }
 
-            if (!await FinalUpdtProdDb.UptdKey(progress))
+            if (!await FinalUpdtProdDb.UptdKey("pmo", progress))
             {
                 await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti.", "OK");
                 await Shell.Current.GoToAsync("//MainPage");
@@ -65,26 +66,46 @@
             if (!await FinalUpdtProdDb.UptdOuts("pmo", progress)) 
             { 
             
-            }
+            }                        
             await Shell.Current.DisplayAlert("Aggiornamento DB", "Aggiornamento mensile completato!", "OK");
         }              
 
         public static async Task<bool> impFileExltoTabSql(
             string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, string label, IProgress<string>? progress = null)
         {
-            // Crea tabella SQL da file Excel (solo struttura)  
+            // Crea tabella SQL da file Excel (solo struttura)
+
+            string strConnSql = Conn.MysqlConn(nomeDbSql);
+
+            if (nomeTbSql is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month") 
+            {
+                string Connpmo = Conn.MysqlConn("pmo");
+                string testTab = $@"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'pvpmo' 
+                    AND table_name = '{nomeTbSql}';";
+                int count = await SqlAsync.SqlScalarIntAsync(Connpmo, testTab);
+                if (count <= 0)
+                //    DataTable tab = new();
+                //await SqlAsync.SqlQryDataTable(Connpmo, testTab, tab, 30);
+                //if (tab.Rows.Count == 0)
+                {
+                    string createSql = $@"CREATE `{nomeTbSql}`.`{nomeTbSql}` TABLE AS SELECT * FROM 
+                        `pvpmo_origine`.`{nomeTbSql}`;";
+                    progress?.Report($"Write: {label}");
+                    bool tuttoOk = await SqlAsync.SqlNoQry(strConnSql, createSql, 60, null);
+                    if (!tuttoOk) return false;
+                }
+            }
 
             DataTable schema = new();
             
             string strConnExl = Conn.ExlFileConn(exlPath);
-            string strConnSql = Conn.MysqlConn(nomeDbSql);
-
-            string qrySchema = $"SELECT * FROM [{workSheet}$] WHERE 1=0;";
+            
+            string qrySchema = $@"SELECT * FROM [{workSheet}$] WHERE 1=0;";
             progress?.Report($"Struct: {label}");
             bool schemaOk = await ExlAsync.ExcQry(strConnExl, qrySchema, schema);
             if (!schemaOk || schema.Columns.Count == 0) return false;
 
-            string ddl = "CREATE OR REPLACE TABLE " + NormTab.NormInp(nomeTbSql, schema);
+            string ddl = $@"CREATE OR REPLACE TABLE " + NormTab.NormInp(nomeTbSql, schema);
             progress?.Report($"Struct: {label}");
             bool ddlOk = await SqlAsync.SqlNoQry(strConnSql, ddl, 60);
             if (!ddlOk) return false;
@@ -98,7 +119,7 @@
 
             DataTable _tabella = new DataTable();
 
-            string QryExl = $"SELECT * FROM [{workSheet}$]";
+            string QryExl = $@"SELECT * FROM [{workSheet}$]";
             progress?.Report($"Load: {label}");
             bool letturaOk = await ExlAsync.ExcQry(strConnExl, QryExl, _tabella);
             if (!letturaOk || _tabella.Rows.Count == 0) return false;

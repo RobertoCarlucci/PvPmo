@@ -31,9 +31,9 @@ namespace PvPmo.Repositories
             {
                 result.Add(new CaricaTabData
                 {
-                    PV_TotalData = reader["PV_TotalData"] as DateTime?,
-                    GlobalTimesheetExtractData = reader["GlobalTimesheetExtractData"] as DateTime?,
-                    PV_MeseSuAnno = reader["PV_MeseSuAnno"] as DateTime?
+                    PV_TotalData = reader["PV_TotalData"] as DateOnly?,
+                    GlobalTimesheetExtractData = reader["GlobalTimesheetExtractData"] as DateOnly?,
+                    PV_MeseSuAnno = reader["PV_MeseSuAnno"] as DateOnly?
                 });
             }
             return result;

@@ -46,7 +46,8 @@ namespace PvPmo.ViewModel
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Errore", ex.Message, "OK");
+                await Shell.Current.DisplayAlert("Errore Aggiornamento Db.", 
+                    $"La procedura è stata terminata controlla il file: {ex.Message}", "OK");
             }
 
             await Task.Delay(500);

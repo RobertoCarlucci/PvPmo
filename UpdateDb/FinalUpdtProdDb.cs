@@ -18,7 +18,7 @@ public static class FinalUpdtProdDb
         foreach (var n in validi)
         {            
             string connProd = Conn.MysqlConn(n.DbTabConfronto + ";Convert Zero Datetime=True");                        
-            string connUptd = Conn.MysqlConn(n.DbTabTest + ";Convert Zero Datetime=True");                        
+            string connUptd = Conn.MysqlConn(n.DbTabTest + ";Convert Zero Datetime=True");                       
 
             if (n.TabConfronto is "pv_total" or "global_timesheet_extract")
             {
@@ -52,7 +52,7 @@ public static class FinalUpdtProdDb
             else if (n.TabConfronto is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month")
             {
                 List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
-
+                
                 // 1. Crea Mapping tra le colonne della tabella di produzione e quella di update.
                 progress?.Report($"Mapping: {label}");
                 Mappings = await NormTab.CreaMapping("SQL", "NotUsed", "NotUsed", "NotUsed", n.DbTabTest, n.TabConfronto, "NotUsed");
@@ -78,7 +78,7 @@ public static class FinalUpdtProdDb
 
                 if (n.TabConfronto is "all_project_mapped_power_bi_column_set" && tuttoOk is true) 
                 {
-                    string cancSql = $"DELETE FROM all_project_mapped_power_bi_column_set WHERE SequenceID IS NULL;";
+                    string cancSql = $"CREATE TABLE;";
                     progress?.Report($"Struct: {label}");
                     tuttoOk = await SqlAsync.SqlNoQry(connProd, cancSql, 60);
                     if (!tuttoOk) return false;
@@ -88,9 +88,10 @@ public static class FinalUpdtProdDb
         }
         return tuttoOk;
     }
-    public static async Task<bool> UptdKey(IProgress<string>? progress)
+    
+    public static async Task<bool> UptdKey(string conn, IProgress<string>? progress)
     {
-        string connProd = Conn.MysqlConn("pmo");
+        string connProd = Conn.MysqlConn(conn);
         bool keyOk;
 
         // 1. Cancella i dati esistenti nella tabella di produzione.

@@ -13,9 +13,9 @@ namespace PvPmo.Util
         }
 
         // Viene caricata la tabella "normalizza" dal Db "pvpmo_origine"
-        //        // utilizzando dalla cartella Service il servizio "CaricaTabNorm" che mi
-        //        // fornisce la mappatura delle colonne da modificare e se necessario anche la
-        //        // stringa da inserire nel comando Sql CONCAT
+        // utilizzando dalla cartella Service il servizio "CaricaTabNorm" che mi
+        // fornisce la mappatura delle colonne da modificare e se necessario anche la
+        // stringa da inserire nel comando Sql CONCAT
 
         public static async Task<bool> NormTabImp(string tipoImportazione, string dblavoro)
         {
@@ -79,8 +79,8 @@ namespace PvPmo.Util
                 string strConnExl = Conn.ExlFileConn(filePath);
                 string connSql = Conn.MysqlConn(nomeDbSql);
 
-                string qryExl = $"SELECT * FROM [{nomeWorkSheet}$] WHERE 1=0;";
-                string qrySql = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
+                string qryExl = $@"SELECT * FROM [{nomeWorkSheet}$] WHERE 1=0;";
+                string qrySql = $@"SHOW COLUMNS FROM `{nomeTbSql}`;";
 
                 await ExlAsync.ExcQry(strConnExl, qryExl, tabUptd);
                 await SqlAsync.SqlQryDataTable(connSql, qrySql, tabProd, 30);
@@ -92,7 +92,7 @@ namespace PvPmo.Util
                 await SqlAsync.SqlQryDataTable(connProd, qryProd, tabProd);
                 
                 string connSql = Conn.MysqlConn(nomeDbSql);
-                string qryUptd = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
+                string qryUptd = $@"SHOW COLUMNS FROM `{nomeTbSql}`;";
                 await SqlAsync.SqlQryDataTable(connSql, qryUptd, tabUptd);
 
                 dif = tabProd.Rows.Count - tabUptd.Rows.Count;
