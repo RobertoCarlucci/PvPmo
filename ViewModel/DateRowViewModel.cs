@@ -1,9 +1,20 @@
-﻿namespace PvPmo.ViewModel;
+﻿using System.Collections.ObjectModel;
 
-public partial class DateRowViewModel : ObservableObject
+namespace PvPmo.ViewModel;
+
+public partial class DateRowViewModel : BaseViewModel
 {
     [ObservableProperty]
     int id;
 
-    public Dictionary<string, string> Fields { get; set; } = new();
+    [ObservableProperty]
+    ObservableCollection<FieldItem> fields = new();
+}
+public partial class FieldItem : ObservableObject
+{
+    [ObservableProperty]
+    string key = string.Empty;
+
+    [ObservableProperty]
+    string value = string.Empty;
 }

@@ -1,3 +1,5 @@
+﻿using System.Diagnostics;
+
 namespace PvPmo.View;
 
 public partial class ModData : ContentPage
@@ -5,8 +7,8 @@ public partial class ModData : ContentPage
 	public ModData(ModDataViewModel viewModel)
 	{
 		InitializeComponent();
-		BindingContext = viewModel;
-	}
+		BindingContext = viewModel;        
+    }
     protected override void OnNavigatedTo(NavigatedToEventArgs args)
     {
         base.OnNavigatedTo(args);
