@@ -1,86 +1,121 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"  
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"  
-             x:Class="PvPmo.View.ModData"  
-             x:Name="ModDataPage"  
-             xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"  
-             x:DataType="viewmodel:ModDataViewModel"  
-             Title="{Binding Title}">  
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PvPmo.View.ModData"
+             x:Name="ModDataPage"
+             xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
+             x:DataType="viewmodel:ModDataViewModel"
+             Title="{Binding Title}">
 
-    <RefreshView Command="{Binding IsRefreshing}">  
-        <Grid ColumnDefinitions="*,*,*"  
-              RowDefinitions="*,*,*"  
-              RowSpacing="0">  
+    <RefreshView Command="{Binding IsRefreshing}">
+        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,*" RowSpacing="0">
 
-            <Image x:Name="backgroundImage"  
-                   Source="wallpaper_dl.png"  
-                   Grid.RowSpan="3"  
-                   Grid.ColumnSpan="3"  
-                   HorizontalOptions="Center"  
-                   VerticalOptions="Center"  
-                   Aspect="AspectFill" />  
+            <Image x:Name="backgroundImage"
+                   Source="wallpaper_dl.png"
+                   Grid.RowSpan="2"
+                   Grid.ColumnSpan="3"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Aspect="AspectFill"/>
 
-            <CollectionView ItemsSource="{Binding DateRows}"  
-                Grid.Column="1"  
-                Grid.ColumnSpan="2"  
-                Grid.Row="0"  
-                Grid.RowSpan="3">  
+            <!-- Intestazioni (mostrate solo una volta) -->
+            <Grid Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Padding="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                <CollectionView.ItemsLayout>  
-                    <!-- Mostra le righe in 1 colonna verticale -->  
-                    <LinearItemsLayout Orientation="Vertical"/>  
-                </CollectionView.ItemsLayout>  
+                <!-- Intestazioni distribuite correttamente -->
+                <Label Grid.Column="0" Text="PV_TotalData" FontAttributes="Bold" TextColor="Red" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                <Label Grid.Column="1" Text="GlobalTimesheetExtractData" FontAttributes="Bold" TextColor="Red" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                <Label Grid.Column="2" Text="PV_MeseSuAnno" FontAttributes="Bold" TextColor="Red" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+            </Grid>
 
-                <CollectionView.ItemTemplate>  
-                    <DataTemplate x:DataType="viewmodel:DateRowViewModel">  
-                        <Border Margin="5" Padding="5" Stroke="LightGray" BackgroundColor="Transparent">  
-                            <Grid ColumnDefinitions="*,*,*">  
-                                <Grid.RowDefinitions>  
-                                    <!-- tante righe quante sono i campi -->  
-                                    <RowDefinition Height="Auto" />  
-                                    <RowDefinition Height="Auto" />  
-                                    <RowDefinition Height="Auto" />  
-                                </Grid.RowDefinitions>  
 
-                                <!-- Intestazioni -->  
-                                <Label Grid.Row="0" Grid.Column="0" Text="PV_TotalData" FontAttributes="Bold" TextColor="Red"/>
-                                <Label Grid.Row="0" Grid.Column="1" Text="GlobalTimesheetExtractData" FontAttributes="Bold" TextColor="Red"/>
-                                <Label Grid.Row="0" Grid.Column="2" Text="PV_MeseSuAnno" FontAttributes="Bold" TextColor="Red"/>  
+            <!-- CollectionView con solo i dati -->
+            <CollectionView HeightRequest="700"
+                            ItemsSource="{Binding DateRows}"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Grid.ColumnSpan="2">
 
-                                <!-- Valori -->  
-                                <Entry Grid.Row="1" Grid.Column="0" Text="{Binding Fields[1].Value}" FontAttributes="Bold" TextColor="Fuchsia"/>
-                                <Entry Grid.Row="1" Grid.Column="1" Text="{Binding Fields[2].Value}" FontAttributes="Bold" TextColor="Fuchsia"/>
-                                <Entry Grid.Row="1" Grid.Column="2" Text="{Binding Fields[3].Value}" FontAttributes="Bold" TextColor="Fuchsia"/>  
-                            </Grid>  
-                        </Border>  
-                    </DataTemplate>  
-                </CollectionView.ItemTemplate>  
-            </CollectionView>  
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical"/>
+                </CollectionView.ItemsLayout>
 
-            <Button Text="Esci senza modifiche."  
-                    Style="{StaticResource MyButton}"  
-                    Command="{Binding BtnAnnullaEsciCommand}"  
-                    IsEnabled="{Binding IsNotBusy}"  
-                    VerticalOptions="Center"  
-                    Grid.Row="0"  
-                    Grid.Column="0"  
-                    Margin="40" />  
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewmodel:DateRowViewModel">
+                        <Border Margin="5" Padding="5" Stroke="LightGray" BackgroundColor="Transparent">
+                            <Grid ColumnDefinitions="*,*,*" Padding="5">
+                                <StackLayout Grid.Column="0">
+                                    <DatePicker Date="{Binding Fields[1].ParsedDate, Mode=TwoWay}"
+                                                Format="dd/MM/yyyy"
+                                                TextColor="Fuchsia"
+                                                HorizontalOptions="Center"
+                                                IsVisible="{Binding Fields[1].IsValidDate}" />
+                                    <Label Text="N/D"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           TextColor="DarkGray"
+                                           IsVisible="{Binding Fields[1].IsValidDate, Converter={StaticResource InverseBoolConverter}}" />
+                                </StackLayout>
 
-            <Button Text="Salva Modifiche ed Esci."  
-                    Style="{StaticResource MyButton}"  
-                    Command="{Binding BtnSalvaEsciCommand}"  
-                    IsEnabled="{Binding IsNotBusy}"  
-                    VerticalOptions="Center"  
-                    Grid.Row="1"  
-                    Grid.Column="0"  
-                    Margin="40" />  
+                                <StackLayout Grid.Column="1">
+                                    <DatePicker Date="{Binding Fields[2].ParsedDate, Mode=TwoWay}"
+                                                Format="dd/MM/yyyy"
+                                                TextColor="Fuchsia"
+                                                HorizontalOptions="Center"
+                                                IsVisible="{Binding Fields[2].IsValidDate}" />
+                                    <Label Text="N/D"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           TextColor="DarkGray"
+                                           IsVisible="{Binding Fields[2].IsValidDate, Converter={StaticResource InverseBoolConverter}}" />
+                                </StackLayout>
 
-            <ActivityIndicator IsVisible="{Binding IsBusy}"  
-                               IsRunning="{Binding IsBusy}"  
-                               HorizontalOptions="Center"  
-                               VerticalOptions="Center"  
-                               Grid.RowSpan="2"  
-                               Grid.ColumnSpan="2"/>  
-        </Grid>  
-    </RefreshView>  
+                                <StackLayout Grid.Column="2">
+                                    <DatePicker Date="{Binding Fields[3].ParsedDate, Mode=TwoWay}"
+                                                Format="dd/MM/yyyy"
+                                                TextColor="Fuchsia"
+                                                HorizontalOptions="Center"
+                                                IsVisible="{Binding Fields[3].IsValidDate}" />
+                                    <Label Text="N/D"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           TextColor="DarkGray"
+                                           IsVisible="{Binding Fields[3].IsValidDate, Converter={StaticResource InverseBoolConverter}}" />
+                                </StackLayout>
+                            </Grid>
+
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Text="Esci senza modifiche."
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnAnnullaEsciCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    VerticalOptions="Center"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Margin="40"/>
+
+            <Button Text="Salva Modifiche ed Esci."
+                    Style="{StaticResource MyButton}"
+                    Command="{Binding BtnSalvaEsciCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    VerticalOptions="Center"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="40"/>
+
+            <ActivityIndicator IsVisible="{Binding IsBusy}"
+                               IsRunning="{Binding IsBusy}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Grid.RowSpan="2"
+                               Grid.ColumnSpan="2"/>
+        </Grid>
+    </RefreshView>
 </ContentPage>

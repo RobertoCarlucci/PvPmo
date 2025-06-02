@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace PvPmo.ViewModel;
 
@@ -12,9 +13,21 @@ public partial class DateRowViewModel : BaseViewModel
 }
 public partial class FieldItem : ObservableObject
 {
-    [ObservableProperty]
-    string key = string.Empty;
+    public string Key { get; set; } = string.Empty;
 
     [ObservableProperty]
-    string value = string.Empty;
+    private string value = string.Empty;
+
+    public bool IsValidDate =>
+        DateTime.TryParse(Value, out _);
+
+    public DateTime ParsedDate
+    {
+        get => DateTime.TryParse(Value, out var date) ? date : DateTime.Now;
+        set => Value = value.ToString("yyyy-MM-dd");
+    }
 }
+
+
+
+

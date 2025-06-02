@@ -44,52 +44,6 @@ public partial class ModDataViewModel : BaseViewModel // ✅ FIX
         }
     }
 
-//public partial class ModDataViewModel : BaseViewModel
-//{
-//    [ObservableProperty]
-//    public ObservableCollection<DateRowViewModel> dateRows = new();
-
-//    //public ObservableCollection<DateRowViewModel> DateRows { get; } = new();
-
-//public ModDataViewModel()
-//    {
-//        Title = "Modifica Date";
-//        _ = LoadAsync(); // Explicitly discard the task to suppress the warning  
-//    }
-
-//    public async Task LoadAsync()
-//    {
-//        string strConn = Conn.MysqlConn("pmo");
-//        string query = "SELECT * FROM `01_tabella_data`;";
-//        var table = new DataTable();
-
-//        await SqlAsync.SqlQryDataTable(strConn, query, table);
-
-//        foreach (DataRow row in table.Rows)
-//        {
-//            var dateRow = new DateRowViewModel();
-
-//            foreach (DataColumn col in table.Columns)
-//            {
-//                var columnName = col.ColumnName;
-
-//                if (columnName.ToLower() == "id" &&
-//                    row[columnName] is int idVal)
-//                {
-//                    dateRow.Id = idVal;
-//                    continue;
-//                }
-
-//                var value = row[columnName]?.ToString() ?? string.Empty;
-
-//                //dateRow.Fields[columnName] = value;
-//                dateRow.Fields.Add(new FieldItem { Key = columnName, Value = value });                
-//            }
-//            DateRows.Add(dateRow);
-//        }
-//        Debug.WriteLine($"DateRows count: {DateRows.Count}");
-//    }
-
     [RelayCommand]
     public async Task BtnSalvaEsci()
     {
