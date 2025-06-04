@@ -39,9 +39,6 @@ public class VarUtil
         string Qry = "INSERT INTO pmo." + nomeTab + " (`";
         string QryTabRif = "";
         string QryTabTemp = "";
-        string uptdLetto;
-        string prodLetto;
-        bool Bol = false;
 
         int x = tabProd.Rows.Count;
 

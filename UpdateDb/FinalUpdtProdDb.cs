@@ -34,7 +34,7 @@ public static class FinalUpdtProdDb
 
                 // 2. Crea Mapping tra le colonne della tabella di produzione e quella di update.
                 progress?.Report($"Mapping: {label}");
-                Mappings = await NormTab.CreaMapping("SQL", "NotUsed", "NotUsed", "NotUsed", n.DbTabTest, n.TabConfronto, "NotUsed");
+                Mappings = await DbUtlil.MyMapping("SQL", n.DbTabConfronto, n.TabConfronto, n.DbTabTest, n.TabTestare, null, null);
 
                 // 3. Leggi tabella da importare
                 string loadSql = $@"SELECT * FROM `{n.TabConfronto}`;";
@@ -55,7 +55,7 @@ public static class FinalUpdtProdDb
                 
                 // 1. Crea Mapping tra le colonne della tabella di produzione e quella di update.
                 progress?.Report($"Mapping: {label}");
-                Mappings = await NormTab.CreaMapping("SQL", "NotUsed", "NotUsed", "NotUsed", n.DbTabTest, n.TabConfronto, "NotUsed");
+                Mappings = await DbUtlil.MyMapping("SQL", n.DbTabConfronto, n.TabConfronto, n.DbTabTest, n.TabTestare, null, null);
                 if (Mappings == null) return false;
 
                 // 2. Leggi tabella da importare

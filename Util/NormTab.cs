@@ -5,13 +5,6 @@ namespace PvPmo.Util
 {
     public static class NormTab
     {
-        private static List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
-        public static void AddMapping(int sourceOrdinal, string destinationColumn)
-        {
-            var NewMapping = new MySqlBulkCopyColumnMapping(sourceOrdinal, destinationColumn);
-            Mappings.Add(NewMapping);
-        }
-
         // Viene caricata la tabella "normalizza" dal Db "pvpmo_origine"
         // utilizzando dalla cartella Service il servizio "CaricaTabNorm" che mi
         // fornisce la mappatura delle colonne da modificare e se necessario anche la
@@ -31,13 +24,27 @@ namespace PvPmo.Util
                 if (n.InpType != tipoImportazione && n.DbDest != dblavoro)
                     continue;
 
+                // Verifica che n.DbDest non sia null prima di passarlo a Conn.MysqlConn
+                if (string.IsNullOrEmpty(n.DbDest))
+                {
+                    esitoGlobale = false;
+                    continue;
+                }
+
                 string connStr = Conn.MysqlConn(n.DbDest);
 
+                // Verifica che n.TabellaMod e n.ColDaMod non siano null prima di passare i valori
                 bool esitoSingolo = n.Azione switch
                 {
-                    "DEL" => await SqlQry.DelColSql(connStr, n.TabellaMod, n.ColDaMod),
-                    "REN" => await SqlQry.RinColSql(connStr, n.TabellaMod, n.ColDaMod, n.Modifica, n.TipoCol),
-                    "ADD" => await SqlQry.AddColSql(connStr, n.TabellaMod, n.ColDaMod, n.TipoCol),
+                    "DEL" => !string.IsNullOrEmpty(n.TabellaMod) && !string.IsNullOrEmpty(n.ColDaMod)
+                        ? await SqlQry.DelColSql(connStr, n.TabellaMod, n.ColDaMod)
+                        : false,
+                    "REN" => !string.IsNullOrEmpty(n.TabellaMod) && !string.IsNullOrEmpty(n.ColDaMod) && !string.IsNullOrEmpty(n.Modifica) && !string.IsNullOrEmpty(n.TipoCol)
+                        ? await SqlQry.RinColSql(connStr, n.TabellaMod, n.ColDaMod, n.Modifica, n.TipoCol)
+                        : false,
+                    "ADD" => !string.IsNullOrEmpty(n.TabellaMod) && !string.IsNullOrEmpty(n.ColDaMod) && !string.IsNullOrEmpty(n.TipoCol)
+                        ? await SqlQry.AddColSql(connStr, n.TabellaMod, n.ColDaMod, n.TipoCol)
+                        : false,
                     "GEN" => await EseguiGenerazione(connStr, n),
                     _ => true
                 };
@@ -45,100 +52,14 @@ namespace PvPmo.Util
             }
             return esitoGlobale;
         }
-        private static async Task<bool> EseguiGenerazione(string conn, CaricaTabNorm n) => n.ColDaMod switch
-        {
-            "Dateid" => await SqlQry.CreaDateId(conn, n.TabellaMod, n.ColDaMod, n.Modifica),
-            "IdMonthYear" => await SqlQry.CreaIdMonthYear(conn, n.TabellaMod, n.ColDaMod, n.Modifica),
-            "Keyid" => await SqlQry.CreaKeyId(conn, n.TabellaMod, n.ColDaMod, n.Modifica),_ => true
-        };
-
-        // Vengono lette le intestazioni delle colonne Access e Sql per creare il mapping
-        // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
-        // AddMapping all'interno della cartella GestDb classe gestione Sql.
-
-        public static async Task<List<MySqlBulkCopyColumnMapping>> CreaMapping(
-            string select, string nomeDbAcs, string nomeTbUptd, string nomeWorkSheet, string nomeDbSql, string nomeTbSql, string filePath)
-        {
-            DataTable tabUptd = new();
-            DataTable tabProd = new();
-            int dif = 0;
-
-            if (select == "ACS")
+        private static async Task<bool> EseguiGenerazione(string conn, CaricaTabNorm n) =>
+            !string.IsNullOrEmpty(n.TabellaMod) && !string.IsNullOrEmpty(n.Modifica) ? n.ColDaMod switch
             {
-                string qryAcs = $"SELECT * FROM [{nomeTbUptd}] WHERE 1=0;";
-                string qrySql = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
-
-                string connSql = Conn.MysqlConn(nomeDbSql);
-                string connAcs = Conn.AcsDbConn(nomeDbAcs, filePath);
-                
-                await AcsAsync.AcsQryTab(connAcs, qryAcs, tabUptd);
-                await SqlAsync.SqlQryDataTable(connSql, qrySql, tabProd, 30); // CORRETTO: usa DataTable non NoQry
-            }
-            else if (select == "EXL")
-            {
-                string strConnExl = Conn.ExlFileConn(filePath);
-                string connSql = Conn.MysqlConn(nomeDbSql);
-
-                string qryExl = $@"SELECT * FROM [{nomeWorkSheet}$] WHERE 1=0;";
-                string qrySql = $@"SHOW COLUMNS FROM `{nomeTbSql}`;";
-
-                await ExlAsync.ExcQry(strConnExl, qryExl, tabUptd);
-                await SqlAsync.SqlQryDataTable(connSql, qrySql, tabProd, 30);
-            }
-            else if (select == "SQL")
-            {
-                string connProd = Conn.MysqlConn("pmo");
-                string qryProd = $"SHOW COLUMNS FROM `{nomeTbSql}`;";
-                await SqlAsync.SqlQryDataTable(connProd, qryProd, tabProd);
-                
-                string connSql = Conn.MysqlConn(nomeDbSql);
-                string qryUptd = $@"SHOW COLUMNS FROM `{nomeTbSql}`;";
-                await SqlAsync.SqlQryDataTable(connSql, qryUptd, tabUptd);
-
-                dif = tabProd.Rows.Count - tabUptd.Rows.Count;
-
-                if (dif == 0)
-                {
-                    Mappings.Clear(); // reset mappings statici
-                    
-                    for (int i = 0; i < tabUptd.Rows.Count && i < tabProd.Rows.Count; i++)
-                    {
-                        if (tabProd.Rows[i]["Field"].ToString() != "id")
-                        {
-                            string? destCol = tabProd.Rows[i]["Field"]?.ToString();
-                            AddMapping(i, destCol ?? $"Row{i}");
-                        }
-                    }
-                    return Mappings;
-                }
-                // Colonne diverse > 1 → conferma da utente
-                var confermaOk = await Shell.Current.DisplayAlert("Errore colonne",
-                    $"Le colonne in Access ({tabUptd.Columns.Count}) e in SQL ({tabProd.Rows.Count}) non coincidono.\nVuoi continuare con le altre tabelle?",
-                    "Si", "No");
-
-                return Mappings;
-            }
-
-            dif = tabProd.Rows.Count - tabUptd.Columns.Count;
-
-            if (dif == 0 || dif == 1)
-            {
-                Mappings.Clear(); // reset mappings statici
-                int offset = dif == 1 ? 1 : 0;
-
-                for (int i = 0; i < tabUptd.Columns.Count && (i + offset) < tabProd.Rows.Count; i++)
-                {
-                    string? destCol = tabProd.Rows[i + offset]["Field"]?.ToString();
-                    AddMapping(i, destCol ?? $"Col{i + offset}");
-                }
-                return Mappings;
-            }
-            // Colonne diverse > 1 → conferma da utente
-            var conferma = await Shell.Current.DisplayAlert("Errore colonne", 
-                $"Le colonne in Access ({tabUptd.Columns.Count}) e in SQL ({tabProd.Rows.Count}) non coincidono.\nVuoi continuare con le altre tabelle?",
-                "Si", "No");
-            return Mappings;
-        }      
+                "Dateid" => await SqlQry.CreaDateId(conn, n.TabellaMod, n.ColDaMod, n.Modifica),
+                "IdMonthYear" => await SqlQry.CreaIdMonthYear(conn, n.TabellaMod, n.ColDaMod, n.Modifica),
+                "Keyid" => await SqlQry.CreaKeyId(conn, n.TabellaMod, n.ColDaMod, n.Modifica),
+                _ => true
+            } : false;
 
         // Vengono normalizzati i nomi delle Tabelle Sql creando le stesse.
         // Si procede anche alla normalizzazione dei nomi colonna.

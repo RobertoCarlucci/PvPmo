@@ -112,7 +112,7 @@ namespace PvPmo.UpdateDb
 
             List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
             progress?.Report($"Mapping: {label}");
-            Mappings = await NormTab.CreaMapping("EXL", "NotUsed", "NotUsed", workSheet, nomeDbSql, nomeTbSql, exlPath);
+            Mappings = await DbUtlil.MyMapping("EXL", nomeDbSql, nomeTbSql, null, null, workSheet,  exlPath);
             if (Mappings == null) return false;
 
             // Copia i dati dal file Excel alla tabella SQL

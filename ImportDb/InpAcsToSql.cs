@@ -92,7 +92,7 @@ public partial class InpAcsToSql()
     {
         List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
         progress?.Report($"Stuct: {label}");
-        Mappings = await NormTab.CreaMapping("ACS", nomeDbAcs, nomeTbAcs, "Not_Used", nomeDbSql, nomeTbSql, acsPath);
+        Mappings = await DbUtlil.MyMapping("ACS", nomeDbSql, nomeTbSql, nomeDbAcs, nomeTbAcs, null, acsPath);
 
         if (Mappings == null)
             return false;

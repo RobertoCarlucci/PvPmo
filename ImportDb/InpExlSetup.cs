@@ -46,7 +46,7 @@
                 if (!ddlOk) return false;
 
                 List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
-                Mappings = await NormTab.CreaMapping("EXL", "Not_Use", "Not_Use", workSheet, dbSql, tabSql, fullPath);
+                Mappings = await DbUtlil.MyMapping("EXL", dbSql, tabSql, null, null, workSheet, fullPath);
                 if (Mappings == null) return false;
 
                 string qryData = $"SELECT * FROM [{workSheet}$];";

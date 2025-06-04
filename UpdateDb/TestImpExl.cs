@@ -84,8 +84,7 @@ namespace PvPmo.UpdateDb
                     if (countUptd != countProd)
                     {
                         await Shell.Current.DisplayAlert("Test righe data", "Numero righe diverso tra produzione e uptd.", "OK");
-                        return false;
-                        //await Shell.Current.GoToAsync("//MainPage");                        
+                        return false;                                           
                     }
 
                     // Viene testato il valore delle date se corrispondenti.

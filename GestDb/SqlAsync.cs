@@ -2,13 +2,6 @@
 
 public partial class SqlAsync
 {    
-    //public static List<MySqlParameter> Params = new List<MySqlParameter>();
-    //public static void AddParam(string nome, Object vale)
-    //{
-    //    var NewParam = new MySqlParameter(nome, vale);
-    //    Params.Add(NewParam);
-    //}
-    
     public static async Task<bool> SqlNoQry(
         string strConn, string qry, int timeoutSec = 0, List<MySqlParameter>? parameters = null)
     {
@@ -78,10 +71,12 @@ public partial class SqlAsync
                 BulkCopyTimeout = timeoutSec,
                 DestinationTableName = tableName
             };
-            if (Mappings != null)                 
+            if (Mappings != null)
+            {
                 Mappings.ForEach(_mapping => { bulk.ColumnMappings.Add(_mapping); });
-                Mappings.Clear();            
-            
+                Mappings.Clear(); // This line is safe now because we check for null above
+            }
+
             await bulk.WriteToServerAsync(data);
             return true;
         }
