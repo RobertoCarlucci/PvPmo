@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Globalization;
 
 namespace PvPmo.ViewModel;
 
@@ -10,6 +9,7 @@ public partial class DateRowViewModel : BaseViewModel
 
     [ObservableProperty]
     ObservableCollection<FieldItem> fields = new();
+        
 }
 public partial class FieldItem : ObservableObject
 {

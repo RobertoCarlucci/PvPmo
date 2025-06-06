@@ -74,28 +74,28 @@ namespace PvPmo.UpdateDb
             string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, string label, IProgress<string>? progress = null)
         {
             // Crea tabella SQL da file Excel (solo struttura)
+            List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
 
             string strConnSql = Conn.MysqlConn(nomeDbSql);
 
             if (nomeTbSql is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month") 
             {
+                
+                DataTable tab = new DataTable();
+
                 string Connpmo = Conn.MysqlConn("pmo");
-                string testTab = $@"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'pvpmo' 
-                    AND table_name = '{nomeTbSql}';";
-                int count = await SqlAsync.SqlScalarIntAsync(Connpmo, testTab);
-                if (count <= 0)
-                //    DataTable tab = new();
-                //await SqlAsync.SqlQryDataTable(Connpmo, testTab, tab, 30);
-                //if (tab.Rows.Count == 0)
+                string testTab = $@"SHOW TABLES LIKE '{nomeTbSql}';";                     
+                
+                await SqlAsync.SqlQryDataTable(Connpmo, testTab, tab, 30);
+                if (tab.Rows.Count <= 0)
                 {
-                    string createSql = $@"CREATE `{nomeTbSql}`.`{nomeTbSql}` TABLE AS SELECT * FROM 
+                    string createSql = $@"CREATE TABLE `pmo`.`{nomeTbSql}` AS  SELECT * FROM 
                         `pvpmo_origine`.`{nomeTbSql}`;";
                     progress?.Report($"Write: {label}");
                     bool tuttoOk = await SqlAsync.SqlNoQry(strConnSql, createSql, 60, null);
                     if (!tuttoOk) return false;
                 }
-            }
-
+            }            
             DataTable schema = new();
             
             string strConnExl = Conn.ExlFileConn(exlPath);
@@ -110,7 +110,7 @@ namespace PvPmo.UpdateDb
             bool ddlOk = await SqlAsync.SqlNoQry(strConnSql, ddl, 60);
             if (!ddlOk) return false;
 
-            List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
+            
             progress?.Report($"Mapping: {label}");
             Mappings = await DbUtlil.MyMapping("EXL", nomeDbSql, nomeTbSql, null, null, workSheet,  exlPath);
             if (Mappings == null) return false;

@@ -20,7 +20,7 @@ public static class FinalUpdtProdDb
             string connProd = Conn.MysqlConn(n.DbTabConfronto + ";Convert Zero Datetime=True");                        
             string connUptd = Conn.MysqlConn(n.DbTabTest + ";Convert Zero Datetime=True");                       
 
-            if (n.TabConfronto is "pv_total" or "global_timesheet_extract")
+            if (n.TabConfronto is "pv_total" or "global_timesheet_extract" && !string.IsNullOrEmpty(n.DbTabConfronto))
             {
                 List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
 
@@ -49,7 +49,8 @@ public static class FinalUpdtProdDb
                 if (!tuttoOk) return false;
                 
             }
-            else if (n.TabConfronto is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month")
+            else if (n.TabConfronto is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month" 
+                    && !string.IsNullOrEmpty(n.DbTabConfronto))
             {
                 List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
                 

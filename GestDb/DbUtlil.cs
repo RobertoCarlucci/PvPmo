@@ -2,31 +2,23 @@
 {
     public partial class DbUtlil
     {
-        // Vengono lette le intestazioni delle colonne Access e Sql per creare il mapping
-        // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
-        // AddMapping all'interno della cartella GestDb classe gestione Sql.
-
         public static List<MySqlParameter> Params = new List<MySqlParameter>();
         public static void AddParam(string nome, Object vale)
         {
             var NewParam = new MySqlParameter(nome, vale);
             Params.Add(NewParam);
         }
-        public static void ClearParams()
-        {
-            Params.Clear();
-        }
-
+        
         private static List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
         public static void AddMapping(int sourceOrdinal, string destinationColumn)
         {
             var NewMapping = new MySqlBulkCopyColumnMapping(sourceOrdinal, destinationColumn);
             Mappings.Add(NewMapping);
         }
-        public static void ClearMappings()
-        {
-            Mappings.Clear();
-        }
+        
+        // Vengono lette le intestazioni delle colonne Access e Sql per creare il mapping
+        // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
+        // MyMapping e restituire al chiamante un oggetto mappings.
         public static async Task<List<MySqlBulkCopyColumnMapping>> MyMapping(string select,string dbDest, string tabDest, 
             string? dbOrgn = null, string? tbOrgn = null, string? nomeWorkSheet = null, string? filePath = null)
         {
@@ -56,14 +48,14 @@
                 await ExlAsync.ExcQry(connOrgn, qryExl, dTabOrgn);
                 await SqlAsync.SqlQryDataTable(conndbDest, qrySql, dTabDest, 30);
             }
-            else if (select == "SQL")
+            else if (select == "SQL" && !string.IsNullOrEmpty(dbOrgn))
             {
                 string conndbDest = Conn.MysqlConn("pmo");
                 string qryProd = $"SHOW COLUMNS FROM `{tabDest}`;";
                 await SqlAsync.SqlQryDataTable(conndbDest, qryProd, dTabDest);
 
-                string connOrgn = Conn.MysqlConn(dbDest);
-                string qryUptd = $@"SHOW COLUMNS FROM `{tabDest}`;";
+                string connOrgn = Conn.MysqlConn(dbOrgn);
+                string qryUptd = $@"SHOW COLUMNS FROM `{tbOrgn}`;";
                 await SqlAsync.SqlQryDataTable(connOrgn, qryUptd, dTabOrgn);
 
                 dif = dTabDest.Rows.Count - dTabOrgn.Rows.Count;
@@ -84,8 +76,8 @@
                 }
                 // Colonne diverse > 1 → conferma da utente
                 var confermaOk = await Shell.Current.DisplayAlert("Errore colonne",
-                    $"Le colonne in Access ({dTabOrgn.Columns.Count}) e in SQL ({dTabDest.Rows.Count}) non coincidono.\nVuoi continuare con le altre tabelle?",
-                    "Si", "No");
+                $"Le colonne nella tabella di origine: {dbOrgn} - ({dTabOrgn.Columns.Count}) e nella tabella di destinazione" +
+                $": {dbDest} - ({dTabDest.Rows.Count}) non coincidono. Vuoi continuare con le altre tabelle?", "Si", "No");
 
                 return Mappings;
             }
@@ -106,8 +98,8 @@
             }
             // Colonne diverse > 1 → conferma da utente
             var conferma = await Shell.Current.DisplayAlert("Errore colonne",
-                $"Le colonne in Access ({dTabOrgn.Columns.Count}) e in SQL ({dTabDest.Rows.Count}) non coincidono.\nVuoi continuare con le altre tabelle?",
-                "Si", "No");
+                $"Le colonne nella tabella di origine: {dbOrgn} - ({dTabOrgn.Columns.Count}) e nella tabella di destinazione" +
+                $": {dbDest} - ({dTabDest.Rows.Count}) non coincidono. Vuoi continuare con le altre tabelle?", "Si", "No");
             return Mappings;
         }
     }

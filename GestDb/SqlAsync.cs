@@ -93,34 +93,4 @@ public partial class SqlAsync
             }
         }
     }
-    public static async Task<int> SqlScalarIntAsync(
-    string strConn, string qry, int timeoutSec = 30, List<MySqlParameter>? parameters = null)
-    {
-        await using var conn = new MySqlConnection(strConn);
-        try
-        {
-            await conn.OpenAsync();
-            await using var cmd = new MySqlCommand(qry, conn);
-            cmd.CommandTimeout = timeoutSec;
-
-            if (parameters != null)
-                cmd.Parameters.AddRange(parameters.ToArray());
-
-            object? result = await cmd.ExecuteScalarAsync();
-            return result != null && int.TryParse(result.ToString(), out int count) ? count : -1;
-        }
-        catch (MySqlException ex)
-        {
-            await DbErrorHandler.ShowErrorAsync(ex, "Errore SQL COUNT");
-            return -1;
-        }
-        finally
-        {
-            if (conn != null && conn.State == ConnectionState.Open) // Fixed condition
-            {
-                await conn.CloseAsync();
-            }
-        }
-    }
-
 }

@@ -19,10 +19,10 @@ namespace PvPmo.ViewModel
         }
         private string title = string.Empty;
 
-        public BaseViewModel(string tabellaCorrente)
-        {
-            this.tabellaCorrente = tabellaCorrente;
-        }
+        //public BaseViewModel(string tabellaCorrente)
+        //{
+        //    this.tabellaCorrente = tabellaCorrente;
+        //}
 
         public bool IsNotBusy => !IsBusy;
 
