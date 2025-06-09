@@ -2,6 +2,8 @@
 {
     public partial class DbUtlil
     {
+        // Classe per gestire le operazioni di utilità del database.
+        
         public static List<MySqlParameter> Params = new List<MySqlParameter>();
         public static void AddParam(string nome, Object vale)
         {

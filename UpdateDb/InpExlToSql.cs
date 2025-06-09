@@ -48,19 +48,19 @@ namespace PvPmo.UpdateDb
             if (!await NormTab.NormTabImp("EXL", "pvpmo_origine"))
             {
                 await Shell.Current.DisplayAlert("Errore !", "Normalizzazione fallita.", "OK");                
-                await Shell.Current.GoToAsync("//MainPage");
+                //await Shell.Current.GoToAsync("//MainPage");
             }
 
             if (!await TestDateImpExl.FinalizzaUptd(progress))
             {
                 await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti.", "OK");
-                await Shell.Current.GoToAsync("//MainPage");
+                //await Shell.Current.GoToAsync("//MainPage");
             }
 
             if (!await FinalUpdtProdDb.UptdKey("pmo", progress))
             {
                 await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti.", "OK");
-                await Shell.Current.GoToAsync("//MainPage");
+                //await Shell.Current.GoToAsync("//MainPage");
             }
 
             if (!await FinalUpdtProdDb.UptdOuts("pmo", progress)) 
