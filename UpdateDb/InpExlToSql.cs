@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-
-namespace PvPmo.UpdateDb
+﻿namespace PvPmo.UpdateDb
 {
     public partial class InpExlToSql()
     {

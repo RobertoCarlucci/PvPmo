@@ -187,7 +187,7 @@ namespace PvPmo.UpdateDb
             DataTable dataProd = new();
             DataTable dataUptd = new();
 
-            string connProd = Conn.MysqlConn(dbtabConfronto + ";Convert Zero Datetime=True");
+            string connProd = Conn.MysqlConn(dbtabConfronto + ";Convert Zero Datetime=True;AllowLoadLocalInfile=true;");
             string connUptd = Conn.MysqlConn(dbTabTest + ";Convert Zero Datetime=True");
 
             bool tuttoOk = true;
