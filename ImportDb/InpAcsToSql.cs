@@ -36,17 +36,22 @@ public partial class InpAcsToSql()
             var label = descrizioni.TryGetValue(key, out var desc) ? desc : $"{n.TabellaSql} ({db})";
 
             try
-            {                
-                bool ok1 = await TabAcstoTabSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath, progress, label);
-                if (ok1) { current++; }
-
-                bool ok2 = await InpAcsDatitoSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath, progress, label);
-                if (ok2) { current++; }
-
-                if (!ok1 || !ok2)
+            {
+                if(!string.IsNullOrEmpty(n.DbInp) && !string.IsNullOrEmpty(n.Tabella) 
+                    && !string.IsNullOrEmpty(n.DbDest) && !string.IsNullOrEmpty(n.TabellaSql)) 
                 {
-                    await Shell.Current.DisplayAlert("Errore", $"Errore durante l'import di {n.Tabella}", "OK");
-                }
+                    bool ok1 = await TabAcstoTabSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath, progress, label);
+                    if (ok1) { current++; }
+
+                    bool ok2 = await InpAcsDatitoSql(n.DbInp, n.Tabella, n.DbDest, n.TabellaSql, acsPath, progress, label);
+                    if (ok2) { current++; }
+
+                    if (!ok1 || !ok2)
+                    {
+                        await Shell.Current.DisplayAlert("Errore", $"Errore durante l'import di {n.Tabella}", "OK");
+                    }
+                }              
+                
             }
             catch (Exception ex)
             {
