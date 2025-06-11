@@ -40,8 +40,8 @@ namespace PvPmo.UpdateDb
                             await Shell.Current.DisplayAlert("Errore", "Dati di test non completi.", "OK");
                             return false;
                         }
-                        tuttoOk = await EseguiTST(n.DbTabConfronto, n.TabConfronto, n.ColConfronto, n.DbTabTest, 
-                            n.TabTestare, n.ColDaTestare, label, progress);
+                        tuttoOk = await EseguiTST(n.DbTabConfronto, n.TabConfronto,  n.DbTabTest, 
+                            n.TabTestare, label, n.ColConfronto, n.ColDaTestare, progress);
                         if (!tuttoOk) return false;
                         break;
                     case "NUM":
@@ -53,7 +53,9 @@ namespace PvPmo.UpdateDb
                         }
                         tuttoOk = await EseguiNUM(n.DbTabConfronto, n.TabConfronto, n.DbTabTest, n.TabTestare, label, progress);
                         if (!tuttoOk) return false;
-                        break;                    
+                        break;
+                    case "UPTD":
+                        continue; // Non eseguo UPTD qui, ma alla fine di tutti i test.
                     default:
                         await Shell.Current.DisplayAlert("Azione sconosciuta", $"Azione {n.Azione} non riconosciuta.", "OK");
                         return !tuttoOk;
@@ -64,28 +66,27 @@ namespace PvPmo.UpdateDb
             if (tuttoOk == true)
             {
 
-                foreach (var u in dati.Where(u => u.Azione == "UPTD" && u.DbTabConfronto == u.DbTabConfronto &&
-                    u.TabConfronto == u.TabConfronto && u.DbTabTest == u.DbTabTest && u.TabTestare == u.TabTestare))                    
+                foreach (var u in dati.Where(u => u.Azione == "UPTD"))                    
                 {
                     var db = string.IsNullOrWhiteSpace(u.DbTabConfronto) ? "default" : u.DbTabConfronto;
                     var key = $"{u.TabConfronto}|{db}";
                     var label = descrizioni.TryGetValue(key, out var desc) ? desc : $"{u.TabConfronto} ({db})";
 
-                    if (string.IsNullOrWhiteSpace(u.DbTabConfronto) || string.IsNullOrWhiteSpace(u.TabConfronto) ||
-                        string.IsNullOrWhiteSpace(u.DbTabTest) || string.IsNullOrWhiteSpace(u.TabTestare) ||
-                        string.IsNullOrWhiteSpace(u.ColConfronto) || string.IsNullOrWhiteSpace(u.ColDaTestare))
-                    {
-                        await Shell.Current.DisplayAlert("Errore", "Dati di update non completi.", "OK");
-                        return false;
-                    }
+                    //if (string.IsNullOrWhiteSpace(u.DbTabConfronto) || string.IsNullOrWhiteSpace(u.TabConfronto) ||
+                    //    string.IsNullOrWhiteSpace(u.DbTabTest) || string.IsNullOrWhiteSpace(u.TabTestare) ||
+                    //    string.IsNullOrWhiteSpace(u.ColConfronto) || string.IsNullOrWhiteSpace(u.ColDaTestare))
+                    //{
+                    //    await Shell.Current.DisplayAlert("Errore", "Dati di update non completi.", "OK");
+                    //    return false;
+                    //}
                     tuttoOk = await EseguiUPTD(u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabTestare,
                             label, u.ColConfronto, u.ColDaTestare, progress);
                 }
             }
             return true;          
         }        
-        public static async Task<bool> EseguiTST(string dbtabConfronto, string tabConfronto, string colConfronto,
-            string dbTabTest, string tabTestare, string colDaTestare, string label, IProgress<string>? progress = null)
+        public static async Task<bool> EseguiTST(string dbtabConfronto, string tabConfronto, string dbTabTest, string tabTestare, 
+            string label, string colConfronto = null, string colDaTestare = null, IProgress<string>? progress = null)
         {
             // Test Valore Data e Record Data presenti in Uptd
             // Confrontandolo con la tabella 01_tabella_data del Db di produzione.
