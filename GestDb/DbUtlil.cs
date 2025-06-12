@@ -52,7 +52,7 @@
             }
             else if (select == "SQL" && !string.IsNullOrEmpty(dbOrgn))
             {
-                string conndbDest = Conn.MysqlConn("pmo");
+                string conndbDest = Conn.MysqlConn(dbDest);
                 string qryProd = $"SHOW COLUMNS FROM `{tabDest}`;";
                 await SqlAsync.SqlQryDataTable(conndbDest, qryProd, dTabDest);
 

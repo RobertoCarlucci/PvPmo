@@ -53,15 +53,10 @@
                 await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti.", "OK");               
             }
 
-            if (!await FinalUpdtProdDb.UptdKeyOutsTransaction("pmo", progress))
+            if (!await UpdtKeyOuts.UptdKeyOutsTransaction("pmo", progress))
             {
-                await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti.", "OK");                
-            }
-
-            //if (!await FinalUpdtProdDb.UptdOuts("pmo", progress)) 
-            //{ 
-            
-            //}                        
+                await Shell.Current.DisplayAlert("Errore !", "Update sulle tabelle Key & Outs falliti. Nessuna modifica effettuata.", "OK");                
+            }                                  
             await Shell.Current.DisplayAlert("Aggiornamento DB", "Aggiornamento mensile completato!", "OK");
         }              
 
