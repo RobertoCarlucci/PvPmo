@@ -35,36 +35,37 @@
                 string filePath = Path.Combine(exlPath, n.Tabella!);                
 
                 inprtOk = await impFileExltoTabSql(n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath, label, progress);
-                if (inprtOk) { current++; }              
-
-                if (!inprtOk)
+                if (inprtOk) 
+                { 
+                    current++; 
+                }
+                else
                 {
                     await Shell.Current.DisplayAlert("Errore su tabella!", $"Errore su: {n.TabellaSql} " +
                         $"non è possibile proseguire.", "OK");
-                    break;
-                    return false;
+                    return inprtOk;
                 }
             }
-
             inprtOk = await NormTab.NormTabImp("EXL", "pvpmo_origine");
             if (!inprtOk)
             {
-                await Shell.Current.DisplayAlert("Errore !", "Normalizzazione fallita. \nNessuna modifica è stata effettuata sulla produzione.", "OK");
-                return false;
+                await Shell.Current.DisplayAlert("Errore Normalizzazione Tabelle !", "Normalizzazione fallita. " +
+                    "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
+                return inprtOk;
             }
             inprtOk = await TestDateImpExl.FinalizzaUptd(progress);
             if (!inprtOk)
             {
-                await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti. " +
+                await Shell.Current.DisplayAlert("Errore Test Tabelle !", "Controlli sulle tabelle importate falliti. " +
                     "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
-                return false;
+                return inprtOk;
             }
             inprtOk = await UpdtKeyOuts.UptdKeyOutsTransaction("pmo", progress);
             if (!inprtOk)
             {
-                await Shell.Current.DisplayAlert("Errore !", "Update sulle tabelle Key & Outs falliti. " +
+                await Shell.Current.DisplayAlert("Errore Update !", "Update sulle tabelle Key & Outs falliti. " +
                     "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
-                return false;
+                return inprtOk;
             }                                  
             await Shell.Current.DisplayAlert("Aggiornamento DB !", "Aggiornamento mensile completato!", "OK");
             return inprtOk;
@@ -88,6 +89,8 @@
                 
                 await SqlAsync.SqlQryDataTable(Connpmo, testTab, tab, 60);
                 if (tab.Rows.Count <= 0)
+                // La tabella non esiste, quindi la creo.
+                // Utilizzo la tabella di origine per creare la nuova tabella in pmo.
                 {
                     string createSql = $@"CREATE TABLE `pmo`.`{nomeTbSql}` AS  SELECT * FROM 
                         `pvpmo_origine`.`{nomeTbSql}`;";
@@ -121,6 +124,7 @@
             if (Mappings == null) return false;
 
             // Copia i dati dal file Excel alla tabella SQL
+            // Crea una tabella temporanea per i dati da importare in pmo.origine
 
             DataTable _tabella = new DataTable();
 

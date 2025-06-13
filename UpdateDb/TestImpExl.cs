@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Vml.Spreadsheet;
-using PvPmo.GestDb;
-using PvPmo.View;
+﻿using PvPmo.View;
 
 namespace PvPmo.UpdateDb
 {
@@ -17,8 +15,7 @@ namespace PvPmo.UpdateDb
             //    // e provvedo all'esecuzione.
 
             var repo = new CaricaTabRepository<CaricaTabFinalizza>("pvpmo_origine", "finalizza");
-            var dati = await repo.GetAllAsync();
-            string passLabel = string.Empty;
+            var dati = await repo.GetAllAsync();           
 
             bool tuttoOk = true;
 
@@ -199,9 +196,9 @@ namespace PvPmo.UpdateDb
                 // 2. Leggi tabella da importare
                 string loadSql = $@"SELECT * FROM `{tabConfronto}`;";
                 DataTable dt = new DataTable();
-                progress?.Report($"Load: {label}");
-                await SqlAsync.SqlQryDataTable(connUptd, loadSql, dt, 60);
-                if (dt.Rows.Count == 0) return false;
+                    progress?.Report($"Load: {label}");
+                    await SqlAsync.SqlQryDataTable(connUptd, loadSql, dt, 60);
+                    if (dt.Rows.Count == 0) return false;
 
                 using (MySqlConnection myConnection = new MySqlConnection(connProd))
                 {
