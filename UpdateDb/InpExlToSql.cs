@@ -4,10 +4,12 @@
     {
         // Importazione file Excel per aggiornamento mensile
 
-        public static async Task InpExl(string type, IProgress<string>? progress = null)
+        public static async Task<bool> InpExl(string type, IProgress<string>? progress = null)
         {
             string? exlPath = await SelCart.PickFolder();
-            if (string.IsNullOrWhiteSpace(exlPath)) return;
+            if (string.IsNullOrWhiteSpace(exlPath)) return false;
+
+            bool inprtOk = true;
 
             var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(Conn.MysqlConn("pvpmo_origine"));
             
@@ -32,32 +34,40 @@
 
                 string filePath = Path.Combine(exlPath, n.Tabella!);                
 
-                bool inprtOk = await impFileExltoTabSql(n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath, label, progress);
+                inprtOk = await impFileExltoTabSql(n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath, label, progress);
                 if (inprtOk) { current++; }              
 
                 if (!inprtOk)
                 {
                     await Shell.Current.DisplayAlert("Errore su tabella!", $"Errore su: {n.TabellaSql} " +
                         $"non è possibile proseguire.", "OK");
-                    break;                    
+                    break;
+                    return false;
                 }
             }
 
-            if (!await NormTab.NormTabImp("EXL", "pvpmo_origine"))
+            inprtOk = await NormTab.NormTabImp("EXL", "pvpmo_origine");
+            if (!inprtOk)
             {
-                await Shell.Current.DisplayAlert("Errore !", "Normalizzazione fallita.", "OK");                
+                await Shell.Current.DisplayAlert("Errore !", "Normalizzazione fallita. \nNessuna modifica è stata effettuata sulla produzione.", "OK");
+                return false;
             }
-
-            if (!await TestDateImpExl.FinalizzaUptd(progress))
+            inprtOk = await TestDateImpExl.FinalizzaUptd(progress);
+            if (!inprtOk)
             {
-                await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti.", "OK");               
+                await Shell.Current.DisplayAlert("Errore !", "Controlli sulle tabelle importate falliti. " +
+                    "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
+                return false;
             }
-
-            if (!await UpdtKeyOuts.UptdKeyOutsTransaction("pmo", progress))
+            inprtOk = await UpdtKeyOuts.UptdKeyOutsTransaction("pmo", progress);
+            if (!inprtOk)
             {
-                await Shell.Current.DisplayAlert("Errore !", "Update sulle tabelle Key & Outs falliti. Nessuna modifica effettuata.", "OK");                
+                await Shell.Current.DisplayAlert("Errore !", "Update sulle tabelle Key & Outs falliti. " +
+                    "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
+                return false;
             }                                  
-            await Shell.Current.DisplayAlert("Aggiornamento DB", "Aggiornamento mensile completato!", "OK");
+            await Shell.Current.DisplayAlert("Aggiornamento DB !", "Aggiornamento mensile completato!", "OK");
+            return inprtOk;
         }              
 
         public static async Task<bool> impFileExltoTabSql(
@@ -76,13 +86,18 @@
                 string Connpmo = Conn.MysqlConn("pmo");
                 string testTab = $@"SHOW TABLES LIKE '{nomeTbSql}';";                     
                 
-                await SqlAsync.SqlQryDataTable(Connpmo, testTab, tab, 30);
+                await SqlAsync.SqlQryDataTable(Connpmo, testTab, tab, 60);
                 if (tab.Rows.Count <= 0)
                 {
                     string createSql = $@"CREATE TABLE `pmo`.`{nomeTbSql}` AS  SELECT * FROM 
                         `pvpmo_origine`.`{nomeTbSql}`;";
                     progress?.Report($"Write: {label}");
                     bool tuttoOk = await SqlAsync.SqlNoQry(strConnSql, createSql, 60, null);
+                    if (!tuttoOk) return false;
+                    string alterSql = $@"ALTER TABLE `pmo`.`{nomeTbSql}` MODIFY COLUMN id 
+                                            INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT;";
+                    progress?.Report($"Write: {label}");
+                    tuttoOk = await SqlAsync.SqlNoQry(strConnSql, alterSql, 60, null);
                     if (!tuttoOk) return false;
                 }
             }            

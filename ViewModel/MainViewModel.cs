@@ -42,7 +42,13 @@ namespace PvPmo.ViewModel
             });
             try
             {
-                await InpExlToSql.InpExl("EXL", progress);
+              bool tuttoOk = await InpExlToSql.InpExl("EXL", progress);
+                if (tuttoOk == false) 
+                {
+                    await Shell.Current.DisplayAlert("Errore Aggiornamento Db.",
+                    $"La procedura è stata terminata.", "OK");
+                    return;
+                }
             }
             catch (Exception ex)
             {
@@ -57,7 +63,7 @@ namespace PvPmo.ViewModel
         }
 
         [RelayCommand]
-        async Task BtnTest()
+        async Task BtnExport()
         {
             if (IsBusy) return;
             IsBusy = true;

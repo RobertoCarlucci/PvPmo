@@ -66,17 +66,22 @@ namespace PvPmo.UpdateDb
             dati = await repo.GetAllAsync();
             if (tuttoOk == true)
             {
+                bool uptdOk = true;
                 foreach (var u in dati.Where(u => u.Azione == "UPTD"))
                 {
-                    var db = string.IsNullOrWhiteSpace(u.DbTabConfronto) ? "default" : u.DbTabConfronto;
-                    var key = $"{u.TabConfronto}|{db}";
-                    var label = descrizioni.TryGetValue(key, out var desc) ? desc : $"{u.TabConfronto} ({db})";
+                    if (uptdOk == true)
+                    {
+                        var db = string.IsNullOrWhiteSpace(u.DbTabConfronto) ? "default" : u.DbTabConfronto;
+                        var key = $"{u.TabConfronto}|{db}";
+                        var label = descrizioni.TryGetValue(key, out var desc) ? desc : $"{u.TabConfronto} ({db})";
 
-                    tuttoOk = await EsgUptdTabProd(u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabTestare,
-                            label, u.ColConfronto, u.ColDaTestare, progress);
+                        uptdOk = await EsgUptdTabProd(u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabTestare,
+                                label, u.ColConfronto, u.ColDaTestare, progress);
+                    }
+                    tuttoOk = false; // Se almeno un test fallisce, non procedo con l'aggiornamento.
                 }
-            }
-            return true;
+            }            
+            return tuttoOk;
         }
 
         public static async Task<bool> EseguiTST(string dbtabConfronto, string tabConfronto, string dbTabTest, string tabTestare,
@@ -129,12 +134,12 @@ namespace PvPmo.UpdateDb
             {
                 bool correzione = await Shell.Current.DisplayAlert(
                     "Date non corrispondenti",
-                    "I valori delle date tra tabella di produzione e aggiornamento non corrispondono. Vuoi correggerli manualmente?",
+                    "I valori delle date tra tabella di produzione e aggiornamento non corrispondono. \nVuoi correggerli manualmente?",
                     "Sì", "No");
 
                 if (!correzione)
                 {
-                    tuttoOk = false;
+                    return false;                     
                 }
                 else
                 {
@@ -161,8 +166,8 @@ namespace PvPmo.UpdateDb
 
             progress?.Report($"Test: {label}");
 
-            await SqlAsync.SqlQryDataTable(connProd, showProd, dataProd, 30);
-            await SqlAsync.SqlQryDataTable(connUptd, showUptd, dataUptd, 30);
+            await SqlAsync.SqlQryDataTable(connProd, showProd, dataProd, 60);
+            await SqlAsync.SqlQryDataTable(connUptd, showUptd, dataUptd, 60);
 
             if (dataUptd.Rows.Count != dataProd.Rows.Count)
             {
@@ -178,7 +183,7 @@ namespace PvPmo.UpdateDb
             DataTable dataProd = new();
             DataTable dataUptd = new();
 
-            string connProd = Conn.MysqlConn(dbtabConfronto + ";Convert Zero Datetime=True;AllowLoadLocalInfile=true;");
+            string connProd = Conn.MysqlConn(dbtabConfronto + ";AllowLoadLocalInfile=true");
             string connUptd = Conn.MysqlConn(dbTabTest + ";Convert Zero Datetime=True");
 
             bool tuttoOk = true;
@@ -274,7 +279,7 @@ namespace PvPmo.UpdateDb
                         var bulk = new MySqlBulkCopy(myConnection, myTrans)
                         {
                             DestinationTableName = tabConfronto,                            
-                            BulkCopyTimeout = 180
+                            BulkCopyTimeout = 240
                         };
                         if (Mappings != null)
                         {

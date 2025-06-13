@@ -92,7 +92,7 @@ public static class UpdtKeyOuts
             catch (MySqlException ex)
             {
                 await myTrans.RollbackAsync();
-                await DbErrorHandler.ShowErrorAsync(ex, "Esecuzione UptdKeyOutsTransaction SQL");                
+                await DbErrorHandler.ShowErrorAsync(ex, "Esecuzione UptdKeyOuts Transaction SQL");                
                 return false;
             }
             finally
