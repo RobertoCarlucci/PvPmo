@@ -1,5 +1,4 @@
-﻿using PvPmo.ImportDb;
-using PvPmo.UpdateDb;
+﻿using PvPmo.Import;
 
 namespace PvPmo.ViewModel
 {

@@ -1,7 +1,7 @@
 ﻿using DocumentFormat.OpenXml.InkML;
 using System.Text;
 
-namespace PvPmo.Util
+namespace PvPmo.Import
 {
     public static class NormTab
     {
@@ -114,15 +114,15 @@ namespace PvPmo.Util
                     }
                 }
                 // Override tipo per colonne specifiche
-                if (originalName == "Divisore" || originalName == ("Hours Per Week")
-                    || originalName == ("Timesheet_Time") || originalName == ("ORE"))
+                if (originalName == "Divisore" || originalName == "Hours Per Week"
+                    || originalName == "Timesheet_Time" || originalName == "ORE")
                     columnType = "FLOAT";
                 if (originalName == "Modifica" || originalName == "TipoCol")
                     columnType = "NVARCHAR(120)";
                 if (originalName == "Res_Start_Date" || originalName == "Res_Finish_Date")
                     columnType = "DATETIME";
-                if (originalName == "Disapproved Timesheets" || originalName == ("Overdue Timesheets")
-                    || originalName == ("Resource Depth") || originalName == ("Resource Quantity"))
+                if (originalName == "Disapproved Timesheets" || originalName == "Overdue Timesheets"
+                    || originalName == "Resource Depth" || originalName == "Resource Quantity")
                     columnType = "DOUBLE";
 
                 sb.Append($"`{renamed}` {columnType}");

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PvPmo.ImportDb;
+namespace PvPmo.Import;
 
 public partial class InpAcsToSql()
 {

@@ -1,4 +1,4 @@
-﻿namespace PvPmo.UpdateDb
+﻿namespace PvPmo.Import
 {
     public partial class InpExlToSql()
     {

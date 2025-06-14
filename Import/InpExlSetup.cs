@@ -1,4 +1,4 @@
-﻿namespace PvPmo.ImportDb
+﻿namespace PvPmo.Import
 {
     public partial class InpExlSetup
     {
