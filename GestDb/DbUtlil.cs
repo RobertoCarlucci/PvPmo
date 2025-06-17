@@ -10,7 +10,7 @@
             var NewParam = new MySqlParameter(nome, vale);
             Params.Add(NewParam);
         }
-        
+                
         private static List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
         public static void AddMapping(int sourceOrdinal, string destinationColumn)
         {
@@ -27,6 +27,8 @@
             DataTable dTabOrgn = new();
             DataTable dTabDest = new();
             int dif = 0;
+
+            //List<MySqlBulkCopyColumnMapping> _mappings = new List<MySqlBulkCopyColumnMapping>();
 
             if (select == "ACS" && !string.IsNullOrEmpty(tbOrgn) && !string.IsNullOrEmpty(filePath) && dbOrgn != null)
             {
@@ -49,41 +51,7 @@
 
                 await ExlAsync.ExcQry(connOrgn, qryExl, dTabOrgn);
                 await SqlAsync.SqlQryDataTable(conndbDest, qrySql, dTabDest, 30);
-            }
-            else if (select == "SQL" && !string.IsNullOrEmpty(dbOrgn))
-            {
-                string conndbDest = Conn.MysqlConn(dbDest);
-                string connOrgn = Conn.MysqlConn(dbOrgn);
-
-                string qryProd = $"SHOW COLUMNS FROM `{tabDest}`;";
-                await SqlAsync.SqlQryDataTable(conndbDest, qryProd, dTabDest);
-                
-                string qryUptd = $@"SHOW COLUMNS FROM `{tbOrgn}`;";
-                await SqlAsync.SqlQryDataTable(connOrgn, qryUptd, dTabOrgn);
-
-                dif = dTabDest.Rows.Count - dTabOrgn.Rows.Count;
-
-                if (dif == 0)
-                {
-                    Mappings.Clear(); // reset mappings statici
-
-                    for (int i = 0; i < dTabOrgn.Rows.Count && i < dTabDest.Rows.Count; i++)
-                    {
-                        //if (dTabDest.Rows[i]["Field"].ToString() != "id")
-                        //{
-                            string? destCol = dTabDest.Rows[i]["Field"]?.ToString();
-                            AddMapping(i, destCol ?? $"Row{i}");
-                        //}
-                    }
-                    return Mappings;
-                }
-                // Colonne diverse > 1 → conferma da utente
-                var confermaOk = await Shell.Current.DisplayAlert("Errore colonne",
-                $"Le colonne nella tabella di origine: {dbOrgn} - ({dTabOrgn.Columns.Count}) e nella tabella di destinazione" +
-                $": {dbDest} - ({dTabDest.Rows.Count}) non coincidono. Vuoi continuare con le altre tabelle?", "Si", "No");
-
-                return Mappings;
-            }
+            }            
 
             dif = dTabDest.Rows.Count - dTabOrgn.Columns.Count;
 

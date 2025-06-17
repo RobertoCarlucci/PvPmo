@@ -1,16 +1,20 @@
-﻿namespace PvPmo.Import
+﻿using PvPmo.GestDb;
+
+namespace PvPmo.Import
 {
     public partial class UptdProd
     {
         public static async Task<bool> EsgUptdTabProd(string connProd, string connUptd, IProgress<string>? progress)
         {
-            string conProd = Conn.MysqlConn(connProd + ";AllowLoadLocalInfile=true");
-            string conUptd = Conn.MysqlConn(connUptd + ";Convert Zero Datetime=True");
+            string _connProd = Conn.MysqlConn(connProd + "; AllowLoadLocalInfile=true");
+            string _connUptd = Conn.MysqlConn(connUptd + "; Convert Zero Datetime=True");
 
-            List<MySqlBulkCopyColumnMapping> MappingsPvt = new List<MySqlBulkCopyColumnMapping>();
-            List<MySqlBulkCopyColumnMapping> MappingsGtex = new List<MySqlBulkCopyColumnMapping>();
-            List<MySqlBulkCopyColumnMapping> MappingsApm = new List<MySqlBulkCopyColumnMapping>();
-            List<MySqlBulkCopyColumnMapping> MappingsTim = new List<MySqlBulkCopyColumnMapping>();
+            Dictionary<string, List<MySqlBulkCopyColumnMapping>> _mapsDict;
+
+            string mapPvt = "mapsPvt";
+            string mapGtex = "mapsGtex";
+            string mapApm = "mapsApm";
+            string mapTim = "mapsTim";
 
             DataTable dataPvt = new();
             DataTable dataGtex = new();
@@ -22,10 +26,10 @@
             string qryApm = string.Empty;
             string qryTim = string.Empty;
 
-            string tabPvt = string.Empty;
-            string tabGtex = string.Empty;
-            string tabApm = string.Empty;
-            string tabTim = string.Empty;
+            string nomeTabPvt = string.Empty;
+            string nomeTabGtex = string.Empty;
+            string nomeTabApm = string.Empty;
+            string nomeTabTim = string.Empty;
 
             var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(Conn.MysqlConn("pvpmo_origine"));
 
@@ -50,57 +54,53 @@
                 {
                     case "all_project_mapped_power_bi_column_set":
                         progress?.Report($"Mapping: {label}");
-                        MappingsApm = await DbUtlil.MyMapping("SQL", u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);
-                        if (MappingsApm == null) return false;
+                        _mapsDict = await SqlMapp.MyMappingList(mapApm, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);                        
                         qryApm = $@"SELECT * FROM `{u.TabConfronto}`;";
                         progress?.Report($"Load: {label}");
-                        await SqlAsync.SqlQryDataTable(conUptd, qryApm, dataApm, 60);
+                        await SqlAsync.SqlQryDataTable(_connUptd, qryApm, dataApm, 60);
                         if (dataApm.Rows.Count == 0) return false;
                         qryApm = $@"TRUNCATE TABLE `{u.TabConfronto}`;";
-                        tabApm = u.TabConfronto;
+                        nomeTabApm = u.TabConfronto;
                         break;
                     case "timesheet_information_by_month":
                         progress?.Report($"Mapping: {label}");
-                        MappingsTim = await DbUtlil.MyMapping("SQL", u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);
-                        if (MappingsTim == null) return false;
+                        _mapsDict = await SqlMapp.MyMappingList(mapTim, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);                        
                         qryTim = $@"SELECT * FROM `{u.TabConfronto}`;";
                         progress?.Report($"Load: {label}");
-                        await SqlAsync.SqlQryDataTable(conUptd, qryApm, dataTim, 60);
-                        if (dataApm.Rows.Count == 0) return false;
+                        await SqlAsync.SqlQryDataTable(_connUptd, qryTim, dataTim, 60);
+                        if (dataTim.Rows.Count == 0) return false;
                         qryTim = $@"TRUNCATE TABLE `{u.TabConfronto}`;";
-                        tabTim = u.TabConfronto;
+                        nomeTabTim = u.TabConfronto;
                         break;
-                    case "pv_total":
-                        progress?.Report($"Mapping: {label}");
-                        MappingsPvt = await DbUtlil.MyMapping("SQL", u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);
-                        if (MappingsPvt == null) return false;
+                    case "pv_total":                        
+                        progress?.Report($"Mapping: {label}");                        
+                        _mapsDict = await SqlMapp.MyMappingList(mapPvt, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);                        
                         qryPvt = $@"SELECT * FROM `{u.TabConfronto}`;";
                         progress?.Report($"Load: {label}");
-                        await SqlAsync.SqlQryDataTable(conUptd, qryPvt, dataPvt, 60);
+                        await SqlAsync.SqlQryDataTable(_connUptd, qryPvt, dataPvt, 60);
                         if (dataPvt.Rows.Count == 0) return false;
                         qryPvt = $@"DELETE `{u.TabConfronto}`.* FROM `{u.TabConfronto}` INNER JOIN `{u.TabTestare}` ON 
                             `{u.TabConfronto}`.`{u.ColConfronto}` = `{u.TabTestare}`.`{u.ColDaTestare}`;";
-                        tabPvt = u.TabConfronto;
+                        nomeTabPvt = u.TabConfronto;
                         break;
                     case "global_timesheet_extract":
-                        progress?.Report($"Mapping: {label}");
-                        MappingsGtex = await DbUtlil.MyMapping("SQL", u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);
-                        if (MappingsGtex == null) return false;
+                        progress?.Report($"Mapping: {label}");                        
+                        _mapsDict = await SqlMapp.MyMappingList(mapGtex, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);                        
                         qryGtex = $@"SELECT * FROM `{u.TabConfronto}`;";
                         progress?.Report($"Load: {label}");
-                        await SqlAsync.SqlQryDataTable(conUptd, qryGtex, dataGtex, 60);
+                        await SqlAsync.SqlQryDataTable(_connUptd, qryGtex, dataGtex, 60);
                         if (dataGtex.Rows.Count == 0) return false;
                         qryGtex = $@"DELETE `{u.TabConfronto}`.* FROM `{u.TabConfronto}` INNER JOIN `{u.TabTestare}` ON 
                             `{u.TabConfronto}`.`{u.ColConfronto}` = `{u.TabTestare}`.`{u.ColDaTestare}`;";
-                        tabGtex = u.TabConfronto;
+                        nomeTabGtex = u.TabConfronto;                        
                         break;
                     default:
                         tuttoOk = false;
                         break;
                 }
-            }
 
-            using (MySqlConnection myConnection = new MySqlConnection(connProd))
+            }
+            using (MySqlConnection myConnection = new MySqlConnection(_connProd + "; Convert Zero Datetime=True;"))
             {
                 await myConnection.OpenAsync();
                 // Start a local transaction
@@ -112,50 +112,66 @@
                     myCommand.CommandText = qryApm;
                     progress?.Report($"Clean: All_Project");
                     await myCommand.ExecuteNonQueryAsync();
+
                     myCommand.CommandText = qryTim;
                     progress?.Report($"Clean: Timesheet");
                     await myCommand.ExecuteNonQueryAsync();
+
+                    myCommand.CommandTimeout = 60;
                     myCommand.CommandText = qryPvt;
                     progress?.Report($"Clean: Pv_Total");
                     await myCommand.ExecuteNonQueryAsync();
+
+                    myCommand.CommandTimeout = 180;
                     myCommand.CommandText = qryGtex;
                     progress?.Report($"Clean: Global");
                     await myCommand.ExecuteNonQueryAsync();
-                    progress?.Report($"Write: All_Projrct");
+
                     var bulkApm = new MySqlBulkCopy(myConnection, myTrans)
-                    { DestinationTableName = tabApm, BulkCopyTimeout = 240 };
-                    if (MappingsApm != null)
+                    { DestinationTableName = nomeTabApm, BulkCopyTimeout = 30 };
+                    var mapsAtm = SqlMapp.ApplicaMapping(bulkApm, mapApm);
+                    if (mapsAtm != null)
                     {
-                        MappingsApm.ForEach(_mapping => { bulkApm.ColumnMappings.Add(_mapping); });
-                        MappingsApm.Clear(); // This line is safe now because we check for null above
+                        mapsAtm.ForEach(_mapping => { bulkApm.ColumnMappings.Add(_mapping); });
+                        mapsAtm.Clear(); // This line is safe now because we check for null above
                     }
+                    progress?.Report($"Write: All_Projrct");
                     await bulkApm.WriteToServerAsync(dataApm);
-                    progress?.Report($"Write: Timesheet");
+
                     var bulkTim = new MySqlBulkCopy(myConnection, myTrans)
-                    { DestinationTableName = tabTim, BulkCopyTimeout = 240 };
-                    if (MappingsTim != null)
+                    { DestinationTableName = nomeTabTim, BulkCopyTimeout = 30 };
+                    var mapsTim = SqlMapp.ApplicaMapping(bulkTim, mapTim);
+                    if (mapsTim != null)
                     {
-                        MappingsTim.ForEach(_mapping => { bulkTim.ColumnMappings.Add(_mapping); });
-                        MappingsTim.Clear(); // This line is safe now because we check for null above
+                        mapsTim.ForEach(_mapping => { bulkTim.ColumnMappings.Add(_mapping); });
+                        mapsTim.Clear(); // This line is safe now because we check for null above
                     }
+                    progress?.Report($"Write: Timesheet");
                     await bulkTim.WriteToServerAsync(dataTim);
-                    var bulkPvt = new MySqlBulkCopy(myConnection, myTrans)
-                    { DestinationTableName = tabPvt, BulkCopyTimeout = 240 };
-                    if (MappingsPvt != null)
-                    {
-                        MappingsPvt.ForEach(_mapping => { bulkPvt.ColumnMappings.Add(_mapping); });
-                        MappingsPvt.Clear(); // This line is safe now because we check for null above
-                    }
-                    await bulkPvt.WriteToServerAsync(dataPvt);
+
                     var bulkGtex = new MySqlBulkCopy(myConnection, myTrans)
-                    { DestinationTableName = tabGtex, BulkCopyTimeout = 240 };
-                    if (MappingsGtex != null)
+                    { DestinationTableName = nomeTabGtex, BulkCopyTimeout = 240 };
+                    var mapsGtex = SqlMapp.ApplicaMapping(bulkGtex, mapGtex);
+                    if (mapsGtex != null)
                     {
-                        MappingsGtex.ForEach(_mapping => { bulkGtex.ColumnMappings.Add(_mapping); });
-                        MappingsGtex.Clear(); // This line is safe now because we check for null above
+                        mapsGtex.ForEach(_mapping => { bulkGtex.ColumnMappings.Add(_mapping); });
+                        mapsGtex.Clear(); // This line is safe now because we check for null above
                     }
+                    progress?.Report($"Write: Global");
                     await bulkGtex.WriteToServerAsync(dataGtex);
-                    await myTrans.CommitAsync();                    
+
+                    var bulkPvt = new MySqlBulkCopy(myConnection, myTrans)
+                    { DestinationTableName = nomeTabPvt, BulkCopyTimeout = 60 };
+                    var mapsPvt = SqlMapp.ApplicaMapping(bulkPvt, mapPvt);
+                    if (mapsPvt != null)
+                    {
+                        mapsPvt.ForEach(_mapping => { bulkPvt.ColumnMappings.Add(_mapping); });
+                        mapsPvt.Clear(); // This line is safe now because we check for null above
+                    }
+                    progress?.Report($"Write: Pv_Total");
+                    await bulkPvt.WriteToServerAsync(dataPvt);
+
+                    await myTrans.CommitAsync();
                 }
                 catch (MySqlException ex)
                 {
@@ -171,7 +187,7 @@
                     {
                         await myConnection.CloseAsync();
                     }
-                }                
+                }
             }
             return tuttoOk;
         }

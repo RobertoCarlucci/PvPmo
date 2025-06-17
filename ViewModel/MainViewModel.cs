@@ -46,8 +46,7 @@ namespace PvPmo.ViewModel
                 if (tuttoOk == false) 
                 {
                     await Shell.Current.DisplayAlert("Errore Aggiornamento Db.",
-                    $"La procedura è stata terminata.", "OK");
-                    return;
+                    $"La procedura è stata terminata.", "OK");                    
                 }
             }
             catch (Exception ex)

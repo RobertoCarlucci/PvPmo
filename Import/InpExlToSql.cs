@@ -53,11 +53,19 @@
                     "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
                 return inprtOk;
             }
-            inprtOk = await TestDateImpExl.FinalizzaUptd(progress);
+            inprtOk = await TestDateImpExl.TestUptd(progress);
             if (!inprtOk)
             {
                 await Shell.Current.DisplayAlert("Errore Test Tabelle !", "Controlli sulle tabelle importate falliti. " +
                     "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
+                return inprtOk;
+            }
+            inprtOk = await UptdProd.EsgUptdTabProd("pmo", "pvpmo_origine", progress);
+            if (!inprtOk)
+            {
+                await Shell.Current.DisplayAlert("Errore Aggiornamento Tabelle !", "Aggiornamento delle tabelle della produzione fallito. " +
+                    "\nNessuna modifica è stata effettuata sulla produzione. " +
+                    "\n Rieseguire la procedura dopo un controllo delle tabelle da importare.", "OK");
                 return inprtOk;
             }
             inprtOk = await UpdtKeyOuts.UptdKeyOutsTransaction("pmo", progress);
@@ -82,27 +90,27 @@
             if (nomeTbSql is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month") 
             {
                 
-                DataTable tab = new DataTable();
+                //DataTable tab = new DataTable();
 
-                string Connpmo = Conn.MysqlConn("pmo");
-                string testTab = $@"SHOW TABLES LIKE '{nomeTbSql}';";                     
+                //string Connpmo = Conn.MysqlConn("pmo");
+                //string testTab = $@"SHOW TABLES LIKE '{nomeTbSql}';";                     
                 
-                await SqlAsync.SqlQryDataTable(Connpmo, testTab, tab, 60);
-                if (tab.Rows.Count <= 0)
-                // La tabella non esiste, quindi la creo.
-                // Utilizzo la tabella di origine per creare la nuova tabella in pmo.
-                {
-                    string createSql = $@"CREATE TABLE `pmo`.`{nomeTbSql}` AS  SELECT * FROM 
-                        `pvpmo_origine`.`{nomeTbSql}`;";
-                    progress?.Report($"Write: {label}");
-                    bool tuttoOk = await SqlAsync.SqlNoQry(strConnSql, createSql, 60, null);
-                    if (!tuttoOk) return false;
-                    string alterSql = $@"ALTER TABLE `pmo`.`{nomeTbSql}` MODIFY COLUMN id 
-                                            INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT;";
-                    progress?.Report($"Write: {label}");
-                    tuttoOk = await SqlAsync.SqlNoQry(strConnSql, alterSql, 60, null);
-                    if (!tuttoOk) return false;
-                }
+                //await SqlAsync.SqlQryDataTable(Connpmo, testTab, tab, 60);
+                //if (tab.Rows.Count <= 0)
+                //// La tabella non esiste, quindi la creo.
+                //// Utilizzo la tabella di origine per creare la nuova tabella in pmo.
+                //{
+                //    string createSql = $@"CREATE TABLE `pmo`.`{nomeTbSql}` AS  SELECT * FROM 
+                //        `pvpmo_origine`.`{nomeTbSql}`;";
+                //    progress?.Report($"Write: {label}");
+                //    bool tuttoOk = await SqlAsync.SqlNoQry(strConnSql, createSql, 60, null);
+                //    if (!tuttoOk) return false;
+                //    string alterSql = $@"ALTER TABLE `pmo`.`{nomeTbSql}` MODIFY COLUMN id 
+                //                            INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT;";
+                //    progress?.Report($"Write: {label}");
+                //    tuttoOk = await SqlAsync.SqlNoQry(strConnSql, alterSql, 60, null);
+                //    if (!tuttoOk) return false;
+                //}
             }            
             DataTable schema = new();
             

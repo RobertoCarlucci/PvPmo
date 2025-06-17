@@ -7,7 +7,7 @@ namespace PvPmo.Import
         // Test delle tabelle di Uptd prima di procedere all'aggiornamento
         // del Db di produzione.
 
-        public static async Task<bool> FinalizzaUptd(IProgress<string>? progress)
+        public static async Task<bool> TestUptd(IProgress<string>? progress)
         {
             var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(Conn.MysqlConn("pvpmo_origine"));
 
@@ -58,26 +58,7 @@ namespace PvPmo.Import
                         await Shell.Current.DisplayAlert("Azione sconosciuta", $"Azione {n.Azione} non riconosciuta.", "OK");
                         return !tuttoOk;
                 }                           
-            }
-            //dati = await repo.GetAllAsync();
-            //if (tuttoOk == true)
-            //{
-            //    bool uptdOk = true;
-            //    foreach (var u in dati.Where(u => u.Azione == "UPTD"))
-            //    {
-            //        if (uptdOk == true)
-            //        {
-            //            var db = string.IsNullOrWhiteSpace(u.DbTabConfronto) ? "default" : u.DbTabConfronto;
-            //            var key = $"{u.TabConfronto}|{db}";
-            //            var label = descrizioni.TryGetValue(key, out var desc) ? desc : $"{u.TabConfronto} ({db})";
-
-            //            uptdOk = await EsgUptdTabProd(u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabTestare,
-            //                    label, u.ColConfronto, u.ColDaTestare, progress);
-            //        }
-            //        tuttoOk = false; // Se almeno un test fallisce, non procedo con l'aggiornamento.
-            //    }
-            //}
-            tuttoOk = await UptdProd.EsgUptdTabProd("pvpmo_origine", "pvpmo_uptd", progress);
+            }            
             return tuttoOk;
         }
 
@@ -174,146 +155,5 @@ namespace PvPmo.Import
             }
             return tuttoOk;
         }
-        //public static async Task<bool> EsgUptdTabProd(string dbtabConfronto, string tabConfronto, string dbTabTest, string tabTestare,
-        //    string label, string colConfronto, string colDaTestare, IProgress<string>? progress = null)
-        //{
-        //    DataTable dataProd = new();
-        //    DataTable dataUptd = new();
-
-        //    string connProd = Conn.MysqlConn(dbtabConfronto + ";AllowLoadLocalInfile=true");
-        //    string connUptd = Conn.MysqlConn(dbTabTest + ";Convert Zero Datetime=True");
-
-        //    bool tuttoOk = true;
-
-        //    if (tabConfronto is "pv_total" or "global_timesheet_extract")
-        //    {
-        //        List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
-
-        //        // 1. Crea Mapping tra le colonne della tabella di produzione e quella di update.
-        //        progress?.Report($"Mapping: {label}");
-        //        Mappings = await DbUtlil.MyMapping("SQL", dbtabConfronto, tabConfronto, dbTabTest, tabConfronto, null, null);
-
-        //        // 2. Leggi tabella da importare
-        //        string loadSql = $@"SELECT * FROM `{tabConfronto}`;";
-        //        DataTable dt = new DataTable();
-        //            progress?.Report($"Load: {label}");
-        //            await SqlAsync.SqlQryDataTable(connUptd, loadSql, dt, 60);
-        //            if (dt.Rows.Count == 0) return false;
-
-        //        using (MySqlConnection myConnection = new MySqlConnection(connProd))
-        //        {
-        //            await myConnection.OpenAsync();
-        //            // Start a local transaction
-        //            MySqlTransaction myTrans = myConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-        //            MySqlCommand myCommand = myConnection.CreateCommand();
-        //            myCommand.Transaction = myTrans;
-        //            try
-        //            {
-        //                myCommand.CommandText = $@"DELETE `{tabConfronto}`.* FROM `{tabConfronto}` INNER JOIN `{tabTestare}` ON 
-        //                    `{tabConfronto}`.`{colConfronto}` = `{tabTestare}`.`{colDaTestare}`;";
-        //                progress?.Report($"Clean: {label}");
-        //                await myCommand.ExecuteNonQueryAsync();                        
-        //                progress?.Report($"Write: {label}");
-        //                var bulk = new MySqlBulkCopy(myConnection, myTrans)
-        //                {
-        //                    DestinationTableName = tabConfronto,                            
-        //                    BulkCopyTimeout = 240
-        //                };
-        //                if (Mappings != null)
-        //                {
-        //                    Mappings.ForEach(_mapping => { bulk.ColumnMappings.Add(_mapping); });
-        //                    Mappings.Clear(); // This line is safe now because we check for null above
-        //                }
-        //                await bulk.WriteToServerAsync(dt);
-        //                await myTrans.CommitAsync();
-        //            }
-        //            catch (MySqlException ex)
-        //            {
-        //                await myTrans.RollbackAsync();
-        //                await DbErrorHandler.ShowErrorAsync(ex, @$"Esecuzione EsgUptdTabProd '{tabConfronto}' Transaction SQL");
-        //                return false;
-        //            }
-        //            finally
-        //            {
-        //                myCommand.Dispose();
-        //                myTrans.Dispose();
-        //                if (myConnection != null && myConnection.State == ConnectionState.Open) // Fixed condition
-        //                {
-        //                    await myConnection.CloseAsync();
-        //                }
-        //            }
-        //            return true;
-        //        }
-        //    }
-        //    else if (tabConfronto is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month")
-        //    {
-        //        List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
-
-        //        // 1. Crea Mapping tra le colonne della tabella di produzione e quella di update.
-        //        progress?.Report($"Mapping: {label}");
-        //        Mappings = await DbUtlil.MyMapping("SQL", dbtabConfronto, tabConfronto, dbTabTest, tabConfronto, null, null);
-        //        if (Mappings == null) return false;
-
-        //        // 2. Leggi tabella da importare
-        //        string loadSql = $@"SELECT * FROM `{tabConfronto}`;";
-        //        DataTable dt = new DataTable();
-        //        progress?.Report($"Load: {label}");
-        //        await SqlAsync.SqlQryDataTable(connUptd, loadSql, dt, 60);
-        //        if (dt.Rows.Count == 0) return false;
-        //        using (MySqlConnection myConnection = new MySqlConnection(connProd))
-        //        {
-        //            await myConnection.OpenAsync();
-        //            // Start a local transaction
-        //            MySqlTransaction myTrans = myConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-        //            MySqlCommand myCommand = myConnection.CreateCommand();
-        //            myCommand.Transaction = myTrans;
-        //            try
-        //            {
-        //                myCommand.CommandText = $@"TRUNCATE TABLE `{tabConfronto}`;";
-        //                progress?.Report($"Clean: {label}");
-        //                await myCommand.ExecuteNonQueryAsync();                        
-        //                progress?.Report($"Write: {label}");
-        //                var bulk = new MySqlBulkCopy(myConnection, myTrans)
-        //                {
-        //                    DestinationTableName = tabConfronto,                            
-        //                    BulkCopyTimeout = 240
-        //                };
-        //                if (Mappings != null)
-        //                {
-        //                    Mappings.ForEach(_mapping => { bulk.ColumnMappings.Add(_mapping); });
-        //                    Mappings.Clear(); // This line is safe now because we check for null above
-        //                }
-                        
-        //                await bulk.WriteToServerAsync(dt);
-        //                await myTrans.CommitAsync();
-        //            }
-        //            catch (MySqlException ex)
-        //            {
-        //                await myTrans.RollbackAsync();
-        //                await DbErrorHandler.ShowErrorAsync(ex, @$"Esecuzione EsgUptdTabProd '{tabConfronto}' Transaction SQL");
-        //                return false;
-        //            }
-        //            finally
-        //            {
-        //                myCommand.Dispose();
-        //                myTrans.Dispose();
-        //                if (myConnection != null && myConnection.State == ConnectionState.Open) // Fixed condition
-        //                {
-        //                    await myConnection.CloseAsync();
-        //                }
-        //            }
-        //            if (tabConfronto is "all_project_mapped_power_bi_column_set" && tuttoOk is true)
-        //            {
-        //                string cancSql = $"DELETE `{tabConfronto}`.* FROM `{tabConfronto}` WHERE `SequenceID` IS NULL;";
-        //                progress?.Report($"Clean: {label}");
-        //                tuttoOk = await SqlAsync.SqlNoQry(connProd, cancSql, 60);
-        //                if (!tuttoOk) return false;
-        //            }                    
-        //        }                
-        //    }            
-                       
-        //}
-
     }
-
 }
