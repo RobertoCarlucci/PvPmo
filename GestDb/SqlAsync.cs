@@ -98,7 +98,7 @@ public partial class SqlAsync
             };
             if (Mappings != null)
             {
-                Mappings.ForEach(_mapping => { bulk.ColumnMappings.Add(_mapping); });
+                Mappings.ForEach(bulk.ColumnMappings.Add);
                 Mappings.Clear(); // This line is safe now because we check for null above
             }
 
@@ -133,7 +133,7 @@ public partial class SqlAsync
             };
             if (Mappings != null)
             {
-                Mappings.ForEach(_mapping => { bulk.ColumnMappings.Add(_mapping); });
+                Mappings.ForEach(bulk.ColumnMappings.Add);
                 Mappings.Clear(); // This line is safe now because we check for null above
             }
 

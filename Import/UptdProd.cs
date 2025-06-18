@@ -54,7 +54,7 @@ namespace PvPmo.Import
                 {
                     case "all_project_mapped_power_bi_column_set":
                         progress?.Report($"Mapping: {label}");
-                        _mapsDict = await SqlMapp.MyMappingList(mapApm, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);                        
+                        _mapsDict = await DbUtlil.MyMappingList(mapApm, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto);                        
                         qryApm = $@"SELECT * FROM `{u.TabConfronto}`;";
                         progress?.Report($"Load: {label}");
                         await SqlAsync.SqlQryDataTable(_connUptd, qryApm, dataApm, 60);
@@ -64,7 +64,7 @@ namespace PvPmo.Import
                         break;
                     case "timesheet_information_by_month":
                         progress?.Report($"Mapping: {label}");
-                        _mapsDict = await SqlMapp.MyMappingList(mapTim, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);                        
+                        _mapsDict = await DbUtlil.MyMappingList(mapTim, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto);                        
                         qryTim = $@"SELECT * FROM `{u.TabConfronto}`;";
                         progress?.Report($"Load: {label}");
                         await SqlAsync.SqlQryDataTable(_connUptd, qryTim, dataTim, 60);
@@ -74,7 +74,7 @@ namespace PvPmo.Import
                         break;
                     case "pv_total":                        
                         progress?.Report($"Mapping: {label}");                        
-                        _mapsDict = await SqlMapp.MyMappingList(mapPvt, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);                        
+                        _mapsDict = await DbUtlil.MyMappingList(mapPvt, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto);                        
                         qryPvt = $@"SELECT * FROM `{u.TabConfronto}`;";
                         progress?.Report($"Load: {label}");
                         await SqlAsync.SqlQryDataTable(_connUptd, qryPvt, dataPvt, 60);
@@ -85,7 +85,7 @@ namespace PvPmo.Import
                         break;
                     case "global_timesheet_extract":
                         progress?.Report($"Mapping: {label}");                        
-                        _mapsDict = await SqlMapp.MyMappingList(mapGtex, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto, null, null);                        
+                        _mapsDict = await DbUtlil.MyMappingList(mapGtex, u.DbTabConfronto, u.TabConfronto, u.DbTabTest, u.TabConfronto);                        
                         qryGtex = $@"SELECT * FROM `{u.TabConfronto}`;";
                         progress?.Report($"Load: {label}");
                         await SqlAsync.SqlQryDataTable(_connUptd, qryGtex, dataGtex, 60);
@@ -129,10 +129,10 @@ namespace PvPmo.Import
 
                     var bulkApm = new MySqlBulkCopy(myConnection, myTrans)
                     { DestinationTableName = nomeTabApm, BulkCopyTimeout = 30 };
-                    var mapsAtm = SqlMapp.ApplicaMapping(bulkApm, mapApm);
+                    var mapsAtm = DbUtlil.ApplicaMapping(bulkApm, mapApm);
                     if (mapsAtm != null)
                     {
-                        mapsAtm.ForEach(_mapping => { bulkApm.ColumnMappings.Add(_mapping); });
+                        mapsAtm.ForEach(bulkApm.ColumnMappings.Add);
                         mapsAtm.Clear(); // This line is safe now because we check for null above
                     }
                     progress?.Report($"Write: All_Projrct");
@@ -140,10 +140,10 @@ namespace PvPmo.Import
 
                     var bulkTim = new MySqlBulkCopy(myConnection, myTrans)
                     { DestinationTableName = nomeTabTim, BulkCopyTimeout = 30 };
-                    var mapsTim = SqlMapp.ApplicaMapping(bulkTim, mapTim);
+                    var mapsTim = DbUtlil.ApplicaMapping(bulkTim, mapTim);
                     if (mapsTim != null)
                     {
-                        mapsTim.ForEach(_mapping => { bulkTim.ColumnMappings.Add(_mapping); });
+                        mapsTim.ForEach(bulkTim.ColumnMappings.Add);
                         mapsTim.Clear(); // This line is safe now because we check for null above
                     }
                     progress?.Report($"Write: Timesheet");
@@ -151,10 +151,10 @@ namespace PvPmo.Import
 
                     var bulkGtex = new MySqlBulkCopy(myConnection, myTrans)
                     { DestinationTableName = nomeTabGtex, BulkCopyTimeout = 240 };
-                    var mapsGtex = SqlMapp.ApplicaMapping(bulkGtex, mapGtex);
+                    var mapsGtex = DbUtlil.ApplicaMapping(bulkGtex, mapGtex);
                     if (mapsGtex != null)
                     {
-                        mapsGtex.ForEach(_mapping => { bulkGtex.ColumnMappings.Add(_mapping); });
+                        mapsGtex.ForEach(bulkGtex.ColumnMappings.Add);
                         mapsGtex.Clear(); // This line is safe now because we check for null above
                     }
                     progress?.Report($"Write: Global");
@@ -162,10 +162,10 @@ namespace PvPmo.Import
 
                     var bulkPvt = new MySqlBulkCopy(myConnection, myTrans)
                     { DestinationTableName = nomeTabPvt, BulkCopyTimeout = 60 };
-                    var mapsPvt = SqlMapp.ApplicaMapping(bulkPvt, mapPvt);
+                    var mapsPvt = DbUtlil.ApplicaMapping(bulkPvt, mapPvt);
                     if (mapsPvt != null)
                     {
-                        mapsPvt.ForEach(_mapping => { bulkPvt.ColumnMappings.Add(_mapping); });
+                        mapsPvt.ForEach(bulkPvt.ColumnMappings.Add);
                         mapsPvt.Clear(); // This line is safe now because we check for null above
                     }
                     progress?.Report($"Write: Pv_Total");
@@ -181,8 +181,8 @@ namespace PvPmo.Import
                 }
                 finally
                 {
-                    myCommand.Dispose();
-                    myTrans.Dispose();
+                    await myCommand.DisposeAsync();
+                    await myTrans.DisposeAsync();
                     if (myConnection != null && myConnection.State == ConnectionState.Open) // Fixed condition
                     {
                         await myConnection.CloseAsync();

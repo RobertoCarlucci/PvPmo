@@ -85,37 +85,11 @@
             // Crea tabella SQL da file Excel (solo struttura)
             List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
 
-            string strConnSql = Conn.MysqlConn(nomeDbSql);
-
-            if (nomeTbSql is "all_project_mapped_power_bi_column_set" or "timesheet_information_by_month") 
-            {
-                
-                //DataTable tab = new DataTable();
-
-                //string Connpmo = Conn.MysqlConn("pmo");
-                //string testTab = $@"SHOW TABLES LIKE '{nomeTbSql}';";                     
-                
-                //await SqlAsync.SqlQryDataTable(Connpmo, testTab, tab, 60);
-                //if (tab.Rows.Count <= 0)
-                //// La tabella non esiste, quindi la creo.
-                //// Utilizzo la tabella di origine per creare la nuova tabella in pmo.
-                //{
-                //    string createSql = $@"CREATE TABLE `pmo`.`{nomeTbSql}` AS  SELECT * FROM 
-                //        `pvpmo_origine`.`{nomeTbSql}`;";
-                //    progress?.Report($"Write: {label}");
-                //    bool tuttoOk = await SqlAsync.SqlNoQry(strConnSql, createSql, 60, null);
-                //    if (!tuttoOk) return false;
-                //    string alterSql = $@"ALTER TABLE `pmo`.`{nomeTbSql}` MODIFY COLUMN id 
-                //                            INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT;";
-                //    progress?.Report($"Write: {label}");
-                //    tuttoOk = await SqlAsync.SqlNoQry(strConnSql, alterSql, 60, null);
-                //    if (!tuttoOk) return false;
-                //}
-            }            
-            DataTable schema = new();
-            
+            string strConnSql = Conn.MysqlConn(nomeDbSql);            
             string strConnExl = Conn.ExlFileConn(exlPath);
-            
+
+            DataTable schema = new();
+
             string qrySchema = $@"SELECT * FROM [{workSheet}$] WHERE 1=0;";
             progress?.Report($"Struct: {label}");
             bool schemaOk = await ExlAsync.ExcQry(strConnExl, qrySchema, schema);
@@ -125,7 +99,6 @@
             progress?.Report($"Struct: {label}");
             bool ddlOk = await SqlAsync.SqlNoQry(strConnSql, ddl, 60);
             if (!ddlOk) return false;
-
             
             progress?.Report($"Mapping: {label}");
             Mappings = await DbUtlil.MyMapping("EXL", nomeDbSql, nomeTbSql, null, null, workSheet,  exlPath);
