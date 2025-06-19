@@ -13,7 +13,7 @@ namespace PvPmo.Repositories
 
         public CaricaTabDataRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("pmo");
+             _connectionString = configuration.GetConnectionString("pmo");
         }
 
         public async Task<List<CaricaTabData>> GetAllAsync(CancellationToken cancellationToken = default)

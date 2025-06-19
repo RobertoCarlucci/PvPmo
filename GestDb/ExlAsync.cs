@@ -1,7 +1,24 @@
 ﻿namespace PvPmo.GestDb
 {
     public class ExlAsync
-    {        
+    {
+        public static async Task<bool> TestConnExl(string strConn)
+        {
+            await using var connection = new OleDbConnection(strConn);
+
+            try
+            {
+                // Il principio è identico: tentiamo di aprire la connessione.
+                await connection.OpenAsync();
+
+                return true;
+            }
+            catch (OleDbException ex)
+            {
+                await DbErrorHandler.ShowOleDbErrorAsync(ex, "Importazione Access");
+                throw;
+            }
+        }
         public static async Task<int> ExcQry(string strConn, string qry)
         {
             using var conn = new OleDbConnection(strConn);

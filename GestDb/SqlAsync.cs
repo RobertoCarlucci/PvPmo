@@ -2,6 +2,28 @@
 
 public partial class SqlAsync
 {
+    public static async Task<bool> TestConnSql(string stringaDiConnessione)
+    {
+        // Il blocco 'await using' garantisce che la connessione venga
+        // chiusa e le risorse rilasciate, anche in caso di errore.
+        await using var connection = new MySqlConnection(stringaDiConnessione);
+
+        try
+        {
+            // 1. Tenta di aprire la connessione in modo asincrono.
+            // Questa è la riga che esegue il test vero e proprio.
+            await connection.OpenAsync();
+
+            // Se il codice arriva qui, l'apertura ha avuto successo.
+            // 2. La connessione viene chiusa automaticamente alla fine del blocco 'using'.
+            return true;
+        }
+        catch (MySqlException ex)
+        {
+            await DbErrorHandler.ShowErrorAsync(ex, "Test Connessione");
+            return false;
+        }
+    }
     public static async Task<bool> SqlNoQry(
         MySqlConnection conn, string qry, int timeoutSec = 0, List<MySqlParameter>? parameters = null)
     {        

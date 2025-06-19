@@ -11,7 +11,16 @@
 
             bool inprtOk = true;
 
-            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(Conn.MysqlConn("pvpmo_origine"));
+            string _connArch = string.Empty;            
+
+            _connArch = (!string.IsNullOrEmpty("pvpmo_origine")) ? _connArch = await Conn.MysqlConn("pvpmo_origine") : _connArch;
+            if (string.IsNullOrEmpty(_connArch))
+            {
+                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                return false;
+            }
+
+            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(_connArch);
             
             var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
             var dati = await repo.GetAllAsync();
@@ -74,7 +83,14 @@
                 await Shell.Current.DisplayAlert("Errore Update !", "Update sulle tabelle Key & Outs falliti. " +
                     "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
                 return inprtOk;
-            }                                  
+            }
+            inprtOk = await PulisciDb.ClearPriKey(progress);
+            if (!inprtOk)
+            {
+                await Shell.Current.DisplayAlert("Errore Update !", "Update sulle tabelle Key & Outs falliti. " +
+                    "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
+                return inprtOk;
+            }
             await Shell.Current.DisplayAlert("Aggiornamento DB !", "Aggiornamento mensile completato!", "OK");
             return inprtOk;
         }              
@@ -83,21 +99,37 @@
             string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, string label, IProgress<string>? progress = null)
         {
             // Crea tabella SQL da file Excel (solo struttura)
+
             List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
 
-            string strConnSql = Conn.MysqlConn(nomeDbSql);            
-            string strConnExl = Conn.ExlFileConn(exlPath);
+            string _connUptd = string.Empty;
+            string _connExl = string.Empty;
+
+            _connUptd = (!string.IsNullOrEmpty(nomeDbSql)) ? _connUptd = await Conn.MysqlConn(nomeDbSql) : _connUptd;
+            if (string.IsNullOrEmpty(_connUptd))
+            {
+                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                return false;
+            }
+            
+            _connExl = (!string.IsNullOrEmpty(exlPath)) ? _connExl = await Conn.ExlFileConn(exlPath) : _connExl;
+            if (string.IsNullOrEmpty(_connExl))
+            {
+                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al File.", "OK");
+                return false;
+            }
+
 
             DataTable schema = new();
 
             string qrySchema = $@"SELECT * FROM [{workSheet}$] WHERE 1=0;";
             progress?.Report($"Struct: {label}");
-            bool schemaOk = await ExlAsync.ExcQry(strConnExl, qrySchema, schema);
+            bool schemaOk = await ExlAsync.ExcQry(_connExl, qrySchema, schema);
             if (!schemaOk || schema.Columns.Count == 0) return false;
 
             string ddl = $@"CREATE OR REPLACE TABLE " + NormTab.NormInp(nomeTbSql, schema);
             progress?.Report($"Struct: {label}");
-            bool ddlOk = await SqlAsync.SqlNoQry(strConnSql, ddl, 60);
+            bool ddlOk = await SqlAsync.SqlNoQry(_connUptd, ddl, 60);
             if (!ddlOk) return false;
             
             progress?.Report($"Mapping: {label}");
@@ -111,11 +143,11 @@
 
             string QryExl = $@"SELECT * FROM [{workSheet}$]";
             progress?.Report($"Load: {label}");
-            bool letturaOk = await ExlAsync.ExcQry(strConnExl, QryExl, _tabella);
+            bool letturaOk = await ExlAsync.ExcQry(_connExl, QryExl, _tabella);
             if (!letturaOk || _tabella.Rows.Count == 0) return false;
 
             progress?.Report($"Write: {label}");
-            bool bulkOk = await SqlAsync.SqlBulkCopy(strConnSql, nomeTbSql, _tabella, Mappings, 60);
+            bool bulkOk = await SqlAsync.SqlBulkCopy(_connUptd, nomeTbSql, _tabella, Mappings, 60);
             return bulkOk;            
         }
     }

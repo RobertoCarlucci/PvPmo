@@ -7,7 +7,8 @@
 
         public CaricaTabRepository(string dbName, string tableName)
         {
-            _connectionString = Conn.MysqlConn(dbName);
+            // Await the asynchronous method to resolve the Task<string> to a string
+            _connectionString = Conn.MysqlConnSer(dbName);
             _tableName = tableName;
         }
 

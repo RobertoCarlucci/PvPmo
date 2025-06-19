@@ -4,6 +4,23 @@
     {
         private static OleDbConnection? conn; // Marked as nullable
 
+        public static async Task<bool> TestConnAcs(string strConn)
+        {            
+            await using var connection = new OleDbConnection(strConn);
+
+            try
+            {
+                // Il principio è identico: tentiamo di aprire la connessione.
+                await connection.OpenAsync();                
+
+                return true;
+            }
+            catch (OleDbException ex)
+            {
+                await DbErrorHandler.ShowOleDbErrorAsync(ex, "Importazione Access");
+                throw;
+            }
+        }
         public static async Task<DataTable> AcsQryTab(string strConn, string qry, DataTable tabella)
         {
             try

@@ -6,8 +6,22 @@ namespace PvPmo.Import
     {
         public static async Task<bool> EsgUptdTabProd(string connProd, string connUptd, IProgress<string>? progress)
         {
-            string _connProd = Conn.MysqlConn(connProd + "; AllowLoadLocalInfile=true");
-            string _connUptd = Conn.MysqlConn(connUptd + "; Convert Zero Datetime=True");
+            string _connProd = string.Empty;
+            string _connUptd = string.Empty;
+
+            _connProd = (!string.IsNullOrEmpty(connProd)) ? _connProd = await Conn.MysqlConn(connProd + "; AllowLoadLocalInfile=true") : _connProd;
+            if (string.IsNullOrEmpty(_connProd))
+            {
+                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                return false;
+            }
+            
+            _connUptd = (!string.IsNullOrEmpty(connUptd)) ? _connUptd = await Conn.MysqlConn(connUptd + "; Convert Zero Datetime=True") : _connUptd;
+            if (string.IsNullOrEmpty(_connUptd))
+            {
+                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                return false;
+            }
 
             Dictionary<string, List<MySqlBulkCopyColumnMapping>> _mapsDict;
 
@@ -31,7 +45,7 @@ namespace PvPmo.Import
             string nomeTabApm = string.Empty;
             string nomeTabTim = string.Empty;
 
-            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(Conn.MysqlConn("pvpmo_origine"));
+            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(await Conn.MysqlConn("pvpmo_origine"));
 
             //    // Carico il File dall'archivio con la sequenza da svolgere
             //    // e provvedo all'esecuzione.
@@ -49,7 +63,12 @@ namespace PvPmo.Import
                 var db = string.IsNullOrWhiteSpace(u.DbTabConfronto) ? "default" : u.DbTabConfronto;
                 var key = $"{u.TabConfronto}|{db}";
                 var label = descrizioni.TryGetValue(key, out var desc) ? desc : $"{u.TabConfronto} ({db})";               
-
+                if (string.IsNullOrWhiteSpace(u.DbTabConfronto) || string.IsNullOrWhiteSpace(u.TabConfronto) ||
+                    string.IsNullOrWhiteSpace(u.DbTabTest) || string.IsNullOrWhiteSpace(u.TabTestare))
+                {
+                    await Shell.Current.DisplayAlert("Errore", "Dati per finalizzare l'importazione non completi.", "OK");
+                    return false;
+                }
                 switch (u.TabConfronto)
                 {
                     case "all_project_mapped_power_bi_column_set":
@@ -129,7 +148,7 @@ namespace PvPmo.Import
 
                     var bulkApm = new MySqlBulkCopy(myConnection, myTrans)
                     { DestinationTableName = nomeTabApm, BulkCopyTimeout = 30 };
-                    var mapsAtm = DbUtlil.ApplicaMapping(bulkApm, mapApm);
+                    var mapsAtm = DbUtlil.ApplicaMappingList(bulkApm, mapApm);
                     if (mapsAtm != null)
                     {
                         mapsAtm.ForEach(bulkApm.ColumnMappings.Add);
@@ -140,7 +159,7 @@ namespace PvPmo.Import
 
                     var bulkTim = new MySqlBulkCopy(myConnection, myTrans)
                     { DestinationTableName = nomeTabTim, BulkCopyTimeout = 30 };
-                    var mapsTim = DbUtlil.ApplicaMapping(bulkTim, mapTim);
+                    var mapsTim = DbUtlil.ApplicaMappingList(bulkTim, mapTim);
                     if (mapsTim != null)
                     {
                         mapsTim.ForEach(bulkTim.ColumnMappings.Add);
@@ -151,7 +170,7 @@ namespace PvPmo.Import
 
                     var bulkGtex = new MySqlBulkCopy(myConnection, myTrans)
                     { DestinationTableName = nomeTabGtex, BulkCopyTimeout = 240 };
-                    var mapsGtex = DbUtlil.ApplicaMapping(bulkGtex, mapGtex);
+                    var mapsGtex = DbUtlil.ApplicaMappingList(bulkGtex, mapGtex);
                     if (mapsGtex != null)
                     {
                         mapsGtex.ForEach(bulkGtex.ColumnMappings.Add);
@@ -162,7 +181,7 @@ namespace PvPmo.Import
 
                     var bulkPvt = new MySqlBulkCopy(myConnection, myTrans)
                     { DestinationTableName = nomeTabPvt, BulkCopyTimeout = 60 };
-                    var mapsPvt = DbUtlil.ApplicaMapping(bulkPvt, mapPvt);
+                    var mapsPvt = DbUtlil.ApplicaMappingList(bulkPvt, mapPvt);
                     if (mapsPvt != null)
                     {
                         mapsPvt.ForEach(bulkPvt.ColumnMappings.Add);

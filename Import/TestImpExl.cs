@@ -9,7 +9,7 @@ namespace PvPmo.Import
 
         public static async Task<bool> TestUptd(IProgress<string>? progress)
         {
-            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(Conn.MysqlConn("pvpmo_origine"));
+            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(await Conn.MysqlConn("pvpmo_origine"));
 
             //    // Carico il File dall'archivio con la sequenza da svolgere
             //    // e provvedo all'esecuzione.
@@ -54,6 +54,8 @@ namespace PvPmo.Import
                         break;
                     case "UPTD":
                         continue; // Non eseguo UPTD qui, ma alla fine di tutti i test.
+                    case "CLN":
+                        continue; // Non eseguo pulizia Key qui, ma solo a fine procedura.
                     default:
                         await Shell.Current.DisplayAlert("Azione sconosciuta", $"Azione {n.Azione} non riconosciuta.", "OK");
                         return !tuttoOk;
@@ -71,8 +73,23 @@ namespace PvPmo.Import
             DataTable dataProd = new();
             DataTable dataUptd = new();
 
-            string connProd = Conn.MysqlConn(dbtabConfronto);
-            string connUptd = Conn.MysqlConn(dbTabTest);
+            string _connProd = string.Empty;
+            string _connUptd = string.Empty;
+
+            _connProd = (!string.IsNullOrEmpty(dbtabConfronto)) ? _connProd = await Conn.MysqlConn(dbtabConfronto) : _connProd;
+            if (string.IsNullOrEmpty(_connProd))
+            {
+                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                return false;
+            }
+
+            _connUptd = (!string.IsNullOrEmpty(dbTabTest)) ? _connUptd = await Conn.MysqlConn(dbTabTest) : _connUptd;
+            if (string.IsNullOrEmpty(_connUptd))
+            {
+                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                return false;
+            }
+
 
             bool tuttoOk = true;
 
@@ -81,8 +98,8 @@ namespace PvPmo.Import
 
             progress?.Report($"Struct: {label}");
 
-            await SqlAsync.SqlQryDataTable(connProd, qProd, dataProd, 60);
-            await SqlAsync.SqlQryDataTable(connUptd, qUptd, dataUptd, 60);
+            await SqlAsync.SqlQryDataTable(_connProd, qProd, dataProd, 60);
+            await SqlAsync.SqlQryDataTable(_connUptd, qUptd, dataUptd, 60);
 
             // Rimuovo righe nulle da produzione.
             // Se non lo faccio mi da errore di confronto.
@@ -134,8 +151,22 @@ namespace PvPmo.Import
             DataTable dataProd = new();
             DataTable dataUptd = new();
 
-            string connProd = Conn.MysqlConn(dbtabConfronto);
-            string connUptd = Conn.MysqlConn(dbTabTest);
+            string _connProd = string.Empty;
+            string _connUptd = string.Empty;
+
+            _connProd = (!string.IsNullOrEmpty(dbtabConfronto)) ? _connProd = await Conn.MysqlConn(dbtabConfronto) : _connProd;
+            if (string.IsNullOrEmpty(_connProd))
+            {
+                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                return false;
+            }
+
+            _connUptd = (!string.IsNullOrEmpty(dbTabTest)) ? _connUptd = await Conn.MysqlConn(dbTabTest) : _connUptd;
+            if (string.IsNullOrEmpty(_connUptd))
+            {
+                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                return false;
+            }
 
             bool tuttoOk = true;
 
@@ -144,8 +175,8 @@ namespace PvPmo.Import
 
             progress?.Report($"Test: {label}");
 
-            await SqlAsync.SqlQryDataTable(connProd, showProd, dataProd, 60);
-            await SqlAsync.SqlQryDataTable(connUptd, showUptd, dataUptd, 60);
+            await SqlAsync.SqlQryDataTable(_connProd, showProd, dataProd, 60);
+            await SqlAsync.SqlQryDataTable(_connUptd, showUptd, dataUptd, 60);
 
             if (dataUptd.Rows.Count != dataProd.Rows.Count)
             {

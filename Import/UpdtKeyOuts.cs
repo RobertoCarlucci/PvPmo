@@ -4,8 +4,16 @@ public static class UpdtKeyOuts
 {    
     public static async Task<bool> UptdKeyOutsTransaction(string myConnString, IProgress<string>? progress)
     {
-        string connProd = Conn.MysqlConn(myConnString);
-        using (MySqlConnection myConnection = new MySqlConnection(connProd))
+        string _connProd = string.Empty;
+
+        _connProd = (!string.IsNullOrEmpty(myConnString)) ? _connProd = await Conn.MysqlConn(myConnString) : _connProd;
+        if (string.IsNullOrEmpty(_connProd))
+        {
+            await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+            return false;
+        }
+
+        using (MySqlConnection myConnection = new MySqlConnection(_connProd))
         {
             await myConnection.OpenAsync();
             // Start a local transaction
@@ -43,7 +51,7 @@ public static class UpdtKeyOuts
                 progress?.Report($"Clean: Elimina Tabella outs_ore_mese");
                 await myCommand.ExecuteNonQueryAsync();
                 myCommand.CommandText = "CREATE TABLE outs_ore_mese (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, GEC VARCHAR(50), " +
-                    "timesheetyear INT, timesheetmonth INT, Dateid DATE, ORE FLOAT);";
+                    "timesheetyear SMALLINT, timesheetmonth SMALLINT, Dateid DATE, ORE FLOAT);";
                 progress?.Report($"Write: Crea Tabella outs_ore_mese");
                 await myCommand.ExecuteNonQueryAsync();
                 myCommand.CommandText = "INSERT INTO outs_ore_mese (GEC, timesheetyear, timesheetmonth, Dateid, ORE) SELECT GEC, YEAR(TimesheetDate), " +

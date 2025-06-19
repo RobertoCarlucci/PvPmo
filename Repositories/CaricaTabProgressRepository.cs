@@ -2,22 +2,22 @@
 
 namespace PvPmo.Repositories
 {
-    public interface ICaricaProgressDescrizioneRepository
+    public interface ICaricaTabProgressRepository
     {
-        Task<List<CaricaProgressDescrizione>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task<List<CaricaTabProgress>> GetAllAsync(CancellationToken cancellationToken = default);
     }
-    public class CaricaProgressDescrizioneRepository : ICaricaProgressDescrizioneRepository
+    public class CaricaTabProgressRepository : ICaricaTabProgressRepository
     {
         private readonly string _connectionString;
 
-        public CaricaProgressDescrizioneRepository(IConfiguration configuration)
+        public CaricaTabProgressRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("pvpmo_origine");
         }
 
-        public async Task<List<CaricaProgressDescrizione>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<List<CaricaTabProgress>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var result = new List<CaricaProgressDescrizione>();
+            var result = new List<CaricaTabProgress>();
 
             await using var conn = new MySqlConnection(_connectionString);
             await conn.OpenAsync(cancellationToken);
@@ -28,7 +28,7 @@ namespace PvPmo.Repositories
 
             while (await reader.ReadAsync(cancellationToken))
             {
-                result.Add(new CaricaProgressDescrizione
+                result.Add(new CaricaTabProgress
                 {
                     TabellaSql = reader["TabellaSql"]?.ToString(),
                     DbName = reader["DbName"]?.ToString(),

@@ -31,21 +31,28 @@ namespace PvPmo.Import
                     continue;
                 }
 
-                string connStr = Conn.MysqlConn(n.DbDest);
+                string _connDb = string.Empty;
+
+                _connDb = (!string.IsNullOrEmpty(n.DbDest)) ? _connDb = await Conn.MysqlConn(n.DbDest) : _connDb;
+                if (string.IsNullOrEmpty(_connDb))
+                {
+                    await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                    return false;
+                }
 
                 // Verifica che n.TabellaMod e n.ColDaMod non siano null prima di passare i valori
                 bool esitoSingolo = n.Azione switch
                 {
                     "DEL" => !string.IsNullOrEmpty(n.TabellaMod) && !string.IsNullOrEmpty(n.ColDaMod)
-                        ? await SqlQry.DelColSql(connStr, n.TabellaMod, n.ColDaMod)
+                        ? await SqlQry.DelColSql(_connDb, n.TabellaMod, n.ColDaMod)
                         : false,
                     "REN" => !string.IsNullOrEmpty(n.TabellaMod) && !string.IsNullOrEmpty(n.ColDaMod) && !string.IsNullOrEmpty(n.Modifica) && !string.IsNullOrEmpty(n.TipoCol)
-                        ? await SqlQry.RinColSql(connStr, n.TabellaMod, n.ColDaMod, n.Modifica, n.TipoCol)
+                        ? await SqlQry.RinColSql(_connDb, n.TabellaMod, n.ColDaMod, n.Modifica, n.TipoCol)
                         : false,
                     "ADD" => !string.IsNullOrEmpty(n.TabellaMod) && !string.IsNullOrEmpty(n.ColDaMod) && !string.IsNullOrEmpty(n.TipoCol)
-                        ? await SqlQry.AddColSql(connStr, n.TabellaMod, n.ColDaMod, n.TipoCol)
+                        ? await SqlQry.AddColSql(_connDb, n.TabellaMod, n.ColDaMod, n.TipoCol)
                         : false,
-                    "GEN" => await EseguiGenerazione(connStr, n),
+                    "GEN" => await EseguiGenerazione(_connDb, n),
                     _ => true
                 };
                 esitoGlobale &= esitoSingolo;

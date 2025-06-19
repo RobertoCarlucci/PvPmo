@@ -12,7 +12,7 @@ public partial class InpAcsToSql()
         string? acsPath = await SelCart.PickFolder();
         if (string.IsNullOrWhiteSpace(acsPath)) return;
         
-        var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(Conn.MysqlConn("pvpmo_origine"));
+        var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(await Conn.MysqlConn("pvpmo_origine"));
 
         var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
         var dati = await repo.GetAllAsync();
@@ -76,16 +76,31 @@ public partial class InpAcsToSql()
     public static async Task<bool> TabAcstoTabSql(
         string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath, IProgress<string>? progress, string label)
     {
-        string StrConnAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
+        string _connProd = string.Empty;
+        string _connAcs = string.Empty;
+
+        _connProd = (!string.IsNullOrEmpty(nomeDbSql)) ? _connProd = await Conn.MysqlConn(nomeDbSql) : _connProd;
+        if (string.IsNullOrEmpty(_connProd))
+        {
+            await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+            return false;
+        }
+        
+        _connAcs = (!string.IsNullOrEmpty(nomeDbAcs) || !string.IsNullOrEmpty(acsPath)) ? _connAcs = await Conn.AcsDbConn(nomeDbAcs, acsPath) : _connAcs;
+        if (string.IsNullOrEmpty(_connAcs))
+        {
+            await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+            return false;
+        }
+
         DataTable _tabella = new DataTable();
         string Qry = $"SELECT * FROM [{nomeTbAcs}] WHERE 1=0;";
         progress?.Report($"Read: {label}");
-        await AcsAsync.AcsQryTab(StrConnAcs, Qry, _tabella);
+        await AcsAsync.AcsQryTab(_connAcs, Qry, _tabella);
         Qry = NormTab.NormInp(nomeTbSql, _tabella);
-        Qry = "CREATE OR REPLACE TABLE " + Qry;
-        string StrConnSql = Conn.MysqlConn(nomeDbSql);
+        Qry = "CREATE OR REPLACE TABLE " + Qry;        
         progress?.Report($"Create: {label}");
-        bool Bol = await SqlAsync.SqlNoQry(StrConnSql, Qry, 30);
+        bool Bol = await SqlAsync.SqlNoQry(_connProd, Qry, 30);
         return Bol;
     }
 
@@ -96,20 +111,34 @@ public partial class InpAcsToSql()
         string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath, IProgress<string>? progress, string label)
     {
         List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
+        string _connProd = string.Empty;
+        string _connAcs = string.Empty;
+
         progress?.Report($"Stuct: {label}");
         Mappings = await DbUtlil.MyMapping("ACS", nomeDbSql, nomeTbSql, nomeDbAcs, nomeTbAcs, null, acsPath);
 
         if (Mappings == null)
             return false;
 
-        string connAcs = Conn.AcsDbConn(nomeDbAcs, acsPath);
-        string connSql = Conn.MysqlConn(nomeDbSql);
+        _connProd = (!string.IsNullOrEmpty(nomeDbSql)) ? _connProd = await Conn.MysqlConn(nomeDbSql) : _connProd;
+        if (string.IsNullOrEmpty(_connProd))
+        {
+            await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+            return false;
+        }
+
+        _connAcs = (!string.IsNullOrEmpty(nomeDbAcs) || !string.IsNullOrEmpty(acsPath)) ? _connAcs = await Conn.AcsDbConn(nomeDbAcs, acsPath) : _connAcs;
+        if (string.IsNullOrEmpty(_connAcs))
+        {
+            await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+            return false;
+        }
 
         DataTable tabella = new();
         string qry = $"SELECT * FROM [{nomeTbAcs}]";
 
-        await AcsAsync.AcsQryTab(connAcs, qry, tabella);
+        await AcsAsync.AcsQryTab(_connAcs, qry, tabella);
         progress?.Report($"Write: {label}");
-        return await SqlAsync.SqlBulkCopy(connSql, nomeTbSql, tabella, Mappings, 180);
+        return await SqlAsync.SqlBulkCopy(_connProd, nomeTbSql, tabella, Mappings, 180);
     }    
 }

@@ -2,23 +2,62 @@
 {    
     public static class Conn
     {
-        public static string MysqlConn(string nomeDb)
+        public static async Task<string> MysqlConn(string nomeDb)
         {
-            string NomeHost = "server = 127.0.0.1; port = 3306;";
-            string UserName = "user = root; Pwd = root; database = ";
-            string StrConn = NomeHost + UserName + nomeDb + ";";
+            string StrConn = string.Empty;
+            bool connessioneOk = true;
+
+            if (!string.IsNullOrWhiteSpace(nomeDb))
+            {
+                string NomeHost = "server = 127.0.0.1; port = 3306;";
+                string UserName = "user = root; Pwd = root; database = ";
+                StrConn = NomeHost + UserName + nomeDb + ";";
+            }
+            connessioneOk = await SqlAsync.TestConnSql(StrConn);
+            StrConn = connessioneOk ? StrConn : string.Empty;
             return StrConn;
         }
-        public static string AcsDbConn(string nomeDb, string nomePath)
+        public static string MysqlConnSer (string nomeDb)
         {
-            string StrConn = "Provider = Microsoft.ACE.OLEDB.16.0; Data Source = "
+            string StrConn = string.Empty;
+            //bool connessioneOk = true;
+
+            if (!string.IsNullOrWhiteSpace(nomeDb))
+            {
+                string NomeHost = "server = 127.0.0.1; port = 3306;";
+                string UserName = "user = root; Pwd = root; database = ";
+                StrConn = NomeHost + UserName + nomeDb + ";";
+            }
+            //connessioneOk = await SqlAsync.TestConnSql(StrConn);
+            //StrConn = connessioneOk ? StrConn : string.Empty;
+            return StrConn;
+        }
+        public static async Task<string> AcsDbConn(string nomeDb, string nomePath)
+        {
+            string StrConn = string.Empty;
+            bool connessioneOk = true;
+
+            if (!string.IsNullOrWhiteSpace(nomeDb) || !string.IsNullOrWhiteSpace(nomePath))
+            {
+                StrConn = "Provider = Microsoft.ACE.OLEDB.16.0; Data Source = "
                 + nomePath + "\\" + nomeDb + ".accdb;";
-            return StrConn;
+            }
+            connessioneOk = await AcsAsync.TestConnAcs(StrConn);
+            StrConn = connessioneOk ? StrConn : string.Empty;
+            return StrConn;           
         }
-        public static string ExlFileConn(string fileImp)
+        public static async Task<string> ExlFileConn(string fileImp)
         {
-            string StrConn = "Provider = Microsoft.ACE.OLEDB.16.0; Data Source = "
-                + fileImp + ".xlsx; Extended Properties = Excel 12.0 Xml;";
+            string StrConn = string.Empty;
+            bool connessioneOk = true;
+
+            if (!string.IsNullOrWhiteSpace(fileImp))
+            {
+               StrConn = "Provider = Microsoft.ACE.OLEDB.16.0; Data Source = "
+               + fileImp + ".xlsx; Extended Properties = Excel 12.0 Xml;";
+            }
+            connessioneOk = await ExlAsync.TestConnExl(StrConn);
+            StrConn = connessioneOk ? StrConn : string.Empty;            
             return StrConn;
         }
     }

@@ -22,33 +22,65 @@
         // delle corrispondenze tra le due e di conseguenza caricato attraverso il metodo
         // MyMapping e restituire al chiamante un oggetto mappings.
         public static async Task<List<MySqlBulkCopyColumnMapping>> MyMapping(string select,string dbDest, string tabDest, 
-            string? dbOrgn = null, string? tbOrgn = null, string? nomeWorkSheet = null, string? filePath = null)
+            string? dbOrgn = null, string? tbOrgn = null, string? nomeWorkSheet = null, string? fullPath = null)
         {
             DataTable dTabOrgn = new();
             DataTable dTabDest = new();
             int dif = 0;            
 
-            if (select == "ACS" && !string.IsNullOrEmpty(tbOrgn) && !string.IsNullOrEmpty(filePath) && dbOrgn != null)
+            if (select == "ACS" && !string.IsNullOrEmpty(tbOrgn) && !string.IsNullOrEmpty(fullPath) && dbOrgn != null)
             {
+                string _conndb = string.Empty;
+                string _connAcs = string.Empty;
+
+                _conndb = (!string.IsNullOrEmpty(dbDest)) ? _conndb = await Conn.MysqlConn(dbDest) : _conndb;
+                if (string.IsNullOrEmpty(_conndb))
+                {
+                    await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                    Mappings.Clear();
+                    return Mappings;
+                }
+
+                _connAcs = (!string.IsNullOrEmpty(dbOrgn) || !string.IsNullOrEmpty(fullPath)) ? _connAcs = await Conn.AcsDbConn(dbOrgn, fullPath) : _connAcs;
+                if (string.IsNullOrEmpty(_connAcs))
+                {
+                    await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                    Mappings.Clear();
+                    return Mappings;
+                }
+
                 string qryAcs = $"SELECT * FROM [{tbOrgn}] WHERE 1=0;";
-                string qrySql = $"SHOW COLUMNS FROM `{tabDest}`;";
+                string qrySql = $"SHOW COLUMNS FROM `{tabDest}`;";                
 
-                string conndbDest = Conn.MysqlConn(dbDest);
-                string connOrgn = Conn.AcsDbConn(dbOrgn, filePath);
-
-                await AcsAsync.AcsQryTab(connOrgn, qryAcs, dTabOrgn);
-                await SqlAsync.SqlQryDataTable(conndbDest, qrySql, dTabDest, 30); // CORRETTO: usa DataTable non NoQry
+                await AcsAsync.AcsQryTab(_connAcs, qryAcs, dTabOrgn);
+                await SqlAsync.SqlQryDataTable(_conndb, qrySql, dTabDest, 30); // CORRETTO: usa DataTable non NoQry
             }
-            else if (select == "EXL" && !string.IsNullOrEmpty(filePath))
+            else if (select == "EXL")
             {
-                string connOrgn = Conn.ExlFileConn(filePath);
-                string conndbDest = Conn.MysqlConn(dbDest);
+                string _connExl = string.Empty;
+                string _conndb = string.Empty;
+
+                _conndb = (!string.IsNullOrEmpty(dbDest)) ? _conndb = await Conn.MysqlConn(dbDest) : _conndb;
+                if (string.IsNullOrEmpty(_conndb))
+                {
+                    await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                    Mappings.Clear();
+                    return Mappings;
+                }
+
+                _connExl = (!string.IsNullOrEmpty(fullPath)) ? _connExl = await Conn.ExlFileConn(fullPath) : _connExl;
+                if (string.IsNullOrEmpty(_connExl))
+                {
+                    await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al File.", "OK");
+                    Mappings.Clear();
+                    return Mappings;
+                }
 
                 string qryExl = $@"SELECT * FROM [{nomeWorkSheet}$] WHERE 1=0;";
                 string qrySql = $@"SHOW COLUMNS FROM `{tabDest}`;";
 
-                await ExlAsync.ExcQry(connOrgn, qryExl, dTabOrgn);
-                await SqlAsync.SqlQryDataTable(conndbDest, qrySql, dTabDest, 30);
+                await ExlAsync.ExcQry(_connExl, qryExl, dTabOrgn);
+                await SqlAsync.SqlQryDataTable(_conndb, qrySql, dTabDest, 30);
             }            
 
             dif = dTabDest.Rows.Count - dTabOrgn.Columns.Count;
@@ -71,7 +103,7 @@
                 $": {dbDest} - ({dTabDest.Rows.Count}) non coincidono. Vuoi continuare con le altre tabelle?", "Si", "No");
             return Mappings;
         }
-        private static Dictionary<string, List<MySqlBulkCopyColumnMapping>> mapsDict;
+        private static Dictionary<string, List<MySqlBulkCopyColumnMapping>> mapsDict = new();
         public static void AddListMapping(string nome, int sourceOrdinal, string destinationColumn)
         {
             // Fix for CS0029: Correctly add the mapping to the dictionary instead of assigning a List to a string variable
@@ -85,7 +117,7 @@
                 DestinationColumn = destinationColumn
             });
         }
-        public static List<MySqlBulkCopyColumnMapping> ApplicaMapping(MySqlBulkCopy bulkCopy, string nomeMapping)
+        public static List<MySqlBulkCopyColumnMapping> ApplicaMappingList(MySqlBulkCopy bulkCopy, string nomeMapping)
         {
             if (!mapsDict.ContainsKey(nomeMapping))
             {
@@ -113,14 +145,30 @@
             DataTable dTabDest = new();
             int dif = 0;
 
-            string conndbDest = Conn.MysqlConn(dbDest);
-            string connOrgn = Conn.MysqlConn(dbOrgn);
+            string _connProd = string.Empty;
+            string _connUptd = string.Empty;
+
+            _connProd = (!string.IsNullOrEmpty(dbDest)) ? _connProd = await Conn.MysqlConn(dbDest) : _connProd;
+            if (string.IsNullOrEmpty(_connProd))
+            {
+                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                mapsDict.Clear();
+                return mapsDict;
+            }
+
+            _connUptd = (!string.IsNullOrEmpty(dbOrgn)) ? _connUptd = await Conn.MysqlConn(dbOrgn) : _connUptd;
+            if (string.IsNullOrEmpty(_connUptd))
+            {
+                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                mapsDict.Clear();
+                return mapsDict;
+            }
 
             string qryProd = $"SHOW COLUMNS FROM `{tabDest}`;";
-            await SqlAsync.SqlQryDataTable(conndbDest, qryProd, dTabDest);
+            await SqlAsync.SqlQryDataTable(_connProd, qryProd, dTabDest);
 
             string qryUptd = $@"SHOW COLUMNS FROM `{tbOrgn}`;";
-            await SqlAsync.SqlQryDataTable(connOrgn, qryUptd, dTabOrgn);
+            await SqlAsync.SqlQryDataTable(_connUptd, qryUptd, dTabOrgn);
 
             dif = dTabDest.Rows.Count - dTabOrgn.Rows.Count;
 
@@ -170,7 +218,7 @@ public class SqlQry
     }
     public static async Task<bool> DelRecSql(string db, string tab)
     {
-        string conn = Conn.MysqlConn(db);
+        string conn = await Conn.MysqlConn(db);
         string sql = $"DELETE FROM `{tab}`;";
         return await SqlAsync.SqlNoQry(conn, sql, 30);
     }
@@ -190,14 +238,14 @@ public class ExlQry
 {
     public static async Task<int> SelExlQry(string fileImp, string foglio)
     {
-        string StrConn = Conn.ExlFileConn(fileImp);
+        string StrConn = await Conn.ExlFileConn(fileImp);
         string qry = $"SELECT * FROM [{foglio}$];";
         int Num = await ExlAsync.ExcQry(qry, StrConn);
         return Num;
     }
     public static async Task<bool> SelExlQry(string fileImp, string foglio, DataTable tabImp)
     {
-        string StrConn = Conn.ExlFileConn(fileImp);
+        string StrConn = await Conn.ExlFileConn(fileImp);
         string qry = $"SELECT * FROM [{foglio}$];";
         bool Bol = await ExlAsync.ExcQry(qry, StrConn, tabImp);
         return Bol;

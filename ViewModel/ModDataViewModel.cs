@@ -17,7 +17,7 @@ public partial class ModDataViewModel : BaseViewModel // ✅ FIX
 
     public async Task LoadAsync()
     {
-        string strConn = Conn.MysqlConn("pmo");
+        string strConn = await Conn.MysqlConn("pmo");
         var query = "SELECT * FROM `01_tabella_data`;";
         var table = new DataTable();
         await SqlAsync.SqlQryDataTable(strConn, query, table);
@@ -47,7 +47,7 @@ public partial class ModDataViewModel : BaseViewModel // ✅ FIX
     [RelayCommand]
     public async Task BtnSalvaEsci()
     {
-        string strConn = Conn.MysqlConn("pmo");
+        string strConn = await Conn.MysqlConn("pmo");
 
         foreach (var row in DateRows)
         {

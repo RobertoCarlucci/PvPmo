@@ -33,16 +33,30 @@
             try
             {
                 string fullPath = $"{exlPath}\\{nomeFile}";                
-                string connExl = Conn.ExlFileConn(fullPath);
-                string connSql = Conn.MysqlConn(dbSql);
+                string _connExl = string.Empty;
+                string _connUptd = string.Empty;
+
+                _connExl = (!string.IsNullOrEmpty(fullPath)) ? _connExl = await Conn.ExlFileConn(fullPath) : _connExl;
+                if (string.IsNullOrEmpty(_connExl))
+                {
+                    await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al File.", "OK");
+                    return false;
+                }
+
+                _connUptd = (!string.IsNullOrEmpty(dbSql)) ? _connUptd = await Conn.MysqlConn(dbSql + "; Convert Zero Datetime=True") : _connUptd;
+                if (string.IsNullOrEmpty(_connUptd))
+                {
+                    await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
+                    return false;
+                }
 
                 DataTable schema = new();
                 string qrySchema = $"SELECT * FROM [{workSheet}$] WHERE 1=0;";
-                bool schemaOk = await ExlAsync.ExcQry(connExl, qrySchema, schema);
+                bool schemaOk = await ExlAsync.ExcQry(_connExl, qrySchema, schema);
                 if (!schemaOk) return false;
 
                 string ddl = "CREATE OR REPLACE TABLE " + NormTab.NormInp(tabSql, schema);
-                bool ddlOk = await SqlAsync.SqlNoQry(connSql, ddl, 30);
+                bool ddlOk = await SqlAsync.SqlNoQry(_connUptd, ddl, 30);
                 if (!ddlOk) return false;
 
                 List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
@@ -51,10 +65,10 @@
 
                 string qryData = $"SELECT * FROM [{workSheet}$];";
                 DataTable dati = new();
-                bool dataOk = await ExlAsync.ExcQry(connExl, qryData, dati);
+                bool dataOk = await ExlAsync.ExcQry(_connExl, qryData, dati);
                 if (!dataOk || dati.Rows.Count == 0) return false;
 
-                bool insertOk = await SqlAsync.SqlBulkCopy(connSql, tabSql, dati, Mappings, 30);
+                bool insertOk = await SqlAsync.SqlBulkCopy(_connUptd, tabSql, dati, Mappings, 30);
                 return insertOk;
             }
             catch (Exception ex)
