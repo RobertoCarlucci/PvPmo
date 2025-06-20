@@ -9,8 +9,8 @@ public partial class DateRowViewModel : BaseViewModel
 
     [ObservableProperty]
     ObservableCollection<FieldItem> fields = new();
-        
 }
+
 public partial class FieldItem : ObservableObject
 {
     public string Key { get; set; } = string.Empty;
@@ -23,10 +23,11 @@ public partial class FieldItem : ObservableObject
 
     public DateTime ParsedDate
     {
-        get => DateTime.TryParse(Value, out var date) ? date : DateTime.Now;
+        get => DateTime.TryParse(Value, out var date) ? date : DateTime.MinValue;
         set => Value = value.ToString("yyyy-MM-dd");
     }
 }
+
 
 
 
