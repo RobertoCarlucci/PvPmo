@@ -1,9 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 
-
 namespace PvPmo.ViewModel;
-
 public partial class ModDataViewModel : BaseViewModel // ✅ FIX
 {
     [ObservableProperty]
@@ -29,6 +27,15 @@ public partial class ModDataViewModel : BaseViewModel // ✅ FIX
             foreach (DataColumn col in table.Columns)
             {
                 var columnName = col.ColumnName;
+
+                //if (columnName.Equals("id", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    if (int.TryParse(row[columnName]?.ToString(), out int idVal))
+                //        dateRow.Id = idVal;
+                //    else
+                //        Debug.WriteLine("❌ ID non valido trovato nella riga.");
+                //    continue;
+                //}
 
                 if (columnName.ToLower() == "id" && row[columnName] is int idVal)
                 {
