@@ -13,22 +13,31 @@ public partial class DateRowViewModel : BaseViewModel
 
 public partial class FieldItem : ObservableObject
 {
-    public string Key { get; set; } = string.Empty;
+    [ObservableProperty]
+    private string key = string.Empty;
 
     [ObservableProperty]
     private string value = string.Empty;
 
-    public bool IsValidDate =>
-        DateTime.TryParse(Value, out _);
+    public bool IsValidDate => DateTime.TryParse(Value, out _);
 
     public DateTime ParsedDate
     {
-        get => DateTime.TryParse(Value, out var date) ? date : DateTime.MinValue;
-        set => Value = value.ToString("yyyy-MM-dd");
+        get
+        {
+            if (DateTime.TryParse(Value, out var date))
+            {
+                // restituisce sempre il primo giorno del mese
+                return new DateTime(date.Year, date.Month, 1);
+            }
+
+            // evita problemi di binding, fallback visivo per DatePicker
+            return DateTime.Now;
+        }
+        set
+        {
+            // memorizza la data in formato compatibile col DB
+            Value = value.ToString("yyyy-MM-dd");
+        }
     }
 }
-
-
-
-
-

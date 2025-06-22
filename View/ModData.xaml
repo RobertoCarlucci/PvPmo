@@ -50,17 +50,22 @@
                                 <!-- Colonna 0 -->
                                 <ContentView Grid.Column="0">
                                     <ContentView.Content>
-                                        <StackLayout>
-                                            <DatePicker Format="dd/MM/yyyy"
-                                                        TextColor="BlueViolet"
-                                                        FontAttributes="Bold"
-                                                        Date="{Binding Fields[0].ParsedDate, Mode=TwoWay}"
-                                                        IsVisible="{Binding Fields[0].IsValidDate}" />
-                                            <Label Text="N/D"
-                                                   HorizontalOptions="Center"
-                                                   TextColor="Gray"
-                                                   IsVisible="{Binding Fields[0].IsValidDate, Converter={StaticResource InverseBoolConverter}}" />
+                                        <StackLayout Grid.Column="0">
+                                            <DatePicker
+                                                Date="{Binding Fields[1].ParsedDate, Mode=TwoWay}"
+                                                Format="dd/MM/yyyy"
+                                                TextColor="BlueViolet"
+                                                FontAttributes="Bold"
+                                                HorizontalOptions="Center"
+                                                IsVisible="{Binding Fields[1].IsValidDate}" />
+                                            <Label
+                                                Text="N/D"
+                                                HorizontalOptions="Center"
+                                                VerticalOptions="Center"
+                                                TextColor="DarkGray"
+                                                IsVisible="{Binding Fields[1].IsValidDate, Converter={StaticResource InverseBoolConverter}}" />
                                         </StackLayout>
+
                                     </ContentView.Content>
                                 </ContentView>
 
@@ -71,12 +76,13 @@
                                             <DatePicker Format="dd/MM/yyyy"
                                                         TextColor="BlueViolet"
                                                         FontAttributes="Bold"
-                                                        Date="{Binding Fields[1].ParsedDate, Mode=TwoWay}"
-                                                        IsVisible="{Binding Fields[1].IsValidDate}" />
+                                                        Date="{Binding Fields[2].ParsedDate, Mode=TwoWay}"
+                                                        IsVisible="{Binding Fields[2].IsValidDate}"
+                                                        HorizontalOptions="Center"/>
                                             <Label Text="N/D"
                                                     HorizontalOptions="Center"
                                                     TextColor="Gray"
-                                                    IsVisible="{Binding Fields[1].IsValidDate, Converter={StaticResource InverseBoolConverter}}" />
+                                                    IsVisible="{Binding Fields[2].IsValidDate, Converter={StaticResource InverseBoolConverter}}" />
                                         </StackLayout>
                                     </ContentView.Content>
                                 </ContentView>
@@ -88,12 +94,13 @@
                                             <DatePicker Format="dd/MM/yyyy"
                                                         TextColor="BlueViolet"
                                                         FontAttributes="Bold"
-                                                        Date="{Binding Fields[2].ParsedDate, Mode=TwoWay}"
-                                                        IsVisible="{Binding Fields[2].IsValidDate}" />
+                                                        Date="{Binding Fields[3].ParsedDate, Mode=TwoWay}"
+                                                        IsVisible="{Binding Fields[3].IsValidDate}" 
+                                                        HorizontalOptions="Center"/>
                                             <Label Text="N/D"
                                                     HorizontalOptions="Center"
                                                     TextColor="Gray"
-                                                    IsVisible="{Binding Fields[2].IsValidDate, Converter={StaticResource InverseBoolConverter}}" />
+                                                    IsVisible="{Binding Fields[3].IsValidDate, Converter={StaticResource InverseBoolConverter}}" />
                                         </StackLayout>
                                     </ContentView.Content>
                                 </ContentView>
