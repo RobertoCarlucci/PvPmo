@@ -12,7 +12,7 @@ namespace PvPmo.Repositories
         {
             Task<List<CaricaTabOrigini>> GetAllAsync(CancellationToken cancellationToken = default);
         }
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
 
         public CaricaTabOriginiRepository(IConfiguration configuration)
         {

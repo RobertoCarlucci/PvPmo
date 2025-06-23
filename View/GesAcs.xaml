@@ -4,77 +4,75 @@
             x:Class="PvPmo.View.GesAcs"  
             xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"  
             x:DataType="viewmodel:GesAcsViewModel"  
-            Title="{Binding Title}">  
+            Title="{Binding Title}"> 
+    
+    <Grid   
+        ColumnDefinitions="*,*,*"             
+        RowSpacing="0">
 
-   <RefreshView Command="{Binding IsRefreshing}">  
-       <Grid   
-           ColumnDefinitions="*,*,*"             
-           RowSpacing="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
+        </Grid.RowDefinitions>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="40" />
-            </Grid.RowDefinitions>
+        <Image x:Name="backgroundImage"  
+                Source="wallpaper_dl.png"  
+                Grid.RowSpan="4"  
+                Grid.ColumnSpan="3"  
+                HorizontalOptions="Center"  
+                VerticalOptions="Center"  
+                Aspect="AspectFill"/>  
 
-            <Image x:Name="backgroundImage"  
-                   Source="wallpaper_dl.png"  
-                   Grid.RowSpan="4"  
-                   Grid.ColumnSpan="3"  
-                   HorizontalOptions="Center"  
-                   VerticalOptions="Center"  
-                   Aspect="AspectFill"/>  
+        <Button Text="Importa Dati Access."  
+                Style="{StaticResource MyButton}"  
+                Command="{Binding BtnImpAcsCommand}"  
+                IsEnabled="{Binding IsNotBusy}"  
+                Grid.Row="0"  
+                Grid.Column="0"  
+                Margin="40"/>  
 
-           <Button Text="Importa Dati Access."  
-                   Style="{StaticResource MyButton}"  
-                   Command="{Binding BtnImpAcsCommand}"  
-                   IsEnabled="{Binding IsNotBusy}"  
-                   Grid.Row="0"  
-                   Grid.Column="0"  
-                   Margin="40"/>  
+        <Button Text="Importa File Setup."  
+                Style="{StaticResource MyButton}"  
+                Command="{Binding BtnImpSetupCommand}"  
+                IsEnabled="{Binding IsNotBusy}"  
+                Grid.Row="1"  
+                Grid.Column="0"  
+                Margin="40"/>
 
-           <Button Text="Importa File Setup."  
-                   Style="{StaticResource MyButton}"  
-                   Command="{Binding BtnImpSetupCommand}"  
-                   IsEnabled="{Binding IsNotBusy}"  
-                   Grid.Row="1"  
-                   Grid.Column="0"  
-                   Margin="40"/>
+        <Button Text="Apri Log"
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnApriLogCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="40"/>
 
-            <Button Text="Apri Log"
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnApriLogCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Margin="40"/>
+        <Button Text="Torna Home Page."  
+                Style="{StaticResource MyButton}"  
+                Command="{Binding BtnAnnullaEsciCommand}"  
+                IsEnabled="{Binding IsNotBusy}"  
+                VerticalOptions="Center"  
+                Grid.Row="2"  
+                Grid.Column="3"  
+                Margin="40"/>
 
-            <Button Text="Torna Home Page."  
-                   Style="{StaticResource MyButton}"  
-                   Command="{Binding BtnAnnullaEsciCommand}"  
-                   IsEnabled="{Binding IsNotBusy}"  
-                   VerticalOptions="Center"  
-                   Grid.Row="2"  
-                   Grid.Column="3"  
-                   Margin="40"/>
-
-            <Label Text="{Binding TabellaCorrente}"
-                   FontSize="18"
-                   FontAttributes="Bold"
-                   Grid.Row="3"
-                   Grid.ColumnSpan="3"
-                   HorizontalOptions="Center"
-                   TextColor="Red" 
-                   IsVisible="{Binding IsProgressVisible}"/>
+        <Label Text="{Binding TabellaCorrente}"
+                FontSize="18"
+                FontAttributes="Bold"
+                Grid.Row="3"
+                Grid.ColumnSpan="3"
+                HorizontalOptions="Center"
+                TextColor="Red"/>
                         
-            <ActivityIndicator IsVisible="{Binding IsBusy}"  
-                               IsRunning="{Binding IsBusy}"  
-                               HorizontalOptions="Fill"  
-                               VerticalOptions="Center"                                
-                               Grid.RowSpan="2"  
-                               Grid.ColumnSpan="2"/>  
+        <ActivityIndicator IsVisible="{Binding IsBusy}"  
+                            IsRunning="{Binding IsBusy}"  
+                            HorizontalOptions="Fill"  
+                            VerticalOptions="Center"                                
+                            Grid.RowSpan="2"  
+                            Grid.ColumnSpan="2"/>  
 
-       </Grid>  
-   </RefreshView>  
+    </Grid>  
+    
 </ContentPage>

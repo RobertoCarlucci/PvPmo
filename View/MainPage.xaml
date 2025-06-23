@@ -4,86 +4,72 @@
              x:Class="PvPmo.View.MainPage"
              xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
              x:DataType="viewmodel:MainViewModel"
-             Title="{Binding Title}">     
+             Title="{Binding Title}">
 
-    <RefreshView Command="{Binding IsRefreshing}">
-        
-        <Grid
-            ColumnDefinitions="*,*,*"           
-            RowSpacing="0">
+    <Grid
+        ColumnDefinitions="*,*,*"           
+        RowSpacing="0">
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="40" />                 
-            </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />            
+        </Grid.RowDefinitions>
 
 
-            <Image x:Name="backgroundImage"
-                   Source="wallpaper_dl.png"
-                   Grid.RowSpan="4"
-                   Grid.ColumnSpan="3"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center"
-                   Aspect="AspectFill" />
+        <Image x:Name="backgroundImage"
+                Source="wallpaper_dl.png"
+                Grid.RowSpan="4"
+                Grid.ColumnSpan="3"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Aspect="AspectFill" />
 
-            <Button Text="Gestione Importazioni Dati Acs ed Exl."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnGesAcsCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Margin="40"/>
+        <Button Text="Gestione Importazioni Dati Acs ed Exl."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnGesAcsCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="40"/>
 
-            <Button Text="Aggiornamento mensile Data Base."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnAgDbCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Margin="40"/>
-            
-            <Button Text="Aggiornamento tabella Date."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnAgDataCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Margin="40"/>
+        <Button Text="Aggiornamento mensile Data Base."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnAgDbCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="40"/>
 
-            <Button Text="Gestione Esportazioni Dati Db."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnExportCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Margin="40"/>
-            
-            <Button Text="Chiudi ed Esci."
-                    Style="{StaticResource MyButton}"
-                    Command="{Binding BtnEndCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    Grid.Row="2"
-                    Grid.Column="2"
-                    Margin="40"/>            
-                        
-            <Label Text="{Binding TabellaCorrente}"
-                   FontSize="18"
-                   FontAttributes="Bold"
-                   Grid.Row="3"
-                   Grid.ColumnSpan="3"
-                   HorizontalOptions="Center"
-                   TextColor="Red" 
-                   IsVisible="{Binding IsProgressVisible}"/>
-            
+        <Button Text="Aggiornamento tabella Date."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnAgDataCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="2"
+                Grid.Column="0"
+                Margin="40"/>
 
-            <ActivityIndicator  IsVisible="{Binding IsBusy}"
-                                IsRunning="{Binding IsBusy}"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"                              
-                                Grid.RowSpan="2"
-                                Grid.ColumnSpan="2"/>
-        </Grid>
-    </RefreshView>
+        <Button Text="Gestione Esportazioni Dati Db."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnExportCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="40"/>
+
+        <Button Text="Chiudi ed Esci."
+                Style="{StaticResource MyButton}"
+                Command="{Binding BtnEndCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="2"
+                Grid.Column="2"
+                Margin="40"/>        
+
+        <ActivityIndicator  IsRunning="{Binding IsBusy}"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"                              
+                            Grid.RowSpan="2"
+                            Grid.ColumnSpan="2"/>
+    </Grid>
+
 </ContentPage>

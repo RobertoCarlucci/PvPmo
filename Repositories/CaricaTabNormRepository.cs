@@ -8,7 +8,7 @@ namespace PvPmo.Repositories
     }
     public class CaricaTabNormRepository : ICaricaTabNormRepository
     {
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
 
         public CaricaTabNormRepository(IConfiguration configuration)
         {

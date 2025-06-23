@@ -9,7 +9,7 @@ namespace PvPmo.Repositories
 
     public class CaricaTabDataRepository : ICaricaTabDataRepository
     {
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
 
         public CaricaTabDataRepository(IConfiguration configuration)
         {

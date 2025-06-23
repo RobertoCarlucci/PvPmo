@@ -28,11 +28,18 @@ public partial class ModDataViewModel : BaseViewModel // ✅ FIX
             {
                 var columnName = col.ColumnName;
 
-                if (columnName.ToLower() == "id" && row[columnName] is int idVal)
+                if (columnName.Equals("id", StringComparison.OrdinalIgnoreCase))
                 {
-                    dateRow.Id = idVal;
+                    if (int.TryParse(row[columnName]?.ToString(), out int idVal))
+                        dateRow.Id = idVal;
                     continue;
                 }
+
+                //if (columnName.ToLower() == "id" && row[columnName] is int idVal)
+                //{
+                //    dateRow.Id = idVal;
+                //    continue;
+                //}
 
                 var value = row[columnName]?.ToString() ?? string.Empty;
 

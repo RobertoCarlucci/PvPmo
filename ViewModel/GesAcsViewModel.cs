@@ -7,14 +7,7 @@ namespace PvPmo.ViewModel
         public GesAcsViewModel()
         {
             Title = "Gestione Db Access.";
-        }
-
-        //private bool isRefreshing;
-        //public bool IsRefreshing
-        //{
-        //    get => isRefreshing;
-        //    set => SetProperty(ref isRefreshing, value);
-        //}
+        }      
 
         [RelayCommand]
         async Task BtnImpAcs()

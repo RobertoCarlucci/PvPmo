@@ -8,7 +8,7 @@ namespace PvPmo.Repositories
     }
     public class CaricaTabProgressRepository : ICaricaTabProgressRepository
     {
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
 
         public CaricaTabProgressRepository(IConfiguration configuration)
         {

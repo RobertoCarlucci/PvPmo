@@ -5,7 +5,7 @@ namespace PvPmo.ViewModel
     public partial class BaseViewModel : ObservableObject
     {
         [ObservableProperty]
-        string tabellaCorrente;
+        string tabellaCorrente = string.Empty;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsNotBusy))]

@@ -8,7 +8,7 @@ namespace PvPmo.Repositories
     }
     public class CaricaTabFinalizzaRepository : ICaricaTabFinalizzaRepository
     {
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
 
         public CaricaTabFinalizzaRepository(IConfiguration configuration)
         {
