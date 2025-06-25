@@ -27,7 +27,6 @@
                 await Shell.Current.DisplayAlert("Importazione completata !", "Tutti i file sono stati importati correttamente.", "OK");
             }
         }
-
         public static async Task<bool> ImportSetup(string exlPath, string nomeFile, string workSheet, string dbSql, string tabSql)
         {
             try

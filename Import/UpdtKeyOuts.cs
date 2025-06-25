@@ -26,20 +26,25 @@ public static class UpdtKeyOuts
                 progress?.Report($"Clean: Elimina Tabella key_global");
                 await myCommand.ExecuteNonQueryAsync();
                 myCommand.CommandText = "CREATE TABLE key_global (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, Org VARCHAR(50), SubOrg VARCHAR(50)," +
-                    "Team VARCHAR(50), Competence VARCHAR(50), LocationRegion VARCHAR(50), Keyid VARCHAR(100))";
+                    "Team VARCHAR(50), Competence VARCHAR(50), LocationRegion VARCHAR(50), Keyid VARCHAR(100));";
                 progress?.Report($"Write: Crea Tabella key_global");
                 await myCommand.ExecuteNonQueryAsync();
                 myCommand.CommandText = "INSERT INTO key_global(Org, SubOrg, Team, Competence, LocationRegion, Keyid) SELECT DISTINCT " +
-                    "OrganizationOBS, SubOrgOBS, TeamOBS, CompetencePrimaryValue, JobLocationRegion, Keyid  FROM pmo.pv_total;";
+                    "OrganizationOBS, SubOrgOBS, TeamOBS, CompetencePrimaryValue, JobLocationRegion, Keyid  FROM pmo.pv_total " +
+                    "WHERE pv_total.OrganizationOBS IS NOT NULL AND pv_total.SubOrgOBS IS NOT NULL AND pv_total.TeamOBS IS NOT NULL " +
+                    "AND pv_total.CompetencePrimaryValue IS NOT NULL AND pv_total.JobLocationRegion IS NOT NULL AND pv_total.Keyid IS NOT NULL ;";
                 progress?.Report($"Write: Inserisci dati Tabella key_global");                
                 await myCommand.ExecuteNonQueryAsync();
                 myCommand.CommandText = "INSERT INTO key_global(Org, SubOrg, Team, Competence, LocationRegion, Keyid) SELECT DISTINCT " +
-                    "Org, SubOrg, Team, Competence, LocationRegion, Keyid  FROM pmo.global_timesheet_extract;";
+                    "Org, SubOrg, Team, Competence, LocationRegion, Keyid  FROM pmo.global_timesheet_extract " +
+                    "WHERE global_timesheet_extract.Org IS NOT NULL AND global_timesheet_extract.SubOrg IS NOT NULL AND global_timesheet_extract.Team IS NOT NULL " +
+                    "AND global_timesheet_extract.Competence IS NOT NULL AND global_timesheet_extract.LocationRegion IS NOT NULL AND global_timesheet_extract.Keyid IS NOT NULL;";
                 progress?.Report($"Write: Inserisci dati Tabella key_global");
                 await myCommand.ExecuteNonQueryAsync();
                 myCommand.CommandText = "DROP TABLE IF EXISTS `pbx_key`;";
                 progress?.Report($"Clean: Elimina Tabella pbx_key");
-                await myCommand.ExecuteNonQueryAsync(); myCommand.CommandText = "CREATE TABLE pbx_key (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, Org VARCHAR(50), SubOrg VARCHAR(50)," +
+                await myCommand.ExecuteNonQueryAsync(); 
+                myCommand.CommandText = "CREATE TABLE pbx_key (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, Org VARCHAR(50), SubOrg VARCHAR(50)," +
                     "Team VARCHAR(50), Competence VARCHAR(50), LocationRegion VARCHAR(50), Keyid VARCHAR(100))";
                 progress?.Report($"Write: Crea Tabella pbx_key");
                 await myCommand.ExecuteNonQueryAsync();

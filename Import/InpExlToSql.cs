@@ -119,7 +119,6 @@
                 return false;
             }
 
-
             DataTable schema = new();
 
             string qrySchema = $@"SELECT * FROM [{workSheet}$] WHERE 1=0;";

@@ -20,16 +20,13 @@
         public static string MysqlConnSer (string nomeDb)
         {
             string StrConn = string.Empty;
-            //bool connessioneOk = true;
-
+            
             if (!string.IsNullOrWhiteSpace(nomeDb))
             {
                 string NomeHost = "server = 127.0.0.1; port = 3306;";
                 string UserName = "user = root; Pwd = root; database = ";
                 StrConn = NomeHost + UserName + nomeDb + ";";
-            }
-            //connessioneOk = await SqlAsync.TestConnSql(StrConn);
-            //StrConn = connessioneOk ? StrConn : string.Empty;
+            }           
             return StrConn;
         }
         public static async Task<string> AcsDbConn(string nomeDb, string nomePath)

@@ -90,7 +90,6 @@ namespace PvPmo.Import
                 return false;
             }
 
-
             bool tuttoOk = true;
 
             string qProd = $"SELECT `{colConfronto}` FROM `{tabConfronto}` ORDER BY `{colConfronto}` ASC;";

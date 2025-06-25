@@ -1,10 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace PvPmo.ViewModel;
-public partial class ModDataViewModel : BaseViewModel // ✅ FIX
+public partial class ModDataViewModel : BaseViewModel
 {
     [ObservableProperty]
-    ObservableCollection<DateRowViewModel> dateRows = new();
+    ObservableCollection<DateRowViewModel> dateRows = new ();
 
     public ModDataViewModel()
     {
@@ -33,13 +33,7 @@ public partial class ModDataViewModel : BaseViewModel // ✅ FIX
                     if (int.TryParse(row[columnName]?.ToString(), out int idVal))
                         dateRow.Id = idVal;
                     continue;
-                }
-
-                //if (columnName.ToLower() == "id" && row[columnName] is int idVal)
-                //{
-                //    dateRow.Id = idVal;
-                //    continue;
-                //}
+                }               
 
                 var value = row[columnName]?.ToString() ?? string.Empty;
 
