@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
+            x:Class="PvPmo.View.LoginView"            
+            x:DataType="viewmodel:LoginViewModel"
+            Title="{Binding Title}">
+
+    <Grid RowSpacing="10"
+        ColumnSpacing="10"
+        Padding="30"
+        ColumnDefinitions="*,*"
+        RowDefinitions="*,*,*,*">
+
+        <Image  x:Name="backgroundImage"
+            Source="wallpaper_dl.png"
+            Aspect="AspectFill"
+            Grid.ColumnSpan="2"
+            Grid.RowSpan="4"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"/>
+
+        <Entry Placeholder="Nome utente"
+            Text="{Binding NomeUtente}"
+            Style="{StaticResource MyEntry}"
+            Grid.Row="0" 
+            Grid.Column="0"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            ReturnType="Next"
+            Margin="40"/>
+
+        <Entry Placeholder="Password"
+            Text="{Binding Password}"
+            Style="{StaticResource MyEntry}"
+            IsPassword="True"
+            Grid.Row="1" 
+            Grid.Column="0"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            ReturnType="Go"
+            Margin="40"/>
+
+        <Button Text="Accedi"
+            Command="{Binding AccediCommand}"
+            Style="{StaticResource MyButton}"
+            Grid.Row="0" 
+            Grid.Column="1"
+            IsEnabled="{Binding IsNotBusy}" 
+            Margin="40"/>
+
+        <Button Text="Riprova"
+            Command="{Binding RiprovaCommand}"
+            Style="{StaticResource MyButton}"
+            Grid.Row="2" 
+            Grid.Column="1"
+            IsVisible="{Binding MostraErrore}"
+            Margin="40"/>
+
+        <Button Text="{Binding EtichettaWindowsLogin}"
+            Command="{Binding AccediWindowsCommand}"
+            Style="{StaticResource MyButton}"
+            Grid.Row="1" 
+            Grid.Column="1"
+            Margin="40"/>
+
+        <Button Text="Esci"
+            Command="{Binding EsciCommand}"
+            Style="{StaticResource MyButton}"
+            Grid.Row="3" 
+            Grid.Column="1"
+            Margin="40"/>
+
+        <Label Text="{Binding MessaggioErrore}"
+            TextColor="Red"
+            FontSize="12"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            Grid.Row="2" 
+            Grid.Column="0"
+            IsVisible="{Binding MostraErrore}" />
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                        IsVisible="{Binding IsBusy}"
+                        Grid.RowSpan="5"
+                        Grid.ColumnSpan="2"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" />
+    </Grid>
+</ContentPage>

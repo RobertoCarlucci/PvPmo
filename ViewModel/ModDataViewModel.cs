@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using PvPmo.View;
+using System.Collections.ObjectModel;
 
 namespace PvPmo.ViewModel;
 public partial class ModDataViewModel : BaseViewModel
@@ -77,12 +78,12 @@ public partial class ModDataViewModel : BaseViewModel
             await SqlAsync.SqlNoQry(strConn, sql);
         }
 
-        await Shell.Current.GoToAsync("..");
+        await Shell.Current.GoToAsync(nameof(MainPage));
     }
 
     [RelayCommand]
     public async Task BtnAnnullaEsci()
     {
-        await Shell.Current.GoToAsync("..");
+        await Shell.Current.GoToAsync(nameof(MainPage));
     }
 }

@@ -23,6 +23,8 @@ namespace PvPmo
 #endif
             //Wiews
 
+            builder.Services.AddSingleton<LoginView>();
+            builder.Services.AddSingleton<LoginViewModel>();
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<MainViewModel>();            
             builder.Services.AddTransient<GesAcs>();

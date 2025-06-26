@@ -14,6 +14,8 @@
             <Color x:Key="PrimaryDark">#FFA000</Color>
             <Color x:Key="Accent">#00BCD4</Color>
             <Color x:Key="Dark">Black</Color>
+            <Color x:Key="BlueViolet">BlueViolet</Color>
+            
 
             <Color x:Key="LightBackground">#FAF9F8</Color>
             <Color x:Key="DarkBackground">Black</Color>
@@ -55,14 +57,41 @@
             <Style TargetType="RefreshView" ApplyToDerivedTypes="True">
                 <Setter Property="RefreshColor" Value="{StaticResource Primary}" />
             </Style>
-            
+
             <Style x:Key="MyButton" TargetType="Button">
+                <Setter Property="Shadow">
+                    <Setter.Value>
+                        <Shadow Brush="Black"
+                            Radius="8"
+                            Offset="2,2"
+                            Opacity="1" />
+                    </Setter.Value>
+                </Setter>
                 <Setter Property="Background" Value="{StaticResource GialloVerde}"/>
-                <Setter Property="TextColor" Value="{StaticResource Dark}"/>
-                <Setter Property="BorderColor" Value="{StaticResource Primary}"/>
-                <Setter Property="BorderWidth" Value="4"/>
-                <Setter Property="HeightRequest" Value="50"/>
-                <Setter Property="CornerRadius" Value="20"/>
+                <Setter Property="TextColor" Value="{StaticResource Dark}" />
+                <Setter Property="BorderColor" Value="{StaticResource Primary}" />
+                <Setter Property="BorderWidth" Value="4" />
+                <Setter Property="HeightRequest" Value="50" />
+                <Setter Property="CornerRadius" Value="20" />
+            </Style>
+
+            <Style x:Key="MyEntry" TargetType="Entry">
+                <Setter Property="TextColor" Value="{StaticResource Dark}" />
+                <Setter Property="PlaceholderColor" Value="{StaticResource BlueViolet}" />
+                <Setter Property="HeightRequest" Value="50" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="BackgroundColor" Value="{StaticResource GialloVerde}" />
+                <Setter Property="Margin" Value="0,5" />
+                <Setter Property="WidthRequest" Value="420" />
+                <Setter Property="Shadow">
+                    <Setter.Value>
+                        <Shadow Brush="Black"
+                            Radius="8"
+                            Offset="2,2"
+                            Opacity="1" />
+                    </Setter.Value>
+                </Setter>
             </Style>
 
             <Style x:Key="MyProgressBar" TargetType="ProgressBar">

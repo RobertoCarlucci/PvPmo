@@ -18,12 +18,7 @@ namespace PvPmo.ViewModel
             set => SetProperty(ref title, value);
         }
         private string title = string.Empty;
-
-        //public BaseViewModel(string tabellaCorrente)
-        //{
-        //    this.tabellaCorrente = tabellaCorrente;
-        //}
-
+        
         public bool IsNotBusy => !IsBusy;
 
         public void StartProgress()

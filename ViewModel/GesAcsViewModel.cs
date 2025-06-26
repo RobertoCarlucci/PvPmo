@@ -1,4 +1,5 @@
 ﻿using PvPmo.Import;
+using PvPmo.View;
 
 namespace PvPmo.ViewModel
 {
@@ -79,7 +80,7 @@ namespace PvPmo.ViewModel
         {
             if (IsBusy)
                 return;
-            await Shell.Current.GoToAsync("..");
+            await Shell.Current.GoToAsync(nameof(MainPage));
         }
     }
 }

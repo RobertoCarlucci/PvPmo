@@ -78,7 +78,7 @@ namespace PvPmo.ViewModel
 
             var confirm = await Shell.Current.DisplayAlert("Esci", "Vuoi chiudere?", "Si", "No");
             if (confirm)
-                Environment.Exit(0);
+                System.Diagnostics.Process.GetCurrentProcess().Kill();
 
             IsBusy = false;
         }
