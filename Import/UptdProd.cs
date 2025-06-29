@@ -1,4 +1,5 @@
-﻿using PvPmo.GestDb;
+﻿using DocumentFormat.OpenXml.Office2013.Excel;
+using PvPmo.GestDb;
 
 namespace PvPmo.Import
 {
@@ -6,22 +7,14 @@ namespace PvPmo.Import
     {
         public static async Task<bool> EsgUptdTabProd(string connProd, string connUptd, IProgress<string>? progress)
         {
-            string _connProd = string.Empty;
-            string _connUptd = string.Empty;
+            string _connProd = await Conn.MysqlConn(connProd + "; AllowLoadLocalInfile = true");
+            string _connUptd = await Conn.MysqlConn(connUptd + "; Convert Zero Datetime = True");
 
-            _connProd = (!string.IsNullOrEmpty(connProd)) ? _connProd = await Conn.MysqlConn(connProd + "; AllowLoadLocalInfile=true") : _connProd;
-            if (string.IsNullOrEmpty(_connProd))
+            if (string.IsNullOrEmpty(_connProd) || string.IsNullOrEmpty(_connUptd))
             {
                 await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
                 return false;
-            }
-            
-            _connUptd = (!string.IsNullOrEmpty(connUptd)) ? _connUptd = await Conn.MysqlConn(connUptd + "; Convert Zero Datetime=True") : _connUptd;
-            if (string.IsNullOrEmpty(_connUptd))
-            {
-                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
-                return false;
-            }
+            }            
 
             Dictionary<string, List<MySqlBulkCopyColumnMapping>> _mapsDict;
 

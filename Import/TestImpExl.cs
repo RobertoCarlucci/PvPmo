@@ -70,26 +70,15 @@ namespace PvPmo.Import
             // Test Valore Data e Record Data presenti in Uptd
             // Confrontandolo con la tabella 01_tabella_data del Db di produzione.
 
-            DataTable dataProd = new();
-            DataTable dataUptd = new();
+            string _connProd = await Conn.MysqlConn(dbtabConfronto);
+            string _connUptd = await Conn.MysqlConn(dbTabTest);
 
-            string _connProd = string.Empty;
-            string _connUptd = string.Empty;
-
-            _connProd = (!string.IsNullOrEmpty(dbtabConfronto)) ? _connProd = await Conn.MysqlConn(dbtabConfronto) : _connProd;
-            if (string.IsNullOrEmpty(_connProd))
+            if (string.IsNullOrEmpty(_connProd) || string.IsNullOrEmpty(_connUptd))
             {
                 await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
                 return false;
             }
-
-            _connUptd = (!string.IsNullOrEmpty(dbTabTest)) ? _connUptd = await Conn.MysqlConn(dbTabTest) : _connUptd;
-            if (string.IsNullOrEmpty(_connUptd))
-            {
-                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
-                return false;
-            }
-
+            
             bool tuttoOk = true;
 
             string qProd = $"SELECT `{colConfronto}` FROM `{tabConfronto}` ORDER BY `{colConfronto}` ASC;";
@@ -97,7 +86,9 @@ namespace PvPmo.Import
 
             progress?.Report($"Struct: {label}");
 
+            var dataProd = new DataTable();
             await SqlAsync.SqlQryDataTable(_connProd, qProd, dataProd, 60);
+            var dataUptd = new DataTable();
             await SqlAsync.SqlQryDataTable(_connUptd, qUptd, dataUptd, 60);
 
             // Rimuovo righe nulle da produzione.
@@ -147,25 +138,14 @@ namespace PvPmo.Import
         public static async Task<bool> EseguiNUM(string dbtabConfronto, string tabConfronto, string dbTabTest, string tabTestare,
             string label, IProgress<string>? progress = null)
         {
-            DataTable dataProd = new();
-            DataTable dataUptd = new();
-
-            string _connProd = string.Empty;
-            string _connUptd = string.Empty;
-
-            _connProd = (!string.IsNullOrEmpty(dbtabConfronto)) ? _connProd = await Conn.MysqlConn(dbtabConfronto) : _connProd;
-            if (string.IsNullOrEmpty(_connProd))
+            string _connProd = await Conn.MysqlConn(dbtabConfronto);
+            string _connUptd = await Conn.MysqlConn(dbTabTest);
+            
+            if (string.IsNullOrEmpty(_connProd) || string.IsNullOrEmpty(_connUptd))
             {
                 await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
                 return false;
-            }
-
-            _connUptd = (!string.IsNullOrEmpty(dbTabTest)) ? _connUptd = await Conn.MysqlConn(dbTabTest) : _connUptd;
-            if (string.IsNullOrEmpty(_connUptd))
-            {
-                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
-                return false;
-            }
+            }            
 
             bool tuttoOk = true;
 
@@ -174,7 +154,9 @@ namespace PvPmo.Import
 
             progress?.Report($"Test: {label}");
 
+            var dataProd = new DataTable();
             await SqlAsync.SqlQryDataTable(_connProd, showProd, dataProd, 60);
+            var dataUptd = new DataTable();
             await SqlAsync.SqlQryDataTable(_connUptd, showUptd, dataUptd, 60);
 
             if (dataUptd.Rows.Count != dataProd.Rows.Count)
@@ -185,5 +167,13 @@ namespace PvPmo.Import
             }
             return tuttoOk;
         }
+        public static async Task<bool> TestCoerenzaDate(DataTable tabDate)
+        {
+            bool tuttoOk = true;
+
+
+            return tuttoOk; // Placeholder for future implementation
+        }
+
     }
 }

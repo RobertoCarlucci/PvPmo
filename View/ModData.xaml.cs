@@ -6,7 +6,7 @@ public partial class ModData : ContentPage
 {
 	public ModData(ModDataViewModel viewModel)
 	{
-		InitializeComponent();
+        InitializeComponent();
 		BindingContext = viewModel;        
     }
     protected override void OnNavigatedTo(NavigatedToEventArgs args)
