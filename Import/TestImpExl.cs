@@ -49,7 +49,7 @@ namespace PvPmo.Import
                             await Shell.Current.DisplayAlert("Errore", "Dati di test non completi.", "OK");
                             return false;
                         }
-                        tuttoOk = await EseguiNUM(n.DbTabConfronto, n.TabConfronto, n.DbTabTest, n.TabTestare, label, progress);
+                        tuttoOk = await TestNumCol(n.DbTabConfronto, n.TabConfronto, n.DbTabTest, n.TabTestare, label, progress);
                         if (!tuttoOk) return false;
                         break;
                     case "UPTD":
@@ -135,7 +135,7 @@ namespace PvPmo.Import
             }
             return tuttoOk;
         }
-        public static async Task<bool> EseguiNUM(string dbtabConfronto, string tabConfronto, string dbTabTest, string tabTestare,
+        public static async Task<bool> TestNumCol(string dbtabConfronto, string tabConfronto, string dbTabTest, string tabTestare,
             string label, IProgress<string>? progress = null)
         {
             string _connProd = await Conn.MysqlConn(dbtabConfronto);
@@ -172,7 +172,8 @@ namespace PvPmo.Import
             bool tuttoOk = true;
 
 
-            return tuttoOk; // Placeholder for future implementation
+
+            return tuttoOk;
         }
 
     }

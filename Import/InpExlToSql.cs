@@ -1,4 +1,6 @@
-﻿namespace PvPmo.Import
+﻿using PvPmo.Saga;
+
+namespace PvPmo.Import
 {
     public partial class InpExlToSql()
     {
@@ -58,20 +60,27 @@
             inprtOk = await NormTab.NormTabImp("EXL", "pvpmo_origine");
             if (!inprtOk)
             {
-                await Shell.Current.DisplayAlert("Errore Normalizzazione Tabelle !", "Normalizzazione fallita. " +
-                    "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
+                var orchestrator = new SagaOrchestrator();
+                await orchestrator.RollbackAsync("pvpmo_origine");
+
+                await Shell.Current.DisplayAlert("Errore Normalizzazione Tabelle !", "Normalizzazione fallita .", "OK");
                 return inprtOk;
             }
             inprtOk = await TestDateImpExl.TestUptd(progress);
             if (!inprtOk)
             {
-                await Shell.Current.DisplayAlert("Errore Test Tabelle !", "Controlli sulle tabelle importate falliti. " +
-                    "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
+                var orchestrator = new SagaOrchestrator();
+                await orchestrator.RollbackAsync("pvpmo_origine");
+
+                await Shell.Current.DisplayAlert("Errore Test Tabelle !", "Controlli sulle tabelle importate falliti. ", "OK");
                 return inprtOk;
             }
             inprtOk = await UptdProd.EsgUptdTabProd("pmo", "pvpmo_origine", progress);
             if (!inprtOk)
             {
+                var orchestrator = new SagaOrchestrator();
+                await orchestrator.RollbackAsync("pvpmo_origine");
+
                 await Shell.Current.DisplayAlert("Errore Aggiornamento Tabelle !", "Aggiornamento delle tabelle della produzione fallito. " +
                     "\nNessuna modifica è stata effettuata sulla produzione. " +
                     "\n Rieseguire la procedura dopo un controllo delle tabelle da importare.", "OK");
@@ -99,55 +108,50 @@
             string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, string label, IProgress<string>? progress = null)
         {
             // Crea tabella SQL da file Excel (solo struttura)
-
-            List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
-
-            string _connUptd = string.Empty;
-            string _connExl = string.Empty;
-
-            _connUptd = (!string.IsNullOrEmpty(nomeDbSql)) ? _connUptd = await Conn.MysqlConn(nomeDbSql) : _connUptd;
-            if (string.IsNullOrEmpty(_connUptd))
-            {
-                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
-                return false;
-            }
             
-            _connExl = (!string.IsNullOrEmpty(exlPath)) ? _connExl = await Conn.ExlFileConn(exlPath) : _connExl;
-            if (string.IsNullOrEmpty(_connExl))
+            string _connSql = await Conn.MysqlConn(nomeDbSql);
+            string _connExl = await Conn.ExlFileConn(exlPath);
+            if (string.IsNullOrEmpty(_connSql) || string.IsNullOrEmpty(_connExl))
             {
-                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al File.", "OK");
+                await Shell.Current.DisplayAlert("Errore Connessione", "Impossibile creare le connessioni.", "OK");
                 return false;
             }
 
-            DataTable schema = new();
+            var orchestrator = new SagaOrchestrator();
+
+            orchestrator.AddStep(new ProteggiTabelleSagaStep(_connSql, nomeTbSql));
+            bool ok = await orchestrator.ExecuteAsync(_connSql);
+            if (!ok) return false;
+
+            var _tabella = new DataTable();
 
             string qrySchema = $@"SELECT * FROM [{workSheet}$] WHERE 1=0;";
             progress?.Report($"Struct: {label}");
-            bool schemaOk = await ExlAsync.ExcQry(_connExl, qrySchema, schema);
-            if (!schemaOk || schema.Columns.Count == 0) return false;
+            ok = await ExlAsync.ExcQry(_connExl, qrySchema, _tabella);
+            if (!ok || _tabella.Columns.Count == 0) return false;
 
-            string ddl = $@"CREATE OR REPLACE TABLE " + NormTab.NormInp(nomeTbSql, schema);
+            string ddl = $@"CREATE OR REPLACE TABLE " + NormTab.NormInp(nomeTbSql, _tabella);
             progress?.Report($"Struct: {label}");
-            bool ddlOk = await SqlAsync.SqlNoQry(_connUptd, ddl, 60);
-            if (!ddlOk) return false;
+            ok = await SqlAsync.SqlNoQry(_connSql, ddl, 60);
+            if (!ok) return false;
             
             progress?.Report($"Mapping: {label}");
-            Mappings = await DbUtlil.MyMapping("EXL", nomeDbSql, nomeTbSql, null, null, workSheet,  exlPath);
+            var Mappings = await DbUtlil.MyMapping("EXL", nomeDbSql, nomeTbSql, null, null, workSheet,  exlPath);
             if (Mappings == null) return false;
 
             // Copia i dati dal file Excel alla tabella SQL
             // Crea una tabella temporanea per i dati da importare in pmo.origine
 
-            DataTable _tabella = new DataTable();
+            _tabella = new DataTable();
 
             string QryExl = $@"SELECT * FROM [{workSheet}$]";
             progress?.Report($"Load: {label}");
-            bool letturaOk = await ExlAsync.ExcQry(_connExl, QryExl, _tabella);
-            if (!letturaOk || _tabella.Rows.Count == 0) return false;
+            ok = await ExlAsync.ExcQry(_connExl, QryExl, _tabella);
+            if (!ok || _tabella.Rows.Count == 0) return false;
 
             progress?.Report($"Write: {label}");
-            bool bulkOk = await SqlAsync.SqlBulkCopy(_connUptd, nomeTbSql, _tabella, Mappings, 60);
-            return bulkOk;            
+            ok = await SqlAsync.SqlBulkCopy(_connSql, nomeTbSql, _tabella, Mappings, 60);
+            return ok;            
         }
     }
 }
