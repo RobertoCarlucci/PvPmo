@@ -34,6 +34,7 @@ namespace PvPmo
 
             //Services
 
+            builder.Services.AddSingleton<SagaService>();
             builder.Services.AddPvPmoServices();
 
             EnsureLogFolderExists();

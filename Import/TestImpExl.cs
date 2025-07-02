@@ -64,14 +64,14 @@ namespace PvPmo.Import
             return tuttoOk;
         }
 
-        public static async Task<bool> EseguiTST(string dbtabConfronto, string tabConfronto, string dbTabTest, string tabTestare,
-            string label, string colConfronto, string colDaTestare, IProgress<string>? progress = null)
+        public static async Task<bool> EseguiTST(string dbProd, string tabProd, string dbUptd, string tabUptd,
+            string label, string colProd, string colUptd, IProgress<string>? progress = null)
         {
             // Test Valore Data e Record Data presenti in Uptd
             // Confrontandolo con la tabella 01_tabella_data del Db di produzione.
 
-            string _connProd = await Conn.MysqlConn(dbtabConfronto);
-            string _connUptd = await Conn.MysqlConn(dbTabTest);
+            string _connProd = await Conn.MysqlConn(dbProd);
+            string _connUptd = await Conn.MysqlConn(dbUptd);
 
             if (string.IsNullOrEmpty(_connProd) || string.IsNullOrEmpty(_connUptd))
             {
@@ -81,8 +81,8 @@ namespace PvPmo.Import
             
             bool tuttoOk = true;
 
-            string qProd = $"SELECT `{colConfronto}` FROM `{tabConfronto}` ORDER BY `{colConfronto}` ASC;";
-            string qUptd = $"SELECT DISTINCT `{colDaTestare}` FROM `{tabTestare}` ORDER BY `{colDaTestare}` ASC;";
+            string qProd = $"SELECT `{colProd}` FROM `{tabProd}` ORDER BY `{colProd}` ASC;";
+            string qUptd = $"SELECT DISTINCT `{colUptd}` FROM `{tabUptd}` ORDER BY `{colUptd}` ASC;";
 
             progress?.Report($"Struct: {label}");
 
@@ -95,7 +95,7 @@ namespace PvPmo.Import
             // Se non lo faccio mi da errore di confronto.
 
             dataProd = dataProd.AsEnumerable()
-                .Where(r => !string.IsNullOrWhiteSpace(r[colConfronto]?.ToString()))
+                .Where(r => !string.IsNullOrWhiteSpace(r[colProd]?.ToString()))
                 .CopyToDataTable();
 
             progress?.Report($"Test: {label}");
@@ -112,8 +112,8 @@ namespace PvPmo.Import
             // Viene testato il valore delle date se corrispondenti.
             // Confronto i valori delle date tra produzione e uptd.
 
-            var valoriProd = dataProd.AsEnumerable().Select(r => r[colConfronto]?.ToString()).ToHashSet();
-            var valoriUptd = dataUptd.AsEnumerable().Select(r => r[colDaTestare]?.ToString()).ToHashSet();
+            var valoriProd = dataProd.AsEnumerable().Select(r => r[colProd]?.ToString()).ToHashSet();
+            var valoriUptd = dataUptd.AsEnumerable().Select(r => r[colUptd]?.ToString()).ToHashSet();
 
             if (!valoriProd.SetEquals(valoriUptd))
             {
@@ -128,18 +128,18 @@ namespace PvPmo.Import
                 }
                 else
                 {
-                    var vm = ServiceHelper.GetService<ModDataViewModel>();
+                    //var vm = ServiceHelper.GetService<ModDataViewModel>();
                     await Shell.Current.GoToAsync(nameof(ModData));
                     return false; // fermiamo il test corrente, verrà rieseguito dopo la modifica
                 }
             }
             return tuttoOk;
         }
-        public static async Task<bool> TestNumCol(string dbtabConfronto, string tabConfronto, string dbTabTest, string tabTestare,
+        public static async Task<bool> TestNumCol(string dbProd, string tabProd, string dbUptd, string tabUptd,
             string label, IProgress<string>? progress = null)
         {
-            string _connProd = await Conn.MysqlConn(dbtabConfronto);
-            string _connUptd = await Conn.MysqlConn(dbTabTest);
+            string _connProd = await Conn.MysqlConn(dbProd);
+            string _connUptd = await Conn.MysqlConn(dbUptd);
             
             if (string.IsNullOrEmpty(_connProd) || string.IsNullOrEmpty(_connUptd))
             {
@@ -149,8 +149,8 @@ namespace PvPmo.Import
 
             bool tuttoOk = true;
 
-            string showProd = $"SHOW COLUMNS FROM `{tabConfronto}`;";
-            string showUptd = $"SHOW COLUMNS FROM `{tabTestare}`;";
+            string showProd = $"SHOW COLUMNS FROM `{tabProd}`;";
+            string showUptd = $"SHOW COLUMNS FROM `{tabUptd}`;";
 
             progress?.Report($"Test: {label}");
 
@@ -162,19 +162,10 @@ namespace PvPmo.Import
             if (dataUptd.Rows.Count != dataProd.Rows.Count)
             {
                 await Shell.Current.DisplayAlert("Test colonne",
-                    $"Numero colonne diverso tra produzione e uptd tabella: ({tabConfronto}).", "OK");
+                    $"Numero colonne diverso tra produzione e uptd tabella: ({tabProd}).", "OK");
                 return false;
             }
             return tuttoOk;
         }
-        public static async Task<bool> TestCoerenzaDate(DataTable tabDate)
-        {
-            bool tuttoOk = true;
-
-
-
-            return tuttoOk;
-        }
-
     }
 }

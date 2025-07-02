@@ -1,13 +1,12 @@
-﻿using PvPmo.Saga;
-
-namespace PvPmo.Import
+﻿namespace PvPmo.Import
 {
-    public partial class InpExlToSql()
+    public partial class InpExlToSql
     {
         // Importazione file Excel per aggiornamento mensile
-
         public static async Task<bool> InpExl(string type, IProgress<string>? progress = null)
         {
+            SagaService _saga = new SagaService();
+
             string? exlPath = await SelCart.PickFolder();
             if (string.IsNullOrWhiteSpace(exlPath)) return false;
 
@@ -45,13 +44,15 @@ namespace PvPmo.Import
 
                 string filePath = Path.Combine(exlPath, n.Tabella!);                
 
-                inprtOk = await impFileExltoTabSql(n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath, label, progress);
+                inprtOk = await impFileExltoTabSql(_saga, n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath, label, progress);
                 if (inprtOk) 
                 { 
                     current++; 
                 }
                 else
                 {
+                    await _saga.RollbackAsync("pvpmo_origine");
+
                     await Shell.Current.DisplayAlert("Errore su tabella!", $"Errore su: {n.TabellaSql} " +
                         $"non è possibile proseguire.", "OK");
                     return inprtOk;
@@ -60,8 +61,7 @@ namespace PvPmo.Import
             inprtOk = await NormTab.NormTabImp("EXL", "pvpmo_origine");
             if (!inprtOk)
             {
-                var orchestrator = new SagaOrchestrator();
-                await orchestrator.RollbackAsync("pvpmo_origine");
+                await _saga.RollbackAsync("pvpmo_origine");               
 
                 await Shell.Current.DisplayAlert("Errore Normalizzazione Tabelle !", "Normalizzazione fallita .", "OK");
                 return inprtOk;
@@ -69,20 +69,15 @@ namespace PvPmo.Import
             inprtOk = await TestDateImpExl.TestUptd(progress);
             if (!inprtOk)
             {
-                var orchestrator = new SagaOrchestrator();
-                await orchestrator.RollbackAsync("pvpmo_origine");
-
-                await Shell.Current.DisplayAlert("Errore Test Tabelle !", "Controlli sulle tabelle importate falliti. ", "OK");
+                await _saga.RollbackAsync("pvpmo_origine");
                 return inprtOk;
             }
             inprtOk = await UptdProd.EsgUptdTabProd("pmo", "pvpmo_origine", progress);
             if (!inprtOk)
             {
-                var orchestrator = new SagaOrchestrator();
-                await orchestrator.RollbackAsync("pvpmo_origine");
+                await _saga.RollbackAsync("pvpmo_origine");
 
-                await Shell.Current.DisplayAlert("Errore Aggiornamento Tabelle !", "Aggiornamento delle tabelle della produzione fallito. " +
-                    "\nNessuna modifica è stata effettuata sulla produzione. " +
+                await Shell.Current.DisplayAlert("Errore Aggiornamento Tabelle !", "Aggiornamento delle tabelle della produzione fallito. " +                    
                     "\n Rieseguire la procedura dopo un controllo delle tabelle da importare.", "OK");
                 return inprtOk;
             }
@@ -104,7 +99,7 @@ namespace PvPmo.Import
             return inprtOk;
         }              
 
-        public static async Task<bool> impFileExltoTabSql(
+        public static async Task<bool> impFileExltoTabSql( SagaService _saga,
             string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, string label, IProgress<string>? progress = null)
         {
             // Crea tabella SQL da file Excel (solo struttura)
@@ -115,12 +110,10 @@ namespace PvPmo.Import
             {
                 await Shell.Current.DisplayAlert("Errore Connessione", "Impossibile creare le connessioni.", "OK");
                 return false;
-            }
+            }           
 
-            var orchestrator = new SagaOrchestrator();
-
-            orchestrator.AddStep(new ProteggiTabelleSagaStep(_connSql, nomeTbSql));
-            bool ok = await orchestrator.ExecuteAsync(_connSql);
+            _saga.AggiungiStep(new ProteggiTabelleSagaStep(_connSql, nomeTbSql));
+            bool ok = await _saga.EseguiAsync(_connSql);
             if (!ok) return false;
 
             var _tabella = new DataTable();

@@ -1,4 +1,4 @@
-﻿namespace PvPmo.Saga
+﻿namespace PvPmo.Models
 {
     public interface ISagaStep
     {
