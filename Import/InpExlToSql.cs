@@ -5,7 +5,7 @@
         // Importazione file Excel per aggiornamento mensile
         public static async Task<bool> InpExl(string type, IProgress<string>? progress = null)
         {
-            SagaService _saga = new SagaService();
+            SagaService _saga = new();
 
             string? exlPath = await SelCart.PickFolder();
             if (string.IsNullOrWhiteSpace(exlPath)) return false;
@@ -44,7 +44,7 @@
 
                 string filePath = Path.Combine(exlPath, n.Tabella!);                
 
-                inprtOk = await impFileExltoTabSql(_saga, n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath, label, progress);
+                inprtOk = await ImpFileExltoTabSql(_saga, n.WorkSheet!, n.DbDest!, n.TabellaSql!, filePath, label, progress);
                 if (inprtOk) 
                 { 
                     current++; 
@@ -67,6 +67,12 @@
                 return inprtOk;
             }
             inprtOk = await TestDateImpExl.TestUptd(progress);
+            if (!inprtOk)
+            {
+                await _saga.RollbackAsync("pvpmo_origine");
+                return inprtOk;
+            }
+            inprtOk = await TestDateTab.VerificaDateProduzioneUpdateAsync(progress);
             if (!inprtOk)
             {
                 await _saga.RollbackAsync("pvpmo_origine");
@@ -99,7 +105,7 @@
             return inprtOk;
         }              
 
-        public static async Task<bool> impFileExltoTabSql( SagaService _saga,
+        public static async Task<bool> ImpFileExltoTabSql( SagaService _saga,
             string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, string label, IProgress<string>? progress = null)
         {
             // Crea tabella SQL da file Excel (solo struttura)
@@ -110,10 +116,10 @@
             {
                 await Shell.Current.DisplayAlert("Errore Connessione", "Impossibile creare le connessioni.", "OK");
                 return false;
-            }           
+            }            
 
-            _saga.AggiungiStep(new ProteggiTabelleSagaStep(_connSql, nomeTbSql));
-            bool ok = await _saga.EseguiAsync(_connSql);
+            _saga.AggiungiStep(new ProteggiTabelleSagaStep(nomeTbSql));
+            bool ok = await _saga.EseguiUltimoStepAsync(_connSql);
             if (!ok) return false;
 
             var _tabella = new DataTable();
@@ -125,7 +131,7 @@
 
             string ddl = $@"CREATE OR REPLACE TABLE " + NormTab.NormInp(nomeTbSql, _tabella);
             progress?.Report($"Struct: {label}");
-            ok = await SqlAsync.SqlNoQry(_connSql, ddl, 60);
+            ok = await SqlAsync.SqlNoQryString(_connSql, ddl, 60);
             if (!ok) return false;
             
             progress?.Report($"Mapping: {label}");

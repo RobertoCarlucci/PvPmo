@@ -55,7 +55,7 @@
                 if (!schemaOk) return false;
 
                 string ddl = "CREATE OR REPLACE TABLE " + NormTab.NormInp(tabSql, schema);
-                bool ddlOk = await SqlAsync.SqlNoQry(_connUptd, ddl, 30);
+                bool ddlOk = await SqlAsync.SqlNoQryString(_connUptd, ddl, 30);
                 if (!ddlOk) return false;
 
                 List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();

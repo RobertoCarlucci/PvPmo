@@ -50,8 +50,7 @@ public partial class SqlAsync
             }
         }
     }
-    public static async Task<bool> SqlNoQry(
-        string strConn, string qry, int timeoutSec = 0, List<MySqlParameter>? parameters = null)
+    public static async Task<bool> SqlNoQryString(string strConn, string qry, int timeoutSec = 0)
     {
         await using var conn = new MySqlConnection(strConn);
         try
@@ -59,8 +58,8 @@ public partial class SqlAsync
             await conn.OpenAsync();
             await using var cmd = new MySqlCommand(qry, conn);
             cmd.CommandTimeout = timeoutSec;
-            if (parameters != null)
-                cmd.Parameters.AddRange(parameters.ToArray());
+            //if (parameters != null)
+            //    cmd.Parameters.AddRange(parameters.ToArray());
             await cmd.ExecuteNonQueryAsync();
             return true;
         }

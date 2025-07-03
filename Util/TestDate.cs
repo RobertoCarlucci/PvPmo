@@ -33,26 +33,20 @@
             }
             catch (MySqlException ex)
             {
-                await DbErrorHandler.ShowErrorAsync(ex, "Test Connessione");
-                return false;
-                
+                await DbErrorHandler.ShowErrorAsync(ex, "Caricamento Classe TestDate Tabella 01_tabella_data");
+                return false;                
             }
-
-            if (!VerificaStrutturaDate(col1, col2, col3, out var errore))
+            if (!VerificaStrutturaDate(col1, col2, col3))
                 return false;
 
             return true;
         }
-
-
         public static bool VerificaStrutturaDate(
-                List<DateTime> col1, List<DateTime> col2, List<DateTime> col3, out string errore)
-        {
-            errore = string.Empty;
-
+                List<DateTime> col1, List<DateTime> col2, List<DateTime> col3)
+        {            
             if (col1.Count != 1)
             {
-                errore = "❌ Colonna 1 deve contenere una sola data.";
+                Shell.Current.DisplayAlert("Test Date Inserite !", "Colonna PV_TotalData deve contenere una sola data.", "OK");
                 return false;
             }
 
@@ -60,7 +54,7 @@
 
             if (col2.Count != 2)
             {
-                errore = "❌ Colonna 2 deve contenere esattamente due date.";
+                Shell.Current.DisplayAlert("Test Date Inserite !", "Colonna GlobalTimesheetExtractData deve contenere esattamente due date.", "OK");                
                 return false;
             }
 
@@ -70,13 +64,15 @@
             var col2Ordinate = col2.OrderBy(d => d).ToList();
             if (col2Ordinate[0] != attesa1 || col2Ordinate[1] != attesa2)
             {
-                errore = $"❌ Colonna 2 deve contenere: {attesa1:dd/MM/yyyy}, {attesa2:dd/MM/yyyy}";
+                Shell.Current.DisplayAlert("Test Date Inserite !", "Colonna PV_TotalData deve contenere:" +
+                    $"\n{attesa1:dd/MM/yyyy}, e non  {attesa2:dd/MM/yyyy}." +
+                    $"\nDevi controllare i valori inseriti tra: PV_TotalData e GlobalTimesheetExtractData", "OK");                
                 return false;
             }
 
             if (col3.Count == 0)
             {
-                errore = "❌ Colonna 3 deve contenere almeno una data.";
+                Shell.Current.DisplayAlert("Test Date Inserite !", "Colonna PVMeseSuAnno deve contenere almeno una data.", "OK");                
                 return false;
             }
 
@@ -85,12 +81,11 @@
             {
                 if (d != attesa)
                 {
-                    errore = $"❌ Colonna 3: atteso {attesa:dd/MM/yyyy}, trovato {d:dd/MM/yyyy}";
+                    Shell.Current.DisplayAlert("Test Date Inserite !", $"Colonna PVMeseSuAnno atteso {attesa:dd/MM/yyyy}, trovato {d:dd/MM/yyyy}.", "OK");                    
                     return false;
                 }
                 attesa = attesa.AddMonths(1);
             }
-
             return true;
         }
     }

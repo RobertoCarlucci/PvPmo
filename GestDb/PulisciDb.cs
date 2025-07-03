@@ -30,15 +30,15 @@
 
                 progress?.Report($"Clean PKey: {label}");                
                 string dropid = $@"ALTER TABLE `{u.TabConfronto}` DROP COLUMN IF EXISTS id;";
-                tuttoOK = await SqlAsync.SqlNoQry(_connProd, dropid, 120);
+                tuttoOK = await SqlAsync.SqlNoQryString(_connProd, dropid, 120);
 
                 progress?.Report($"Clean PKey: {label}");
                 string addIncrement = $@"ALTER TABLE `{u.TabConfronto}` AUTO_INCREMENT = 1;";
-                tuttoOK = await SqlAsync.SqlNoQry(_connProd, addIncrement, 180);
+                tuttoOK = await SqlAsync.SqlNoQryString(_connProd, addIncrement, 180);
 
                 progress?.Report($"Create PKey: {label}");
                 string addId = $@"ALTER TABLE `{u.TabConfronto}` ADD id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;";
-                tuttoOK = await SqlAsync.SqlNoQry(_connProd, addId, 0);
+                tuttoOK = await SqlAsync.SqlNoQryString(_connProd, addId, 0);
 
             }
             return tuttoOK;

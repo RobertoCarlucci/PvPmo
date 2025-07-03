@@ -204,28 +204,28 @@ public class SqlQry
     private static async Task<bool> UpdtColConcat(string conn, string tab, string col, string concat)
     {
         string sql = $"UPDATE `{tab}` SET `{col}` = CONCAT({concat});";
-        return await SqlAsync.SqlNoQry(conn, sql, 180);
+        return await SqlAsync.SqlNoQryString(conn, sql, 180);
     }
     public static async Task<bool> AddColSql(string conn, string tab, string col, string type)
     {
         string sql = $"ALTER TABLE `{tab}` ADD COLUMN `{col}` {type};";
-        return await SqlAsync.SqlNoQry(conn, sql, 30);
+        return await SqlAsync.SqlNoQryString(conn, sql, 30);
     }
     public static async Task<bool> DelColSql(string conn, string tab, string col)
     {
         string sql = $"ALTER TABLE `{tab}` DROP COLUMN IF EXISTS `{col}`;";
-        return await SqlAsync.SqlNoQry(conn, sql, 30);
+        return await SqlAsync.SqlNoQryString(conn, sql, 30);
     }
     public static async Task<bool> DelRecSql(string db, string tab)
     {
         string conn = await Conn.MysqlConn(db);
         string sql = $"DELETE FROM `{tab}`;";
-        return await SqlAsync.SqlNoQry(conn, sql, 30);
+        return await SqlAsync.SqlNoQryString(conn, sql, 30);
     }
     public static async Task<bool> RinColSql(string conn, string tab, string oldCol, string newCol, string type)
     {
         string sql = $"ALTER TABLE `{tab}` CHANGE `{oldCol}` `{newCol}` {type};";
-        return await SqlAsync.SqlNoQry(conn, sql, 30);
+        return await SqlAsync.SqlNoQryString(conn, sql, 30);
     }
     public static async Task<DataTable> NomiColSql(string conn, string tab, DataTable schema)
     {

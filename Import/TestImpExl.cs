@@ -119,7 +119,8 @@ namespace PvPmo.Import
             {
                 bool correzione = await Shell.Current.DisplayAlert(
                     "Date non corrispondenti",
-                    "I valori delle date tra tabella di produzione e aggiornamento non corrispondono. \nVuoi correggerli manualmente?",
+                    "I valori delle date presenti nella Tabella 01_tabella_data non sono coerenti con le date " +
+                    "\ncontenute nei file per l'aggiornamento mensile. \nVuoi correggerli manualmente?",
                     "Sì", "No");
 
                 if (!correzione)

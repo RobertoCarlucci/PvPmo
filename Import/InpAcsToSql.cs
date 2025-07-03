@@ -100,7 +100,7 @@ public partial class InpAcsToSql()
         Qry = NormTab.NormInp(nomeTbSql, _tabella);
         Qry = "CREATE OR REPLACE TABLE " + Qry;        
         progress?.Report($"Create: {label}");
-        bool Bol = await SqlAsync.SqlNoQry(_connProd, Qry, 30);
+        bool Bol = await SqlAsync.SqlNoQryString(_connProd, Qry, 30);
         return Bol;
     }
 

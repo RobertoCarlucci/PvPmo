@@ -76,7 +76,7 @@ public partial class ModDataViewModel : BaseViewModel
             });
 
             string sql = $"UPDATE `01_tabella_data` SET {string.Join(", ", updates)} WHERE id = {row.Id};";
-            await SqlAsync.SqlNoQry(strConn, sql);
+            await SqlAsync.SqlNoQryString(strConn, sql);
         }
         await TestDate.VerificaDateDaTabellaAsync(strConn, "01_tabella_data");
 
