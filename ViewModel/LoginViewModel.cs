@@ -1,7 +1,6 @@
 ﻿using PvPmo.View;
 
 namespace PvPmo.ViewModel;
-
 public partial class LoginViewModel : BaseViewModel
 {
     private readonly ServizioAutenticazione _auth;

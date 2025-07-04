@@ -31,7 +31,7 @@
         {
             try
             {
-                string fullPath = $"{exlPath}\\{nomeFile}";                
+                string fullPath = $"{exlPath}\\{nomeFile}";
                 string _connExl = string.Empty;
                 string _connUptd = string.Empty;
 

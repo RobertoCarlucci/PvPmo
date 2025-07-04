@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PvPmo.Import;
+﻿namespace PvPmo.Import;
 
 public partial class InpAcsToSql()
 {
@@ -11,10 +7,13 @@ public partial class InpAcsToSql()
     {
         string? acsPath = await SelCart.PickFolder();
         if (string.IsNullOrWhiteSpace(acsPath)) return;
-        
-        var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(await Conn.MysqlConn("pvpmo_origine"));
 
-        var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
+        string dbUptd = "pvpmo_origine";
+        string dbProd = "pmo";
+
+        var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(await Conn.MysqlConn(dbUptd));
+
+        var repo = new CaricaTabRepository<CaricaTabOrigini>(dbUptd, "origine");
         var dati = await repo.GetAllAsync();
 
         // Aggiunto per evitare che un errore blocchi tutte le tabelle:
@@ -59,7 +58,7 @@ public partial class InpAcsToSql()
             }
             
         }        
-        bool norm = await NormTab.NormTabImp("ACS", "pmo");
+        bool norm = await NormTab.NormTabImp("ACS", dbProd);
         if (!norm) 
         {
             await Shell.Current.DisplayAlert("Errore", "Normalizzazione fallita", "OK");
@@ -111,14 +110,14 @@ public partial class InpAcsToSql()
         string nomeDbAcs, string nomeTbAcs, string nomeDbSql, string nomeTbSql, string acsPath, IProgress<string>? progress, string label)
     {
         List<MySqlBulkCopyColumnMapping> Mappings = new List<MySqlBulkCopyColumnMapping>();
-        string _connProd = string.Empty;
-        string _connAcs = string.Empty;
-
+        
         progress?.Report($"Stuct: {label}");
         Mappings = await DbUtlil.MyMapping("ACS", nomeDbSql, nomeTbSql, nomeDbAcs, nomeTbAcs, null, acsPath);
 
         if (Mappings == null)
             return false;
+        string _connProd =  string.Empty;
+        string _connAcs = string.Empty;
 
         _connProd = (!string.IsNullOrEmpty(nomeDbSql)) ? _connProd = await Conn.MysqlConn(nomeDbSql) : _connProd;
         if (string.IsNullOrEmpty(_connProd))

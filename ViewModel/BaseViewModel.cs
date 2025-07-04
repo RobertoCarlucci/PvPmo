@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-
-namespace PvPmo.ViewModel
+﻿namespace PvPmo.ViewModel
 {
     public partial class BaseViewModel : ObservableObject
     {

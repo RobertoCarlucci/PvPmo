@@ -1,58 +1,49 @@
-﻿namespace PvPmo.GestDb
-{    
+﻿using Windows.System;
+
+namespace PvPmo.GestDb
+{
     public static class Conn
     {
         public static async Task<string> MysqlConn(string nomeDb)
         {
-            string StrConn = string.Empty;            
+            if (string.IsNullOrWhiteSpace(nomeDb)) return string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(nomeDb))
-            {
-                string NomeHost = "server = 127.0.0.1; port = 3306;";
-                string UserName = "user = root; Pwd = root; database = ";
-                StrConn = NomeHost + UserName + nomeDb + ";";
-            }
-            bool connessioneOk = await SqlAsync.TestConnSql(StrConn);
-            StrConn = connessioneOk ? StrConn : string.Empty;
-            return StrConn;
+            string baseConn = AppConfig.GetConnectionString("MySqlDefault");
+            string fullConn = $"{baseConn}{nomeDb};";
+            //string fullConn = $"{baseConn}database={nomeDb};";
+
+            bool connessioneOk = await SqlAsync.TestConnSql(fullConn);
+            return connessioneOk ? fullConn : string.Empty;
         }
-        public static string MysqlConnSer (string nomeDb)
+
+        public static string MysqlConnSer(string nomeDb)
         {
-            string StrConn = string.Empty;
-            
-            if (!string.IsNullOrWhiteSpace(nomeDb))
-            {
-                string NomeHost = "server = 127.0.0.1; port = 3306;";
-                string UserName = "user = root; Pwd = root; database = ";
-                StrConn = NomeHost + UserName + nomeDb + ";";
-            }           
-            return StrConn;
+            if (string.IsNullOrWhiteSpace(nomeDb)) return string.Empty;
+
+            string baseConn = AppConfig.GetConnectionString("MySqlDefault");
+            return $"{baseConn}database={nomeDb};";
         }
+
         public static async Task<string> AcsDbConn(string nomeDb, string nomePath)
         {
-            string StrConn = string.Empty;            
+            if (string.IsNullOrWhiteSpace(nomeDb) || string.IsNullOrWhiteSpace(nomePath)) return string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(nomeDb) || !string.IsNullOrWhiteSpace(nomePath))
-            {
-                StrConn = "Provider = Microsoft.ACE.OLEDB.16.0; Data Source = "
-                + nomePath + "\\" + nomeDb + ".accdb;";
-            }
-            bool connessioneOk = await AcsAsync.TestConnAcs(StrConn);
-            StrConn = connessioneOk ? StrConn : string.Empty;
-            return StrConn;           
+            string provider = AppConfig.GetConnectionString("OleDbProvider");
+            string fullConn = $"{provider}Data Source={nomePath}\\{nomeDb}.accdb;";
+
+            bool connessioneOk = await AcsAsync.TestConnAcs(fullConn);
+            return connessioneOk ? fullConn : string.Empty;
         }
+
         public static async Task<string> ExlFileConn(string fileImp)
         {
-            string StrConn = string.Empty;           
+            if (string.IsNullOrWhiteSpace(fileImp)) return string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(fileImp))
-            {
-               StrConn = "Provider = Microsoft.ACE.OLEDB.16.0; Data Source = "
-               + fileImp + ".xlsx; Extended Properties = Excel 12.0 Xml;";
-            }
-            bool connessioneOk = await ExlAsync.TestConnExl(StrConn);
-            StrConn = connessioneOk ? StrConn : string.Empty;            
-            return StrConn;
+            string provider = AppConfig.GetConnectionString("OleDbProvider");
+            string fullConn = $"{provider}Data Source={fileImp}.xlsx;Extended Properties=Excel 12.0 Xml;";
+
+            bool connessioneOk = await ExlAsync.TestConnExl(fullConn);
+            return connessioneOk ? fullConn : string.Empty;
         }
-    }
+    }    
 }

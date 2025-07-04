@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2013.Excel;
-using PvPmo.GestDb;
-
-namespace PvPmo.Import
+﻿namespace PvPmo.Import
 {
     public partial class UptdProd
     {

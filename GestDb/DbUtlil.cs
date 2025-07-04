@@ -139,38 +139,28 @@
         }
 
         public static async Task<Dictionary<string, List<MySqlBulkCopyColumnMapping>>> MyMappingList(
-            string nMapping, string dbDest, string tabDest, string dbOrgn , string tbOrgn)
+            string nMapping, string connProd, string tabDest, string connUptd, string tbOrgn)
         {
             DataTable dTabOrgn = new();
-            DataTable dTabDest = new();
-            int dif = 0;
+            DataTable dTabDest = new();           
 
-            string _connProd = string.Empty;
-            string _connUptd = string.Empty;
+            string _connProd = await Conn.MysqlConn(connProd);
+            string _connUptd = await Conn.MysqlConn(connUptd);
 
-            _connProd = (!string.IsNullOrEmpty(dbDest)) ? _connProd = await Conn.MysqlConn(dbDest) : _connProd;
-            if (string.IsNullOrEmpty(_connProd))
+            if (string.IsNullOrEmpty(_connProd) || string.IsNullOrEmpty(_connUptd))
             {
                 await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
                 mapsDict.Clear();
                 return mapsDict;
             }
-
-            _connUptd = (!string.IsNullOrEmpty(dbOrgn)) ? _connUptd = await Conn.MysqlConn(dbOrgn) : _connUptd;
-            if (string.IsNullOrEmpty(_connUptd))
-            {
-                await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
-                mapsDict.Clear();
-                return mapsDict;
-            }
-
+            
             string qryProd = $"SHOW COLUMNS FROM `{tabDest}`;";
             await SqlAsync.SqlQryDataTable(_connProd, qryProd, dTabDest);
 
             string qryUptd = $@"SHOW COLUMNS FROM `{tbOrgn}`;";
             await SqlAsync.SqlQryDataTable(_connUptd, qryUptd, dTabOrgn);
 
-            dif = dTabDest.Rows.Count - dTabOrgn.Rows.Count;
+            int dif = dTabDest.Rows.Count - dTabOrgn.Rows.Count;
 
             if (dif == 0)
             {
@@ -186,8 +176,8 @@
             }
 
             var confermaOk = await Shell.Current.DisplayAlert("Errore colonne",
-                $"Le colonne nella tabella di origine: {dbOrgn} - ({dTabOrgn.Columns.Count}) e nella tabella di destinazione" +
-                $": {dbDest} - ({dTabDest.Rows.Count}) non coincidono. Vuoi continuare con le altre tabelle?", "Si", "No");
+                $"Le colonne nella tabella di origine: {connUptd} - ({dTabOrgn.Columns.Count}) e nella tabella di destinazione" +
+                $": {connProd} - ({dTabDest.Rows.Count}) non coincidono. Vuoi continuare con le altre tabelle?", "Si", "No");
 
             return mapsDict;
         }

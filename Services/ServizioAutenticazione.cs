@@ -37,28 +37,6 @@ namespace PvPmo.Services
             var utenteCorrente = $"{Environment.UserDomainName}\\{Environment.UserName}";
             return utente.NomeUtente.Equals(utenteCorrente, StringComparison.OrdinalIgnoreCase) ? utente : null;
         }
-
-        //public Utente? Autentica(string nome, string? password)
-        //{
-        //    var utente = _utenti.FirstOrDefault(u => u.NomeUtente.Equals(nome, StringComparison.OrdinalIgnoreCase));
-        //    if (utente is null) return null;
-
-        //    if (utente.Tipo == TipoUtente.Locale)
-        //    {
-        //        if (string.IsNullOrWhiteSpace(password)) return null;
-        //        var hash = CalcolaHash(password);
-        //        return hash == utente.PasswordHash ? utente : null;
-        //    }
-
-        //    // Verifica utente Windows (senza password)
-        //    if (utente.Tipo == TipoUtente.Windows)
-        //    {
-        //        var utenteCorrente = $"{Environment.UserDomainName}\\{Environment.UserName}";
-        //        return nomeInserito.Equals(utenteCorrente, StringComparison.OrdinalIgnoreCase) ? utente : null;
-        //    }
-
-        //}
-
         private string CalcolaHash(string input)
         {
             using var sha = SHA256.Create();

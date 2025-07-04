@@ -9,7 +9,9 @@
             //    // Carico il File dall'archivio con la sequenza da svolgere
             //    // e provvedo all'esecuzione.
 
-            var repo = new CaricaTabRepository<CaricaTabFinalizza>("pvpmo_origine", "finalizza");
+            string dbUptd = "pvpmo_origine";            
+
+            var repo = new CaricaTabRepository<CaricaTabFinalizza>(dbUptd, "finalizza");
             var dati = await repo.GetAllAsync();
 
             bool tuttoOK = true;

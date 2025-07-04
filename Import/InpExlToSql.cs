@@ -11,10 +11,11 @@
             if (string.IsNullOrWhiteSpace(exlPath)) return false;
 
             bool inprtOk = true;
-
+            string dbUptd = "pvpmo_origine";
+            string dbProd = "pmo";
             string _connArch = string.Empty;            
 
-            _connArch = (!string.IsNullOrEmpty("pvpmo_origine")) ? _connArch = await Conn.MysqlConn("pvpmo_origine") : _connArch;
+            _connArch = (!string.IsNullOrEmpty(dbUptd)) ? _connArch = await Conn.MysqlConn(dbUptd) : _connArch;
             if (string.IsNullOrEmpty(_connArch))
             {
                 await Shell.Current.DisplayAlert("Errore Connessione", "Non è possibile creare la connessione al database.", "OK");
@@ -23,7 +24,7 @@
 
             var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(_connArch);
             
-            var repo = new CaricaTabRepository<CaricaTabOrigini>("pvpmo_origine", "origine");
+            var repo = new CaricaTabRepository<CaricaTabOrigini>(dbUptd, "origine");
             var dati = await repo.GetAllAsync();
 
             var validi = dati.Where(n =>
@@ -51,59 +52,60 @@
                 }
                 else
                 {
-                    await _saga.RollbackAsync("pvpmo_origine");
-
-                    await Shell.Current.DisplayAlert("Errore su tabella!", $"Errore su: {n.TabellaSql} " +
-                        $"non è possibile proseguire.", "OK");
+                    await MostraErrore($"Errore su: {n.TabellaSql} non è possibile proseguire.");
+                    await _saga.RollbackAsync(dbUptd);                    
                     return inprtOk;
                 }
             }
-            inprtOk = await NormTab.NormTabImp("EXL", "pvpmo_origine");
+            inprtOk = await NormTab.NormTabImp("EXL", dbUptd);
             if (!inprtOk)
             {
-                await _saga.RollbackAsync("pvpmo_origine");               
-
-                await Shell.Current.DisplayAlert("Errore Normalizzazione Tabelle !", "Normalizzazione fallita .", "OK");
+                await MostraErrore("Errore Normalizzazione Tabelle !\nNormalizzazione fallita .");
+                await _saga.RollbackAsync(dbUptd);                
                 return inprtOk;
             }
             inprtOk = await TestDateImpExl.TestUptd(progress);
             if (!inprtOk)
             {
-                await _saga.RollbackAsync("pvpmo_origine");
+                await MostraErrore("Errore test Tabelle update !\nControllare file Excell .");
+                await _saga.RollbackAsync(dbUptd);
                 return inprtOk;
             }
             inprtOk = await TestDateTab.VerificaDateProduzioneUpdateAsync(progress);
             if (!inprtOk)
             {
-                await _saga.RollbackAsync("pvpmo_origine");
+                await MostraErrore("Test Date tabelle produzione e update fallito.");
+                await _saga.RollbackAsync(dbUptd);
                 return inprtOk;
             }
-            inprtOk = await UptdProd.EsgUptdTabProd("pmo", "pvpmo_origine", progress);
+            inprtOk = await UptdProd.EsgUptdTabProd("pmo", dbUptd, progress);
             if (!inprtOk)
             {
-                await _saga.RollbackAsync("pvpmo_origine");
+                await _saga.RollbackAsync(dbUptd);
 
-                await Shell.Current.DisplayAlert("Errore Aggiornamento Tabelle !", "Aggiornamento delle tabelle della produzione fallito. " +                    
-                    "\n Rieseguire la procedura dopo un controllo delle tabelle da importare.", "OK");
+                await MostraErrore("Aggiornamento delle tabelle della produzione fallito. " +
+                    "\n Rieseguire la procedura dopo un controllo delle tabelle da importare.");
                 return inprtOk;
             }
-            inprtOk = await UpdtKeyOuts.UptdKeyOutsTransaction("pmo", progress);
+            inprtOk = await UpdtKeyOuts.UptdKeyOutsTransaction(dbProd, progress);
             if (!inprtOk)
             {
-                await Shell.Current.DisplayAlert("Errore Update !", "Update sulle tabelle Key & Outs falliti. " +
-                    "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
+                await MostraErrore( "Update sulle tabelle Key & Outs falliti. \nNessuna modifica è stata effettuata sulla produzione.");
                 return inprtOk;
             }
             inprtOk = await PulisciDb.ClearPriKey(progress);
             if (!inprtOk)
             {
-                await Shell.Current.DisplayAlert("Errore Update !", "Update sulle tabelle Key & Outs falliti. " +
-                    "\nNessuna modifica è stata effettuata sulla produzione.", "OK");
+                await MostraErrore("Update primary fallito. \nRicaricare il Db");
                 return inprtOk;
             }
             await Shell.Current.DisplayAlert("Aggiornamento DB !", "Aggiornamento mensile completato!", "OK");
             return inprtOk;
-        }              
+        }
+        public static async Task MostraErrore(string messaggio)
+        {
+            await Shell.Current.DisplayAlert("Errore Update Db !", messaggio, "OK");
+        }
 
         public static async Task<bool> ImpFileExltoTabSql( SagaService _saga,
             string workSheet, string nomeDbSql, string nomeTbSql, string exlPath, string label, IProgress<string>? progress = null)

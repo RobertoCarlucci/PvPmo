@@ -10,4 +10,3 @@ global using CommunityToolkit.Maui;
 global using System.Data.OleDb;
 global using System.Data;
 global using MySqlConnector;
-

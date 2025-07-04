@@ -25,7 +25,6 @@ namespace PvPmo.Util
                 }
                 table.Rows.Add(row);
             }
-
             return table;
         }
     }

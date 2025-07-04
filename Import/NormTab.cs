@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using System.Text;
+﻿using System.Text;
 
 namespace PvPmo.Import
 {
@@ -12,8 +11,9 @@ namespace PvPmo.Import
 
         public static async Task<bool> NormTabImp(string tipoImportazione, string dblavoro)
         {
+            string dbUptd = "pvpmo_origine";
             // Carico la tabella con le azioni da svolgere dal Service
-            var repo = new CaricaTabRepository<CaricaTabNorm>("pvpmo_origine", "normalizza");
+            var repo = new CaricaTabRepository<CaricaTabNorm>(dbUptd, "normalizza");
             var dati = await repo.GetAllAsync();
 
             bool esitoGlobale = true;

@@ -4,8 +4,11 @@
     {
         public static async Task<bool> VerificaDateProduzioneUpdateAsync(IProgress<string>? progress)
         {
-            string _connProd = await Conn.MysqlConn("pmo");
-            string _connUptd = await Conn.MysqlConn("pvpmo_origine");
+            string dbUptd = "pvpmo_origine";
+            string dbProd = "pmo";
+
+            string _connProd = await Conn.MysqlConn(dbProd);
+            string _connUptd = await Conn.MysqlConn(dbUptd);
 
             if (string.IsNullOrEmpty(_connProd) || string.IsNullOrEmpty(_connUptd))
             {

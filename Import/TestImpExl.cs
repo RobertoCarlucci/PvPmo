@@ -9,12 +9,13 @@ namespace PvPmo.Import
 
         public static async Task<bool> TestUptd(IProgress<string>? progress)
         {
-            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(await Conn.MysqlConn("pvpmo_origine"));
+            string dbUptd = "pvpmo_origine";
+            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(await Conn.MysqlConn(dbUptd));
 
             //    // Carico il File dall'archivio con la sequenza da svolgere
             //    // e provvedo all'esecuzione.
 
-            var repo = new CaricaTabRepository<CaricaTabFinalizza>("pvpmo_origine", "finalizza");
+            var repo = new CaricaTabRepository<CaricaTabFinalizza>(dbUptd, "finalizza");
             var dati = await repo.GetAllAsync();           
 
             bool tuttoOk = true;

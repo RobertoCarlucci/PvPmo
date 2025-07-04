@@ -103,9 +103,11 @@
         {
             var dropQuery = $@"DROP TABLE IF EXISTS {_tabella};";
             await SqlAsync.SqlNoQryString(conn, dropQuery);
+            await Task.Delay(1000);
 
             var renameQuery = $"RENAME TABLE {_tabella}_shw TO {_tabella};";
-            await SqlAsync.SqlNoQryString(conn, renameQuery);               
+            await SqlAsync.SqlNoQryString(conn, renameQuery);
+            await Task.Delay(1000);
         }
     }
 }

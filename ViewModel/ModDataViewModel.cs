@@ -1,5 +1,4 @@
 ﻿using PvPmo.View;
-using PvPmo.Util;
 using System.Collections.ObjectModel;
 
 namespace PvPmo.ViewModel;
@@ -16,7 +15,9 @@ public partial class ModDataViewModel : BaseViewModel
 
     public async Task LoadAsync()
     {
-        string strConn = await Conn.MysqlConn("pmo");
+        string dbProd = "pmo";
+        string strConn = await Conn.MysqlConn(dbProd);
+
         string query = "SELECT * FROM `01_tabella_data`;";
         var table = new DataTable();
 
@@ -53,7 +54,9 @@ public partial class ModDataViewModel : BaseViewModel
     [RelayCommand]
     public async Task BtnSalvaEsci()
     {
-        string strConn = await Conn.MysqlConn("pmo");
+        string dbProd = "pmo";
+
+        string strConn = await Conn.MysqlConn(dbProd);
 
         foreach (var row in DateRows)
         {
