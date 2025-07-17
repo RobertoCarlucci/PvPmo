@@ -10,8 +10,7 @@ namespace PvPmo.Import
         // stringa da inserire nel comando Sql CONCAT
 
         public static async Task<bool> NormTabImp(string tipoImportazione, string dblavoro)
-        {
-            string dbUptd = "pvpmo_origine";
+        {            
             // Carico la tabella con le azioni da svolgere dal Service
             var dati = await EmbeddedJsonLoader.LoadJsonAsync<NormalizzaConfig>("NormalizzaConfig.json");
 

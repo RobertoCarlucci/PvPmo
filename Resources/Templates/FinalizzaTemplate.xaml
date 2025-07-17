@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    xmlns:models="clr-namespace:PvPmo.Models">
+
+    <DataTemplate x:Key="FinalizzaTemplate" x:DataType="models:FinalizzaConfig">
+        <Border Margin="10" Padding="10">
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Azione:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding Azione}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Tabella sorgente:" Style="{StaticResource MediumLabel}" />
+                <Switch IsToggled="{Binding TabConfronto}" />
+
+                <Label Text="Colonna sorgente:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding ColConfronto}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Tabella produzione:" Style="{StaticResource MediumLabel}" />
+                <Switch IsToggled="{Binding TabTestare}" />
+
+                <Label Text="Colonna produzione:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding ColDaTestare}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Db sorgente:" Style="{StaticResource MediumLabel}" />
+                <Switch IsToggled="{Binding DbTabConfronto}" />
+
+                <Label Text="Db produzione:" Style="{StaticResource MediumLabel}" />
+                <Switch IsToggled="{Binding DbTabTest}" />
+            </VerticalStackLayout>
+        </Border>
+    </DataTemplate>
+
+</ResourceDictionary>

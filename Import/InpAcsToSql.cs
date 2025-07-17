@@ -7,8 +7,7 @@ public partial class InpAcsToSql()
     {
         string? acsPath = await SelCart.PickFolder();
         if (string.IsNullOrWhiteSpace(acsPath)) return;
-
-        string dbUptd = "pvpmo_origine";
+        
         string dbProd = "pmo";
 
         var descrizioni = await ProgressHelper.CaricaDescrizioniAsync();
@@ -90,7 +89,7 @@ public partial class InpAcsToSql()
             return false;
         }
 
-        DataTable _tabella = new DataTable();
+        DataTable _tabella = new();
         string Qry = $"SELECT * FROM [{nomeTbAcs}] WHERE 1=0;";
         progress?.Report($"Read: {label}");
         await AcsAsync.AcsQryTab(_connAcs, Qry, _tabella);

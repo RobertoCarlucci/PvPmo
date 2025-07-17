@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:PvPmo.Models">
+
+    <DataTemplate x:Key="NormalizzaTemplate" x:DataType="models:NormalizzaConfig">
+        <Border Margin="10" Padding="10">
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Azione:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding Azione}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Colonna da Modificare:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding ColDaMod}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Tipo Modifica:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding Modifica}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Colonna Tipo:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding TipoCol}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Tabella da Modificare:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding TabellaMod}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Db da Modificare:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding DbDest}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Tipo Modifica:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding InpType}" Style="{StaticResource MyEntry}" />
+            </VerticalStackLayout>
+        </Border>
+    </DataTemplate>
+</ResourceDictionary>

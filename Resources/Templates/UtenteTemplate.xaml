@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    xmlns:models="clr-namespace:PvPmo.Models">
+
+    <DataTemplate x:Key="UtenteTemplate" x:DataType="models:Utente">
+        <Border Margin="10" Padding="10">
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Nome utente:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding NomeUtente}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Password:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding PasswordHash}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Ruolo:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding Ruolo}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Locale/Rete:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding Tipo}" Style="{StaticResource MyEntry}" />
+            </VerticalStackLayout>
+        </Border>
+    </DataTemplate>
+
+</ResourceDictionary>

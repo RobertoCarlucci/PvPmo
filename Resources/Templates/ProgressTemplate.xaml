@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    xmlns:models="clr-namespace:PvPmo.Models">
+
+    <DataTemplate x:Key="ProgressTemplate" x:DataType="models:ProgressConfig">
+        <Border Margin="10" Padding="10">
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Tabella Lavoro:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding TabellaSql}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Db in Uso:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding DbName}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Descrizione:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding Descrizione}" Style="{StaticResource MyEntry}" />
+            </VerticalStackLayout>
+        </Border>
+    </DataTemplate>
+
+</ResourceDictionary>

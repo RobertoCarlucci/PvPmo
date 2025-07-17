@@ -88,6 +88,21 @@
 
 	<!-- XAML -->
 	<ItemGroup>		
+		<MauiXaml Update="Resources\Templates\FinalizzaTemplate.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>		
+		<MauiXaml Update="Resources\Templates\NormalizzaTemplate.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>		
+		<MauiXaml Update="Resources\Templates\OrigineTemplate.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>		
+		<MauiXaml Update="Resources\Templates\ProgressTemplate.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>		
+		<MauiXaml Update="Resources\Templates\UtenteTemplate.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>		
 		<MauiXaml Update="View\GesAcsView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>		
@@ -102,8 +117,6 @@
 	<!-- Cartelle -->
 	<ItemGroup>
 		<Folder Include="Archivio\Setup\" />
-		<Folder Include="Resources\Selector\" />
-		<Folder Include="Resources\Template\" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="View\GesAcsView.xaml.cs">

@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    xmlns:models="clr-namespace:PvPmo.Models">
+
+    <DataTemplate x:Key="OrigineTemplate" x:DataType="models:OrigineConfig">
+        <Border Margin="10" Padding="10">
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Db sorgente:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding DbInp}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Tabella sorgente:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding Tabella}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Db destinazione:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding DbDest}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Tabella destinazione:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding TabellaSql}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Foglio Excell:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding WorkSheet}" Style="{StaticResource MyEntry}" />
+
+                <Label Text="Tipo del sorgente:" Style="{StaticResource MediumLabel}" />
+                <Entry Text="{Binding InpType}" Style="{StaticResource MyEntry}" />
+            </VerticalStackLayout>
+        </Border>
+    </DataTemplate>
+
+</ResourceDictionary>
