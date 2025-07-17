@@ -46,7 +46,6 @@ public partial class ModDataViewModel : BaseViewModel
                     Value = value
                 });
             }
-
             DateRows.Add(dateRow);
         }
     }

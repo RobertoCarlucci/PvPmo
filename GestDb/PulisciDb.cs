@@ -4,20 +4,17 @@
     {
         public static async Task<bool> ClearPriKey(IProgress<string>? progress)
         {
-            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(await Conn.MysqlConn("pvpmo_origine"));
+            var descrizioni = await ProgressHelper.CaricaDescrizioniAsync();
 
             //    // Carico il File dall'archivio con la sequenza da svolgere
             //    // e provvedo all'esecuzione.
 
-            string dbUptd = "pvpmo_origine";            
-
-            var repo = new CaricaTabRepository<CaricaTabFinalizza>(dbUptd, "finalizza");
-            var dati = await repo.GetAllAsync();
+            var final = await EmbeddedJsonLoader.LoadJsonAsync<FinalizzaConfig>("FinalizzaConfig.json");
 
             bool tuttoOK = true;
             string _connProd = string.Empty;
 
-            foreach (var u in dati.Where(u => u.Azione == "CLN"))
+            foreach (var u in final.Where(u => u.Azione == "CLN"))
             {
                 var db = string.IsNullOrWhiteSpace(u.DbTabConfronto) ? "default" : u.DbTabConfronto;
                 var key = $"{u.TabConfronto}|{db}";
@@ -30,7 +27,7 @@
                     return false;
                 }
 
-                progress?.Report($"Clean PKey: {label}");                
+                progress?.Report($"Clean PKey: {label}");
                 string dropid = $@"ALTER TABLE `{u.TabConfronto}` DROP COLUMN IF EXISTS id;";
                 tuttoOK = await SqlAsync.SqlNoQryString(_connProd, dropid, 120);
 
@@ -44,6 +41,6 @@
 
             }
             return tuttoOK;
-        }        
-    }
+        }
+    }    
 }

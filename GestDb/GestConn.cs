@@ -1,6 +1,4 @@
-﻿using Windows.System;
-
-namespace PvPmo.GestDb
+﻿namespace PvPmo.GestDb
 {
     public static class Conn
     {
@@ -9,8 +7,7 @@ namespace PvPmo.GestDb
             if (string.IsNullOrWhiteSpace(nomeDb)) return string.Empty;
 
             string baseConn = AppConfig.GetConnectionString("MySqlDefault");
-            string fullConn = $"{baseConn}{nomeDb};";
-            //string fullConn = $"{baseConn}database={nomeDb};";
+            string fullConn = $"{baseConn}{nomeDb};";            
 
             bool connessioneOk = await SqlAsync.TestConnSql(fullConn);
             return connessioneOk ? fullConn : string.Empty;

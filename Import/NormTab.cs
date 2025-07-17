@@ -13,8 +13,7 @@ namespace PvPmo.Import
         {
             string dbUptd = "pvpmo_origine";
             // Carico la tabella con le azioni da svolgere dal Service
-            var repo = new CaricaTabRepository<CaricaTabNorm>(dbUptd, "normalizza");
-            var dati = await repo.GetAllAsync();
+            var dati = await EmbeddedJsonLoader.LoadJsonAsync<NormalizzaConfig>("NormalizzaConfig.json");
 
             bool esitoGlobale = true;
 
@@ -59,7 +58,7 @@ namespace PvPmo.Import
             }
             return esitoGlobale;
         }
-        private static async Task<bool> EseguiGenerazione(string conn, CaricaTabNorm n) =>
+        private static async Task<bool> EseguiGenerazione(string conn, NormalizzaConfig n) =>
             !string.IsNullOrEmpty(n.TabellaMod) && !string.IsNullOrEmpty(n.Modifica) ? n.ColDaMod switch
             {
                 "Dateid" => await SqlQry.CreaDateId(conn, n.TabellaMod, n.ColDaMod, n.Modifica),

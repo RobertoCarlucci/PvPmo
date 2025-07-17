@@ -35,20 +35,19 @@
             string nomeTabApm = string.Empty;
             string nomeTabTim = string.Empty;
 
-            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(await Conn.MysqlConn("pvpmo_origine"));
+            var descrizioni = await ProgressHelper.CaricaDescrizioniAsync();
 
             //    // Carico il File dall'archivio con la sequenza da svolgere
             //    // e provvedo all'esecuzione.
 
-            var repo = new CaricaTabRepository<CaricaTabFinalizza>("pvpmo_origine", "finalizza");
-            var dati = await repo.GetAllAsync();
+            var final = await EmbeddedJsonLoader.LoadJsonAsync<FinalizzaConfig>("FinalizzaConfig.json");
 
             bool tuttoOk = true;
 
             // Se non ci sono tabelle da testare esco.
             // Eseguo i test sui file exl di update importati in pmo_origine.
            
-            foreach (var u in dati.Where(u => u.Azione == "UPTD"))
+            foreach (var u in final.Where(u => u.Azione == "UPTD"))
             {
                 var db = string.IsNullOrWhiteSpace(u.DbTabConfronto) ? "default" : u.DbTabConfronto;
                 var key = $"{u.TabConfronto}|{db}";
@@ -107,7 +106,6 @@
                         tuttoOk = false;
                         break;
                 }
-
             }
             using (MySqlConnection myConnection = new MySqlConnection(_connProd + "; Convert Zero Datetime=True;"))
             {

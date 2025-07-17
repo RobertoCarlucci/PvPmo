@@ -11,10 +11,8 @@ public partial class InpAcsToSql()
         string dbUptd = "pvpmo_origine";
         string dbProd = "pmo";
 
-        var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(await Conn.MysqlConn(dbUptd));
-
-        var repo = new CaricaTabRepository<CaricaTabOrigini>(dbUptd, "origine");
-        var dati = await repo.GetAllAsync();
+        var descrizioni = await ProgressHelper.CaricaDescrizioniAsync();
+        var dati = await EmbeddedJsonLoader.LoadJsonAsync<OrigineConfig>("OrigineConfig.json");        
 
         // Aggiunto per evitare che un errore blocchi tutte le tabelle:
 

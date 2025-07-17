@@ -26,7 +26,7 @@
                 VerticalOptions="Center"
                 Aspect="AspectFill" />
 
-        <Button Text="Gestione Importazioni Dati Acs ed Exl."
+        <Button Text="Gestione Dati Import Export."
                 Style="{StaticResource MyButton}"
                 Command="{Binding BtnGesAcsCommand}"
                 IsEnabled="{Binding IsNotBusy}"
@@ -49,10 +49,10 @@
                 Grid.Row="2"
                 Grid.Column="0"
                 Margin="40"/>
-
-        <Button Text="Gestione Esportazioni Dati Db."
+                
+        <Button Text="Gestione Impostazioni App."
                 Style="{StaticResource MyButton}"
-                Command="{Binding BtnExportCommand}"
+                Command="{Binding BtnModSetupAppCommand}"
                 IsEnabled="{Binding IsNotBusy}"
                 Grid.Row="0"
                 Grid.Column="1"

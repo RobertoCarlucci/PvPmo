@@ -9,21 +9,19 @@ namespace PvPmo.Import
 
         public static async Task<bool> TestUptd(IProgress<string>? progress)
         {
-            string dbUptd = "pvpmo_origine";
-            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(await Conn.MysqlConn(dbUptd));
+            var descrizioni = await ProgressHelper.CaricaDescrizioniAsync();
 
             //    // Carico il File dall'archivio con la sequenza da svolgere
             //    // e provvedo all'esecuzione.
 
-            var repo = new CaricaTabRepository<CaricaTabFinalizza>(dbUptd, "finalizza");
-            var dati = await repo.GetAllAsync();           
+            var final = await EmbeddedJsonLoader.LoadJsonAsync<FinalizzaConfig>("FinalizzaConfig.json");
 
             bool tuttoOk = true;
 
             // Se non ci sono tabelle da testare esco.
             // Eseguo i test sui file exl di update importati in pmo_origine.
 
-            foreach (var n in dati)
+            foreach (var n in final)
             {
                 var db = string.IsNullOrWhiteSpace(n.DbTabConfronto) ? "default" : n.DbTabConfronto;
                 var key = $"{n.TabConfronto}|{db}";
@@ -129,8 +127,7 @@ namespace PvPmo.Import
                     return false;                     
                 }
                 else
-                {
-                    //var vm = ServiceHelper.GetService<ModDataViewModel>();
+                {                   
                     await Shell.Current.GoToAsync(nameof(ModDataView));
                     return false; // fermiamo il test corrente, verrà rieseguito dopo la modifica
                 }

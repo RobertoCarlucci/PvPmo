@@ -1,0 +1,110 @@
+[
+  {
+    "Azione": "TST",
+    "TabConfronto": "01_tabella_data",
+    "ColConfronto": "PVTotalData",
+    "TabTestare": "pv_total",
+    "ColDaTestare": "dateid",
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  },
+  {
+    "Azione": "NUM",
+    "TabConfronto": "pv_total",
+    "ColConfronto": null,
+    "TabTestare": "pv_total",
+    "ColDaTestare": null,
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  },
+  {
+    "Azione": "TST",
+    "TabConfronto": "01_tabella_data",
+    "ColConfronto": "GlobalTimesheetExtractData",
+    "TabTestare": "global_timesheet_extract",
+    "ColDaTestare": "dateid",
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  },
+  {
+    "Azione": "NUM",
+    "TabConfronto": "global_timesheet_extract",
+    "ColConfronto":null,
+    "TabTestare": "global_timesheet_extract",
+    "ColDaTestare": null,
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  },
+  {
+    "Azione": "NUM",
+    "TabConfronto": "all_project_mapped_power_bi_column_set",
+    "ColConfronto": null,
+    "TabTestare": "all_project_mapped_power_bi_column_set",
+    "ColDaTestare": null,
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  },
+  {
+    "Azione": "NUM",
+    "TabConfronto": "timesheet_information_by_month",
+    "ColConfronto":null,
+    "TabTestare": "timesheet_information_by_month",
+    "ColDaTestare": null,
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  },
+  {
+    "Azione": "UPTD",
+    "TabConfronto": "timesheet_information_by_month",
+    "ColConfronto": null,
+    "TabTestare": "timesheet_information_by_month",
+    "ColDaTestare": null,
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  },
+  {
+    "Azione": "UPTD",
+    "TabConfronto": "global_timesheet_extract",
+    "ColConfronto": "DateId",
+    "TabTestare": "01_tabella_data",
+    "ColDaTestare": "GlobalTimesheetExtractData",
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  },
+  {
+    "Azione": "UPTD",
+    "TabConfronto": "pv_total",
+    "ColConfronto": "DateId",
+    "TabTestare": "01_tabella_data",
+    "ColDaTestare": "PVTotalData",
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  },
+  {
+    "Azione": "UPTD",
+    "TabConfronto": "all_project_mapped_power_bi_column_set",
+    "ColConfronto": null,
+    "TabTestare": "all_project_mapped_power_bi_column_set",
+    "ColDaTestare": null,
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  },
+  {
+    "Azione": "CLN",
+    "TabConfronto": "global_timesheet_extract",
+    "ColConfronto": null,
+    "TabTestare": null,
+    "ColDaTestare": null,
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  },
+  {
+    "Azione": "CLN",
+    "TabConfronto": "timesheet_information_by_month",
+    "ColConfronto": null,
+    "TabTestare": null,
+    "ColDaTestare": null,
+    "DbTabConfronto": "pmo",
+    "DbTabTest": "pvpmo_origine"
+  }
+]

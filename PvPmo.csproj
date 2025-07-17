@@ -13,20 +13,19 @@
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 		<WindowsPackageType>None</WindowsPackageType>
-
-		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
-
-		<!-- Aggiornati per coerenza -->
 		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
 
-		<!-- Per la generazione EXE stand-alone -->
+		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
+
+		<!-- EXE stand-alone -->
 		<RuntimeIdentifier>win10-x64</RuntimeIdentifier>
 		<SelfContained>true</SelfContained>
 		<PublishSingleFile>true</PublishSingleFile>
 		<PlatformTarget>x64</PlatformTarget>
 	</PropertyGroup>
 
+	<!-- Configurazioni personalizzate -->
 	<PropertyGroup>
 		<Configurations>Debug;Release;DEV;PROD</Configurations>
 	</PropertyGroup>
@@ -37,38 +36,43 @@
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<DefineConstants>RELEASE;PROD</DefineConstants>
-	</PropertyGroup>	
+	</PropertyGroup>
 
+	<!-- File JSON nella cartella Data -->
 	<ItemGroup>
-		<None Include="Resources\Config\utenti.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		
-		<!-- App Icon -->
+		<EmbeddedResource Include="Data\*.json" />
+	</ItemGroup>
+
+	<!-- Icone e splash -->
+	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
-
-		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+	</ItemGroup>
 
-		<!-- Images -->
+	<!-- Immagini -->
+	<ItemGroup>
 		<MauiImage Include="Resources\Images\*" />
 		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
+	</ItemGroup>
 
-		<!-- Custom Fonts -->
+	<!-- Font -->
+	<ItemGroup>
 		<MauiFont Include="Resources\Fonts\*" />
+	</ItemGroup>
 
-		<!-- Raw Assets -->
+	<!-- Asset grezzi -->
+	<ItemGroup>
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
-
 	<ItemGroup>
-		<Compile Remove="Archivio\ExportXLSX\**" />
-		<EmbeddedResource Remove="Archivio\ExportXLSX\**" />
-		<MauiCss Remove="Archivio\ExportXLSX\**" />
-		<MauiXaml Remove="Archivio\ExportXLSX\**" />
-		<None Remove="Archivio\ExportXLSX\**" />
+		<Compile Remove="Resources\Config\**" />
+		<EmbeddedResource Remove="Resources\Config\**" />
+		<MauiCss Remove="Resources\Config\**" />
+		<MauiXaml Remove="Resources\Config\**" />
+		<None Remove="Resources\Config\**" />
 	</ItemGroup>
 
+	<!-- Dipendenze NuGet -->
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="12.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
@@ -82,47 +86,38 @@
 		<PackageReference Include="System.Data.OleDb" Version="9.0.6" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<!-- XAML -->
+	<ItemGroup>		
 		<MauiXaml Update="View\GesAcsView.xaml">
 			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
+		</MauiXaml>		
 		<MauiXaml Update="View\LoginView.xaml">
-		  <Generator>MSBuild:Compile</Generator>
+			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 		<MauiXaml Update="View\ModDataView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 	</ItemGroup>
 
+	<!-- Cartelle -->
 	<ItemGroup>
 		<Folder Include="Archivio\Setup\" />
+		<Folder Include="Resources\Selector\" />
+		<Folder Include="Resources\Template\" />
 	</ItemGroup>
-
 	<ItemGroup>
-	  <Compile Update="View\GesAcsView.xaml.cs">
-	    <DependentUpon>GesAcsView.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="View\MainPageView.xaml.cs">
-	    <DependentUpon>MainPageView.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="View\ModDataView.xaml.cs">
-	    <DependentUpon>ModDataView.xaml</DependentUpon>
-	  </Compile>
+		<Compile Update="View\GesAcsView.xaml.cs">
+			<DependentUpon>GesAcsView.xaml</DependentUpon>
+		</Compile>		
+		<Compile Update="View\MainPageView.xaml.cs">
+			<DependentUpon>MainPageView.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="View\ModDataView.xaml.cs">
+			<DependentUpon>ModDataView.xaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
-
 	<ItemGroup>
-	  <None Update="appsettings.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="appsettings.DEV.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="appsettings.PROD.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
+		<PRIResource Remove="Resources\Config\**" />
 	</ItemGroup>
 
 </Project>

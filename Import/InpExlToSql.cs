@@ -22,10 +22,8 @@
                 return false;
             }
 
-            var descrizioni = await DescrizioniProgress.GetProgressDescriptionsAsync(_connArch);
-            
-            var repo = new CaricaTabRepository<CaricaTabOrigini>(dbUptd, "origine");
-            var dati = await repo.GetAllAsync();
+            var descrizioni = await ProgressHelper.CaricaDescrizioniAsync();
+            var dati = await EmbeddedJsonLoader.LoadJsonAsync<OrigineConfig>("OrigineConfig.json");
 
             var validi = dati.Where(n =>
                 n.InpType == type &&
