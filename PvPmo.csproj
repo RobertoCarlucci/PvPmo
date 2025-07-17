@@ -106,6 +106,9 @@
 		<MauiXaml Update="View\GesAcsView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>		
+		<MauiXaml Update="View\JsonEditorView.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>		
 		<MauiXaml Update="View\LoginView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>

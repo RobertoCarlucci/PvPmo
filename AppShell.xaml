@@ -18,4 +18,7 @@
     <ShellContent        
         ContentTemplate="{DataTemplate view:GesAcsView}"
         Route="GesAcsView" />
+    <ShellContent        
+        ContentTemplate="{DataTemplate view:JsonEditorView}"
+        Route="JsonEditorView" />
 </Shell>

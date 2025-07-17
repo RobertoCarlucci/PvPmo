@@ -11,6 +11,7 @@ namespace PvPmo
             Routing.RegisterRoute(nameof(MainPageView), typeof(MainPageView));
             Routing.RegisterRoute(nameof(ModDataView), typeof(ModDataView));
             Routing.RegisterRoute(nameof(GesAcsView), typeof(GesAcsView));
+            Routing.RegisterRoute(nameof(JsonEditorView), typeof(JsonEditorView));
         }
     }
 }

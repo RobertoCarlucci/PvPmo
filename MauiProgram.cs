@@ -31,6 +31,8 @@ namespace PvPmo
             builder.Services.AddTransient<GesAcsViewModel>();
             builder.Services.AddTransient<ModDataView>();
             builder.Services.AddTransient<ModDataViewModel>();
+            builder.Services.AddTransient<JsonEditorView>();
+            builder.Services.AddTransient<JsonEditorViewModel>();
 
             //Services
 

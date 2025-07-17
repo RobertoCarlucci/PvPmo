@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace PvPmo.View;
+﻿namespace PvPmo.View;
 
 public partial class ModDataView : ContentPage
 {

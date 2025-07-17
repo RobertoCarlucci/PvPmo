@@ -69,7 +69,7 @@ namespace PvPmo.ViewModel
 
             IsBusy = true;
 
-            //await Shell.Current.GoToAsync(nameof(JsonEditorView));
+            await Shell.Current.GoToAsync(nameof(JsonEditorView));
 
             IsBusy = false;
             return;
