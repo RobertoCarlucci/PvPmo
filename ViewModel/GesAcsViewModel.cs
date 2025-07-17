@@ -80,7 +80,7 @@ namespace PvPmo.ViewModel
         {
             if (IsBusy)
                 return;
-            await Shell.Current.GoToAsync(nameof(MainPage));
+            await Shell.Current.GoToAsync(nameof(MainPageView));
         }
     }
 }

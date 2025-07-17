@@ -83,12 +83,12 @@ public partial class ModDataViewModel : BaseViewModel
         }
         await TestDate.VerificaDateDaTabellaAsync(strConn, "01_tabella_data");
 
-        await Shell.Current.GoToAsync(nameof(MainPage));
+        await Shell.Current.GoToAsync(nameof(MainPageView));
     }
 
     [RelayCommand]
     public async Task BtnAnnullaEsci()
     {
-        await Shell.Current.GoToAsync(nameof(MainPage));
+        await Shell.Current.GoToAsync(nameof(MainPageView));
     }
 }

@@ -1,8 +1,8 @@
 namespace PvPmo.View;
 
-public partial class GesAcs : ContentPage
+public partial class GesAcsView : ContentPage
 {
-	public GesAcs(GesAcsViewModel viewModel)
+	public GesAcsView(GesAcsViewModel viewModel)
 	{
 		InitializeComponent();
         BindingContext = viewModel;

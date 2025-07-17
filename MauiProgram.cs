@@ -25,11 +25,11 @@ namespace PvPmo
 
             builder.Services.AddSingleton<LoginView>();
             builder.Services.AddSingleton<LoginViewModel>();
-            builder.Services.AddSingleton<MainPage>();
+            builder.Services.AddSingleton<MainPageView>();
             builder.Services.AddSingleton<MainViewModel>();            
-            builder.Services.AddTransient<GesAcs>();
+            builder.Services.AddTransient<GesAcsView>();
             builder.Services.AddTransient<GesAcsViewModel>();
-            builder.Services.AddTransient<ModData>();
+            builder.Services.AddTransient<ModDataView>();
             builder.Services.AddTransient<ModDataViewModel>();
 
             //Services

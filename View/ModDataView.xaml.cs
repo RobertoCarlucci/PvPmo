@@ -2,9 +2,9 @@
 
 namespace PvPmo.View;
 
-public partial class ModData : ContentPage
+public partial class ModDataView : ContentPage
 {
-	public ModData(ModDataViewModel viewModel)
+	public ModDataView(ModDataViewModel viewModel)
 	{
         InitializeComponent();
 		BindingContext = viewModel;        

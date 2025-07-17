@@ -14,6 +14,8 @@
 		<ApplicationVersion>1</ApplicationVersion>
 		<WindowsPackageType>None</WindowsPackageType>
 
+		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
+
 		<!-- Aggiornati per coerenza -->
 		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
@@ -81,19 +83,31 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<MauiXaml Update="View\GesAcs.xaml">
+		<MauiXaml Update="View\GesAcsView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 		<MauiXaml Update="View\LoginView.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
-		<MauiXaml Update="View\ModData.xaml">
+		<MauiXaml Update="View\ModDataView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>
 		<Folder Include="Archivio\Setup\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="View\GesAcsView.xaml.cs">
+	    <DependentUpon>GesAcsView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="View\MainPageView.xaml.cs">
+	    <DependentUpon>MainPageView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="View\ModDataView.xaml.cs">
+	    <DependentUpon>ModDataView.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>

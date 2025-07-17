@@ -15,7 +15,7 @@ namespace PvPmo.ViewModel
         {
             if (IsBusy) return;
             IsBusy = true;
-            await Shell.Current.GoToAsync(nameof(GesAcs));
+            await Shell.Current.GoToAsync(nameof(GesAcsView));
             IsBusy = false;
         }
 
@@ -24,7 +24,7 @@ namespace PvPmo.ViewModel
         {
             if (IsBusy) return;
             IsBusy = true;
-            await Shell.Current.GoToAsync(nameof(ModData));
+            await Shell.Current.GoToAsync(nameof(ModDataView));
             IsBusy = false;
         }
 

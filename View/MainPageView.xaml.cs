@@ -1,8 +1,8 @@
 ﻿namespace PvPmo.View;
 
-public partial class MainPage : ContentPage
+public partial class MainPageView : ContentPage
 {
-    public MainPage(MainViewModel viewModel)
+    public MainPageView(MainViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = viewModel;

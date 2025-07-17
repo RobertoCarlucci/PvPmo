@@ -6,17 +6,16 @@
     xmlns:view="clr-namespace:PvPmo.View"
     Shell.FlyoutBehavior="Disabled">
 
-    <ShellContent
-        Title="Accedi"
+    <ShellContent        
         ContentTemplate="{DataTemplate view:LoginView}"
         Route="LoginView" />
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate view:MainPage}"
-        Route="MainPage" />
-    <ShellContent
-        Title="Modifica Date"
-        ContentTemplate="{DataTemplate view:ModData}"
-        Route="ModData" />
-
+    <ShellContent        
+        ContentTemplate="{DataTemplate view:MainPageView}"
+        Route="MainPageView" />
+    <ShellContent        
+        ContentTemplate="{DataTemplate view:ModDataView}"
+        Route="ModDataView" />
+    <ShellContent        
+        ContentTemplate="{DataTemplate view:GesAcsView}"
+        Route="GesAcsView" />
 </Shell>

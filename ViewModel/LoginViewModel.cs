@@ -28,7 +28,7 @@ public partial class LoginViewModel : BaseViewModel
         {
             var utente = _auth.Autentica(NomeUtente, Password);
             if (utente is not null)
-                await Shell.Current.GoToAsync(nameof(MainPage));
+                await Shell.Current.GoToAsync(nameof(MainPageView));
             //App.Current.MainPage = new MainPage(new MainViewModel(utente));
             else
                 MostraErrore = (MessaggioErrore = "Credenziali non valide.") != null;
@@ -47,7 +47,7 @@ public partial class LoginViewModel : BaseViewModel
         {
             var utente = _auth.Autentica(utenteWindows, null);
             if (utente is not null)
-                await Shell.Current.GoToAsync(nameof(MainPage));
+                await Shell.Current.GoToAsync(nameof(MainPageView));
             //App.Current.MainPage = new MainPage(new MainViewModel(utente));
             else
                 MostraErrore = (MessaggioErrore = $"L'utente \"{utenteWindows}\" non è autorizzato.") != null;

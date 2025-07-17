@@ -131,7 +131,7 @@ namespace PvPmo.Import
                 else
                 {
                     //var vm = ServiceHelper.GetService<ModDataViewModel>();
-                    await Shell.Current.GoToAsync(nameof(ModData));
+                    await Shell.Current.GoToAsync(nameof(ModDataView));
                     return false; // fermiamo il test corrente, verrà rieseguito dopo la modifica
                 }
             }
