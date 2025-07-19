@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
+    x:DataType="viewmodel:JsonEditorViewModel"
+    x:Class="PvPmo.View.EditorConfigView"
+    Title="{Binding Title}">
+
+    <Grid Padding="20">
+        <!-- Sfondo -->
+        <Image Source="wallpaper_dl.png"
+               Aspect="AspectFill"
+               Opacity="0.15"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill"
+               ZIndex="-1" />
+
+        <!-- Contenuto -->
+        <VerticalStackLayout Spacing="20">
+            <Label Text="{Binding TipoSelezionato.TitoloConfig}" 
+                   FontSize="28" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" />
+
+            <!-- CollectionView con TemplateSelector -->
+            <CollectionView ItemsSource="{Binding Configurazioni}"
+                            ItemTemplate="{StaticResource ConfigTemplateSelector}">
+                <CollectionView.EmptyView>
+                    <Label Text="Nessuna configurazione disponibile." 
+                           TextColor="Gray" 
+                           HorizontalOptions="Center"
+                           FontAttributes="Italic" />
+                </CollectionView.EmptyView>
+            </CollectionView>
+
+            <!-- Bottoni di azione -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="30">
+                <Button Text="Salva modifiche"
+                        Command="{Binding SalvaCommand}"
+                        Style="{StaticResource MyButton}" />
+
+                <Button Text="Torna"
+                        Command="{Binding BtnAnnullaTornaCommand}"
+                        Style="{StaticResource MyButton}" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

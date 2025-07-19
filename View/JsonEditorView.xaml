@@ -6,6 +6,7 @@
              xmlns:models="clr-namespace:PvPmo.Models"
              x:DataType="viewmodel:JsonEditorViewModel"
              Title="{Binding Title}">
+    
     <Grid ColumnDefinitions="*,*"   
       RowDefinitions="*,*,*"   
       RowSpacing="0">
@@ -30,23 +31,18 @@
                HorizontalTextAlignment="Center"/>
 
             <Border Stroke="DarkGray" Padding="10">
-                <CollectionView ItemsSource="{Binding TipiDisponibili}" SelectionMode="Single"                                >
+                <CollectionView ItemsSource="{Binding TipiDisponibili}"
+                        SelectionMode="Single"
+                        SelectedItem="{Binding SelectedTipo, Mode=TwoWay}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:ConfigOption">
                             <Border Padding="10" Margin="5" Stroke="DarkGray" BackgroundColor="Transparent">
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer 
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:JsonEditorViewModel}}
-                                    , Path=ApriEditorCommand}" 
-                                    CommandParameter="{Binding}" />
-                                </Border.GestureRecognizers>
-
                                 <VerticalStackLayout>
                                     <Label Text="{Binding TitoloConfig}" FontAttributes="Bold" FontSize="18" TextColor="Red" />
                                     <Label Text="{Binding Descrizione}" FontSize="14" TextColor="Fuchsia" />
                                 </VerticalStackLayout>
                             </Border>
-                        </DataTemplate>                        
+                        </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </Border>

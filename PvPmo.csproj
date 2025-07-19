@@ -103,6 +103,9 @@
 		<MauiXaml Update="Resources\Templates\UtenteTemplate.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>		
+		<MauiXaml Update="View\EditorConfigView.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>		
 		<MauiXaml Update="View\GesAcsView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>		

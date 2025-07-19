@@ -11,7 +11,7 @@ namespace PvPmo.ViewModel
 
         [ObservableProperty]
         private ObservableCollection<object> configurazioni = new();
-
+        
         [ObservableProperty]
         private ObservableCollection<ConfigOption> tipiDisponibili = new()
             {
@@ -83,12 +83,20 @@ namespace PvPmo.ViewModel
         {
             await Shell.Current.GoToAsync(nameof(JsonEditorView));
         }
+        [ObservableProperty]
+        private ConfigOption? selectedTipo;
+
+        partial void OnSelectedTipoChanged(ConfigOption? value)
+        {
+            if (value is not null)
+                ApriEditorCommand.Execute(value);
+        }
 
         [RelayCommand]
         public async Task ApriEditor(ConfigOption opzione)
         {
-            //if (opzione is not null)
-            //    await Shell.Current.GoToAsync(nameof(EditorConfigView));
+            if (opzione is not null)
+                await Shell.Current.GoToAsync(nameof(EditorConfigView));
         }
     }
 }
