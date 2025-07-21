@@ -31,13 +31,22 @@
             <Color x:Key="PrimaryDark">#FFA000</Color>
             <Color x:Key="Accent">#00BCD4</Color>
             <Color x:Key="Dark">Black</Color>
-            <Color x:Key="BlueViolet">BlueViolet</Color>
-            
+            <Color x:Key="BlueViolet">BlueViolet</Color>            
 
             <Color x:Key="LightBackground">#FAF9F8</Color>
             <Color x:Key="DarkBackground">Black</Color>
             <Color x:Key="GialloVerde">YellowGreen</Color>
-            
+
+            <Style x:Key="ConfigBorderStyle" TargetType="Border">
+                <Setter Property="Stroke" Value="LightGray" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="Background" Value="{AppThemeBinding Light='White', Dark='#1E1E1E'}" />
+                <Setter Property="Padding" Value="12" />
+                <Setter Property="Margin" Value="6" />
+                <Setter Property="StrokeShape">
+                    <RoundRectangle CornerRadius="8"/>
+                </Setter>
+            </Style>
 
             <Style TargetType="Page" ApplyToDerivedTypes="True">
                 <Setter Property="BackgroundColor"
@@ -119,7 +128,6 @@
                 <Setter Property="HorizontalOptions" Value="Fill" />
                 <Setter Property="VerticalOptions" Value="Center" />
             </Style>
-
 
             <Style x:Key="ButtonOutline" TargetType="Button">
                 <Setter Property="Background" Value="{StaticResource LightBackground}"/>

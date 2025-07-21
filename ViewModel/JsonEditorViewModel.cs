@@ -34,32 +34,27 @@ namespace PvPmo.ViewModel
         {
             Title = "Seleziona Configurazione da Modificare.";
         }
-
         public async Task CaricaAsync(JsonConfigType tipo)
         {
             string fileName = tipo == JsonConfigType.Utenti ? "utenti.json" : $"{tipo}Config.json";
 
             TipoSelezionato = TipiDisponibili.FirstOrDefault(c => c.Tipo == tipo);
 
-            switch (tipo)
+            Configurazioni.Clear();
+
+            IEnumerable<object>? elementi = tipo switch
             {
-                case JsonConfigType.Origine:
-                    Configurazioni = new(await EmbeddedJsonLoader.LoadJsonAsync<OrigineConfig>(fileName));
-                    break;
-                case JsonConfigType.Normalizza:
-                    Configurazioni = new(await EmbeddedJsonLoader.LoadJsonAsync<NormalizzaConfig>(fileName));
-                    break;
-                case JsonConfigType.Progress:
-                    Configurazioni = new(await EmbeddedJsonLoader.LoadJsonAsync<ProgressConfig>(fileName));
-                    break;
-                case JsonConfigType.Finalizza:
-                    Configurazioni = new(await EmbeddedJsonLoader.LoadJsonAsync<FinalizzaConfig>(fileName));
-                    break;
-                case JsonConfigType.Utenti:
-                    Configurazioni = new(await EmbeddedJsonLoader.LoadJsonAsync<Utente>(fileName));
-                    break;
-            }
-        }
+                JsonConfigType.Origine => await EmbeddedJsonLoader.LoadJsonAsync<OrigineConfig>(fileName),
+                JsonConfigType.Normalizza => await EmbeddedJsonLoader.LoadJsonAsync<NormalizzaConfig>(fileName),
+                JsonConfigType.Progress => await EmbeddedJsonLoader.LoadJsonAsync<ProgressConfig>(fileName),
+                JsonConfigType.Finalizza => await EmbeddedJsonLoader.LoadJsonAsync<FinalizzaConfig>(fileName),
+                JsonConfigType.Utenti => await EmbeddedJsonLoader.LoadJsonAsync<Utente>(fileName),
+                _ => Enumerable.Empty<object>()
+            };
+
+            foreach (var item in elementi)
+                Configurazioni.Add(item);
+        }        
 
         [RelayCommand]
         public async Task SalvaAsync()
@@ -83,6 +78,7 @@ namespace PvPmo.ViewModel
         {
             await Shell.Current.GoToAsync(nameof(JsonEditorView));
         }
+
         [ObservableProperty]
         private ConfigOption? selectedTipo;
 
@@ -91,10 +87,68 @@ namespace PvPmo.ViewModel
             if (value is not null)
                 ApriEditorCommand.Execute(value);
         }
+        
+        public void CaricaConfigurazioni(ConfigOption tipo)
+        {
+            Configurazioni.Clear();
+
+            object? nuovo = tipo.Tipo switch
+            {
+                JsonConfigType.Utenti => new Utente
+                {
+                    NomeUtente = "",
+                    PasswordHash = "",
+                    Ruolo = "",
+                    Tipo = TipoUtente.Locale
+                },
+                JsonConfigType.Origine => new OrigineConfig
+                {
+                    DbInp = "",
+                    Tabella = "",
+                    DbDest = "",
+                    TabellaSql = "",
+                    WorkSheet = "",
+                    InpType = ""
+                },
+                JsonConfigType.Progress => new ProgressConfig
+                {
+                    TabellaSql = "",
+                    DbName = "",
+                    Descrizione = ""
+                },
+                JsonConfigType.Normalizza => new NormalizzaConfig
+                {
+                    Azione = "",
+                    ColDaMod = "",
+                    Modifica = "",
+                    TipoCol = "",
+                    TabellaMod = "",
+                    DbDest = "",
+                    InpType = ""
+                },
+                JsonConfigType.Finalizza => new FinalizzaConfig
+                {
+                    Azione = "",
+                    TabConfronto = "",
+                    ColConfronto = "",
+                    TabTestare = "",
+                    ColDaTestare = "",
+                    DbTabConfronto = "",
+                    DbTabTest = ""
+                },
+                _ => null
+            };
+            if (nuovo is not null)
+                Configurazioni.Add(nuovo);           
+        }
+
 
         [RelayCommand]
         public async Task ApriEditor(ConfigOption opzione)
-        {
+        {           
+            TipoSelezionato = opzione;
+            await CaricaAsync(opzione.Tipo);            
+
             if (opzione is not null)
                 await Shell.Current.GoToAsync(nameof(EditorConfigView));
         }

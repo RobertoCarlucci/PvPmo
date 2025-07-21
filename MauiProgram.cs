@@ -33,7 +33,7 @@ namespace PvPmo
             builder.Services.AddTransient<ModDataViewModel>();
             builder.Services.AddTransient<JsonEditorView>();
             builder.Services.AddTransient<EditorConfigView>();
-            builder.Services.AddTransient<JsonEditorViewModel>();
+            builder.Services.AddSingleton<JsonEditorViewModel>();
 
             //Services
 

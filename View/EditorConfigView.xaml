@@ -3,47 +3,68 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
+    xmlns:models="clr-namespace:PvPmo.Models"
     x:DataType="viewmodel:JsonEditorViewModel"
     x:Class="PvPmo.View.EditorConfigView"
-    Title="{Binding Title}">
+    Title="Modifica Configurazione JSON">
 
-    <Grid Padding="20">
+    <Grid ColumnDefinitions="*,*"   
+          RowDefinitions="*,*"   
+          RowSpacing="0">
+        
         <!-- Sfondo -->
         <Image Source="wallpaper_dl.png"
                Aspect="AspectFill"
-               Opacity="0.15"
+               
+               Grid.RowSpan="2"  
+               Grid.ColumnSpan="2"  
                HorizontalOptions="Fill"
-               VerticalOptions="Fill"
-               ZIndex="-1" />
+               VerticalOptions="Fill"/>
 
         <!-- Contenuto -->
-        <VerticalStackLayout Spacing="20">
-            <Label Text="{Binding TipoSelezionato.TitoloConfig}" 
+        <VerticalStackLayout Spacing="20"
+                             Grid.ColumnSpan="2"
+                             Grid.Row="0">
+            
+            <Label Text="{Binding TipoSelezionato.TitoloConfig}"                   
                    FontSize="28" 
                    FontAttributes="Bold" 
                    HorizontalOptions="Center" />
 
-            <!-- CollectionView con TemplateSelector -->
+            <!-- CollectionView con ConfigTemplateSelector -->
             <CollectionView ItemsSource="{Binding Configurazioni}"
-                            ItemTemplate="{StaticResource ConfigTemplateSelector}">
+                            ItemTemplate="{StaticResource ConfigTemplateSelector}"
+                            VerticalScrollBarVisibility="Always"
+                            SelectionMode="None"
+                            Margin="10">               
+
                 <CollectionView.EmptyView>
-                    <Label Text="Nessuna configurazione disponibile." 
-                           TextColor="Gray" 
+                    <Label Text="Nessuna configurazione disponibile"
+                           FontAttributes="Italic"
+                           TextColor="Gray"
                            HorizontalOptions="Center"
-                           FontAttributes="Italic" />
+                           Margin="20"/>
                 </CollectionView.EmptyView>
             </CollectionView>
 
-            <!-- Bottoni di azione -->
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="30">
-                <Button Text="Salva modifiche"
-                        Command="{Binding SalvaCommand}"
-                        Style="{StaticResource MyButton}" />
 
-                <Button Text="Torna"
-                        Command="{Binding BtnAnnullaTornaCommand}"
-                        Style="{StaticResource MyButton}" />
-            </HorizontalStackLayout>
         </VerticalStackLayout>
+        
+        <Button Text="Salva modifiche"
+                Command="{Binding SalvaCommand}"
+                Style="{StaticResource MyButton}" 
+                VerticalOptions="Center"  
+                Grid.Row="1"  
+                Grid.Column="0"  
+                Margin="40"/>
+
+        <Button Text="Torna"
+                Command="{Binding BtnAnnullaTornaCommand}"
+                Style="{StaticResource MyButton}"
+                VerticalOptions="Center"  
+                Grid.Row="1"  
+                Grid.Column="1"  
+                Margin="40"/>
+        
     </Grid>
 </ContentPage>

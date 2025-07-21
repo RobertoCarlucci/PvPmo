@@ -25,6 +25,7 @@
                         FontAttributes = FontAttributes.Bold,
                         HorizontalOptions = LayoutOptions.Center,
                         Margin = new Thickness(10)
+
                     })
             };
         }
