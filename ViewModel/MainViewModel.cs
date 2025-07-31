@@ -61,19 +61,19 @@ namespace PvPmo.ViewModel
             IsBusy = false;
         }
 
-        [RelayCommand]
-        async Task BtnModSetupApp()
-        {
-            if (IsBusy)
-                return;
+        //[RelayCommand]
+        //async Task BtnModSetupApp()
+        //{
+        //    if (IsBusy)
+        //        return;
 
-            IsBusy = true;
+        //    IsBusy = true;
 
-            //await Shell.Current.GoToAsync(nameof(JsonEditorView));
+        //    await Shell.Current.GoToAsync(nameof(JsonEditorView));
 
-            IsBusy = false;
-            return;
-        }        
+        //    IsBusy = false;
+        //    return;
+        //}        
 
         [RelayCommand]
         async Task BtnEnd()
