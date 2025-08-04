@@ -73,7 +73,7 @@ namespace PvPmo.ViewModel
 
             IsBusy = false;
             return;
-        }        
+        }
 
         [RelayCommand]
         async Task BtnEnd()

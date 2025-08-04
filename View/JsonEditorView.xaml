@@ -29,14 +29,13 @@
                FontSize="30"   
                TextColor="Gray "   
                HorizontalTextAlignment="Center"/>
-
-            <Border Stroke="DarkGray" Padding="10">
+           
                 <CollectionView ItemsSource="{Binding TipiDisponibili}"
                         SelectionMode="Single"
                         SelectedItem="{Binding SelectedTipo, Mode=TwoWay}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:ConfigOption">
-                            <Border Padding="10" Margin="5" Stroke="DarkGray" BackgroundColor="Transparent">
+                            <Border Style="{StaticResource ConfigBorderStyle}">
                                 <VerticalStackLayout>
                                     <Label Text="{Binding TitoloConfig}" FontAttributes="Bold" FontSize="18" TextColor="Red" />
                                     <Label Text="{Binding Descrizione}" FontSize="14" TextColor="Fuchsia" />
@@ -44,8 +43,7 @@
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
-                </CollectionView>
-            </Border>
+                </CollectionView>           
         </VerticalStackLayout>        
 
         <Button Text="Esci senza modifiche"                    
@@ -55,6 +53,5 @@
             Grid.Row="1"  
             Grid.Column="0"  
             Margin="40"/>
-
     </Grid>
 </ContentPage>
