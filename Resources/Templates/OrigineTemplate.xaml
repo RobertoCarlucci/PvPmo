@@ -7,19 +7,20 @@
         <VerticalStackLayout Margin="0" Spacing="0">
 
             <!-- Intestazione fissa -->
-            <Grid ColumnDefinitions="*,*,*,*,*,*"
-              BackgroundColor="Black"
-              Padding="6"
-              ColumnSpacing="12">
-
-                <Label Text="Db sorgente:" TextColor="White" FontAttributes="Bold" Grid.Column="0" HorizontalTextAlignment="Center" />
-                <Label Text="Tabella sorgente:" TextColor="White" FontAttributes="Bold" Grid.Column="1" HorizontalTextAlignment="Center" />
-                <Label Text="Db destinazione:" TextColor="White" FontAttributes="Bold" Grid.Column="2" HorizontalTextAlignment="Center" />
-                <Label Text="Tabella destinazione:" TextColor="White" FontAttributes="Bold" Grid.Column="3" HorizontalTextAlignment="Center" />
-                <Label Text="Foglio Excel:" TextColor="White" FontAttributes="Bold" Grid.Column="4" HorizontalTextAlignment="Center" />
-                <Label Text="Tipo sorgente:" TextColor="White" FontAttributes="Bold" Grid.Column="5" HorizontalTextAlignment="Center" />
-            </Grid>
-
+            <Grid ColumnDefinitions="*,*,*,*,*,*">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                
+                <Grid Grid.Row="0">
+                    <Label Grid.Column="0" Text="Db sorgente:" Style="{StaticResource ConfigIntestazioneCol}"/>
+                    <Label Grid.Column="1" Text="Tabella sorgente:" Style="{StaticResource ConfigIntestazioneCol}" />
+                    <Label Grid.Column="2" Text="Db destinazione:" Style="{StaticResource ConfigIntestazioneCol}" />
+                    <Label Grid.Column="3" Text="Tabella destinazione:" Style="{StaticResource ConfigIntestazioneCol}" />
+                    <Label Grid.Column="4" Text="Foglio Excel:" Style="{StaticResource ConfigIntestazioneCol}" />
+                    <Label Grid.Column="5" Text="Tipo sorgente:" Style="{StaticResource ConfigIntestazioneCol}" />
+                </Grid>
             <!-- Spazio vuoto -->
             <BoxView HeightRequest="8" />
 
@@ -44,6 +45,7 @@
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
             </ScrollView>
+            </Grid>
 
         </VerticalStackLayout>
     </DataTemplate>

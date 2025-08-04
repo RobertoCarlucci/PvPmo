@@ -9,13 +9,13 @@
 <!--<RefreshView Command="{Binding IsRefreshing}">-->
     <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,*" RowSpacing="0">
 
-        <!--<Image x:Name="backgroundImage"
+        <Image x:Name="backgroundImage"
                 Source="wallpaper_dl.png"
                 Grid.RowSpan="2"
                 Grid.ColumnSpan="3"
                 HorizontalOptions="Center"
                 VerticalOptions="Center"
-                Aspect="AspectFill"/>-->
+                Aspect="AspectFill"/>
 
         <!-- Intestazioni (mostrate solo una volta) -->
         <Grid Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Padding="0" >

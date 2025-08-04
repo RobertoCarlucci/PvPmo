@@ -64,8 +64,8 @@
                 <Setter Property="Stroke" Value="LightGray" />
                 <Setter Property="StrokeThickness" Value="1" />
                 <Setter Property="Background" Value="{AppThemeBinding Light='White', Dark='lightgrey'}" />
-                <Setter Property="Padding" Value="0" />
-                <Setter Property="Margin" Value="2" />
+                <Setter Property="Padding" Value="5" />
+                <Setter Property="Margin" Value="4" />
                 <Setter Property="StrokeShape">
                     <RoundRectangle CornerRadius="8"/>
                 </Setter>

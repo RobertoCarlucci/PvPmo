@@ -27,7 +27,7 @@
             <Label Text="Configurazioni JSON"   
                FontAttributes="Bold"   
                FontSize="30"   
-               TextColor="Gray "   
+               TextColor="DarkGray"   
                HorizontalTextAlignment="Center"/>
            
                 <CollectionView ItemsSource="{Binding TipiDisponibili}"
@@ -37,8 +37,8 @@
                         <DataTemplate x:DataType="models:ConfigOption">
                             <Border Style="{StaticResource ConfigBorderStyle}">
                                 <VerticalStackLayout>
-                                    <Label Text="{Binding TitoloConfig}" FontAttributes="Bold" FontSize="18" TextColor="Red" />
-                                    <Label Text="{Binding Descrizione}" FontSize="14" TextColor="Fuchsia" />
+                                    <Label Text="{Binding TitoloConfig}" Style="{StaticResource ConfigIntestazioneCol}" HorizontalOptions="Start" />
+                                    <Label Text="{Binding Descrizione}" Style="{StaticResource ConfigStileCol}" HorizontalOptions="Start" />
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
