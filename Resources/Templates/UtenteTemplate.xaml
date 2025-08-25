@@ -4,20 +4,20 @@
                     xmlns:models="clr-namespace:PvPmo.Models">
 
     <DataTemplate x:Key="UtenteTemplate" x:DataType="models:Utente">
-        <Border Margin="10" Padding="10">
-            <VerticalStackLayout Spacing="5">
-                <Label Text="Nome utente:" Style="{StaticResource MediumLabel}" />
+        <Border Style="{StaticResource ConfigBorderStyle}">
+            <HorizontalStackLayout Spacing="5">
+                <Label Text="Nome utente:" Style="{StaticResource ConfigIntestazioneCol}" />
                 <Entry Text="{Binding NomeUtente}" Style="{StaticResource MyEntry}" />
 
-                <Label Text="Password:" Style="{StaticResource MediumLabel}" />
+                <Label Text="Password:" Style="{StaticResource ConfigIntestazioneCol}" />
                 <Entry Text="{Binding PasswordHash}" Style="{StaticResource MyEntry}" />
 
-                <Label Text="Ruolo:" Style="{StaticResource MediumLabel}" />
+                <Label Text="Ruolo:" Style="{StaticResource ConfigIntestazioneCol}" />
                 <Entry Text="{Binding Ruolo}" Style="{StaticResource MyEntry}" />
 
-                <Label Text="Locale/Rete:" Style="{StaticResource MediumLabel}" />
+                <Label Text="Locale/Rete:" Style="{StaticResource ConfigIntestazioneCol}" />
                 <Entry Text="{Binding Tipo}" Style="{StaticResource MyEntry}" />
-            </VerticalStackLayout>
+            </HorizontalStackLayout>
         </Border>
     </DataTemplate>
 

@@ -7,11 +7,11 @@
         <VerticalStackLayout Margin="0" Spacing="0">
 
             <!-- Intestazione fissa -->
-            <Grid ColumnDefinitions="*,*,*,*,*,*">
-                <Grid.RowDefinitions>
+            <Grid >
+                <!--<Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+                </Grid.RowDefinitions>-->
                 
                 <Grid Grid.Row="0">
                     <Label Grid.Column="0" Text="Db sorgente:" Style="{StaticResource ConfigIntestazioneCol}"/>
