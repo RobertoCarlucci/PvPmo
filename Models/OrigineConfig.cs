@@ -9,5 +9,4 @@
         public string? WorkSheet { get; set; }
         public string? InpType { get; set; }
     }
-
 }

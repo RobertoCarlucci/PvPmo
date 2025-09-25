@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using PvPmo.View;
-using System.Diagnostics;
 
 namespace PvPmo
 {

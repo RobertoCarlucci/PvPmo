@@ -22,6 +22,6 @@
         ContentTemplate="{DataTemplate view:JsonEditorView}"
         Route="JsonEditorView" />
     <ShellContent        
-    ContentTemplate="{DataTemplate view:EditorConfigView}"
-    Route="EditorConfigView" />
+        ContentTemplate="{DataTemplate view:EditorConfigView}"
+        Route="EditorConfigView" />
 </Shell>

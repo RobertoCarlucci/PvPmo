@@ -1,7 +1,5 @@
 ﻿namespace PvPmo.Models
 {
-    using PvPmo.Models;
-
     public static class ProgressHelper
     {
         public static async Task<Dictionary<string, string>> CaricaDescrizioniAsync()
@@ -18,5 +16,4 @@
                 );
         }
     }
-
 }
