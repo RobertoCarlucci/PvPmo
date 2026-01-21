@@ -1,6 +1,4 @@
-﻿using PvPmo.View;
-
-namespace PvPmo
+﻿namespace PvPmo
 {
     public partial class App : Application
     {

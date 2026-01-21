@@ -1,93 +1,96 @@
 ﻿using PvPmo.View;
 using System.Collections.ObjectModel;
 
-namespace PvPmo.ViewModel;
-public partial class ModDataViewModel : BaseViewModel
+namespace PvPmo.ViewModel
 {
-    [ObservableProperty]
-    ObservableCollection<DateRowViewModel> dateRows = new ();
-
-    public ModDataViewModel()
+    public partial class ModDataViewModel : BaseViewModel
     {
-        Title = "Modifica Date";
-        _ = LoadAsync();
-    }
+        [ObservableProperty]
+        ObservableCollection<DateRowViewModel> dateRows = new();
 
-    public async Task LoadAsync()
-    {
-        string dbProd = "pmo";
-        string strConn = await Conn.MysqlConn(dbProd);
-
-        string query = "SELECT * FROM `01_tabella_data`;";
-        var table = new DataTable();
-
-        await SqlAsync.SqlQryDataTable(strConn, query, table);
-
-        foreach (DataRow row in table.Rows)
+        public ModDataViewModel()
         {
-            var dateRow = new DateRowViewModel();
+            Title = "Modifica Date";
+            _ = LoadAsync();
+        }
 
-            foreach (DataColumn col in table.Columns)
+        public async Task LoadAsync()
+        {
+            string dbProd = "pmo";
+            string strConn = await Conn.MysqlConn(dbProd);
+
+            string query = "SELECT * FROM `01_tabella_data`;";
+            var table = new DataTable();
+
+            await SqlAsync.SqlQryDataTable(strConn, query, table);
+
+            foreach (DataRow row in table.Rows)
             {
-                var columnName = col.ColumnName;
+                var dateRow = new DateRowViewModel();
 
-                if (columnName.Equals("id", StringComparison.OrdinalIgnoreCase))
+                foreach (DataColumn col in table.Columns)
                 {
-                    if (int.TryParse(row[columnName]?.ToString(), out int idVal))
-                        dateRow.Id = idVal;
-                    continue;
-                }               
+                    var columnName = col.ColumnName;
 
-                var value = row[columnName]?.ToString() ?? string.Empty;
+                    if (columnName.Equals("id", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (int.TryParse(row[columnName]?.ToString(), out int idVal))
+                            dateRow.Id = idVal;
+                        continue;
+                    }
 
-                dateRow.Fields.Add(new FieldItem
-                {
-                    Key = columnName,
-                    Value = value
-                });
+                    var value = row[columnName]?.ToString() ?? string.Empty;
+
+                    dateRow.Fields.Add(new FieldItem
+                    {
+                        Key = columnName,
+                        Value = value
+                    });
+                }
+                DateRows.Add(dateRow);
             }
-            DateRows.Add(dateRow);
         }
-    }
 
-    [RelayCommand]
-    public async Task BtnSalvaEsci()
-    {
-        string dbProd = "pmo";
-
-        string strConn = await Conn.MysqlConn(dbProd);
-
-        foreach (var row in DateRows)
+        [RelayCommand]
+        public async Task BtnSalvaEsci()
         {
-            var updates = row.Fields.Select(field =>
+            string dbProd = "pmo";
+
+            string strConn = await Conn.MysqlConn(dbProd);
+
+            foreach (var row in DateRows)
             {
-                string valueSql;
-
-                if (field.IsValidDate)
+                var updates = row.Fields.Select(field =>
                 {
-                    var parsed = field.ParsedDate;
-                    var firstOfMonth = new DateTime(parsed.Year, parsed.Month, 1);
-                    valueSql = $"'{firstOfMonth:yyyy-MM-dd}'";
-                }
-                else
-                {
-                    valueSql = "NULL";
-                }
+                    string valueSql;
 
-                return $"`{field.Key}` = {valueSql}";
-            });
+                    if (field.IsValidDate)
+                    {
+                        var parsed = field.ParsedDate;
+                        var firstOfMonth = new DateTime(parsed.Year, parsed.Month, 1);
+                        valueSql = $"'{firstOfMonth:yyyy-MM-dd}'";
+                    }
+                    else
+                    {
+                        valueSql = "NULL";
+                    }
 
-            string sql = $"UPDATE `01_tabella_data` SET {string.Join(", ", updates)} WHERE id = {row.Id};";
-            await SqlAsync.SqlNoQryString(strConn, sql);
+                    return $"`{field.Key}` = {valueSql}";
+                });
+
+                string sql = $"UPDATE `01_tabella_data` SET {string.Join(", ", updates)} WHERE id = {row.Id};";
+                await SqlAsync.SqlNoQryString(strConn, sql);
+            }
+            await TestDate.VerificaDateDaTabellaAsync(strConn, "01_tabella_data");
+
+            await Shell.Current.GoToAsync(nameof(MainPageView));
         }
-        await TestDate.VerificaDateDaTabellaAsync(strConn, "01_tabella_data");
 
-        await Shell.Current.GoToAsync(nameof(MainPageView));
-    }
-
-    [RelayCommand]
-    public async Task BtnAnnullaEsci()
-    {
-        await Shell.Current.GoToAsync(nameof(MainPageView));
+        [RelayCommand]
+        public async Task BtnAnnullaEsci()
+        {
+            await Shell.Current.GoToAsync(nameof(MainPageView));
+        }
     }
 }
+
