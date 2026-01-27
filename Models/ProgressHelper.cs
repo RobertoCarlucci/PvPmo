@@ -4,7 +4,8 @@
     {
         public static async Task<Dictionary<string, string>> CaricaDescrizioniAsync()
         {
-            var lista = await EmbeddedJsonLoader.LoadJsonAsync<ProgressConfig>("ProgressConfig.json");
+            var databaseService = ServiceHelper.GetService<DatabaseService>();
+            var lista = await databaseService.GetProgressConfigsAsync();
 
             return lista
                 .Where(p => !string.IsNullOrWhiteSpace(p.TabellaSql) &&

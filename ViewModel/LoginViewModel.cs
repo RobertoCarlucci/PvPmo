@@ -6,9 +6,9 @@ public partial class LoginViewModel : BaseViewModel
     private readonly ServizioAutenticazione _auth;
     private readonly string utenteWindows;
 
-    public LoginViewModel()
+    public LoginViewModel(ServizioAutenticazione auth)
     {
-        _auth = new ServizioAutenticazione();
+        _auth = auth;
         utenteWindows = $"{Environment.UserDomainName}\\{Environment.UserName}";
         Title = "Pagina di Accesso";
     }
@@ -26,7 +26,7 @@ public partial class LoginViewModel : BaseViewModel
         IsBusy = true;
         try
         {
-            var utente = _auth.Autentica(NomeUtente, Password);
+            var utente = await _auth.AutenticaAsync(NomeUtente, Password);
             if (utente is not null)
                 await Shell.Current.GoToAsync(nameof(MainPageView));
             //App.Current.MainPage = new MainPage(new MainViewModel(utente));
@@ -45,7 +45,7 @@ public partial class LoginViewModel : BaseViewModel
         IsBusy = true;
         try
         {
-            var utente = _auth.Autentica(utenteWindows, null);
+            var utente = await _auth.AutenticaAsync(utenteWindows, null);
             if (utente is not null)
                 await Shell.Current.GoToAsync(nameof(MainPageView));
             //App.Current.MainPage = new MainPage(new MainViewModel(utente));

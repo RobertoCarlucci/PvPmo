@@ -2,13 +2,18 @@
 
 public partial class ModDataView : ContentPage
 {
-	public ModDataView(ModDataViewModel viewModel)
-	{
-        InitializeComponent();
-		BindingContext = viewModel;        
-    }
-    protected override void OnNavigatedTo(NavigatedToEventArgs args)
+    private readonly ModDataViewModel _viewModel;
+
+    public ModDataView(ModDataViewModel viewModel)
     {
-        base.OnNavigatedTo(args);
+        InitializeComponent();
+        _viewModel = viewModel;
+        BindingContext = viewModel;        
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await _viewModel.InitializeAsync();
     }
 }

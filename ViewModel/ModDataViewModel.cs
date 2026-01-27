@@ -10,43 +10,65 @@ public partial class ModDataViewModel : BaseViewModel
     public ModDataViewModel()
     {
         Title = "Modifica Date";
-        _ = LoadAsync();
+    }
+
+    public async Task InitializeAsync()
+    {
+        await LoadAsync();
     }
 
     public async Task LoadAsync()
     {
-        string dbProd = "pmo";
-        string strConn = await Conn.MysqlConn(dbProd);
+        if (IsBusy)
+            return;
 
-        string query = "SELECT * FROM `01_tabella_data`;";
-        var table = new DataTable();
-
-        await SqlAsync.SqlQryDataTable(strConn, query, table);
-
-        foreach (DataRow row in table.Rows)
+        try
         {
-            var dateRow = new DateRowViewModel();
+            IsBusy = true;
 
-            foreach (DataColumn col in table.Columns)
+            string dbProd = "pmo";
+            string strConn = await Conn.MysqlConn(dbProd);
+
+            string query = "SELECT * FROM `01_tabella_data`;";
+            var table = new DataTable();
+
+            await SqlAsync.SqlQryDataTable(strConn, query, table);
+
+            DateRows.Clear();
+
+            foreach (DataRow row in table.Rows)
             {
-                var columnName = col.ColumnName;
+                var dateRow = new DateRowViewModel();
 
-                if (columnName.Equals("id", StringComparison.OrdinalIgnoreCase))
+                foreach (DataColumn col in table.Columns)
                 {
-                    if (int.TryParse(row[columnName]?.ToString(), out int idVal))
-                        dateRow.Id = idVal;
-                    continue;
-                }               
+                    var columnName = col.ColumnName;
 
-                var value = row[columnName]?.ToString() ?? string.Empty;
+                    if (columnName.Equals("id", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (int.TryParse(row[columnName]?.ToString(), out int idVal))
+                            dateRow.Id = idVal;
+                        continue;
+                    }               
 
-                dateRow.Fields.Add(new FieldItem
-                {
-                    Key = columnName,
-                    Value = value
-                });
+                    var value = row[columnName]?.ToString() ?? string.Empty;
+
+                    dateRow.Fields.Add(new FieldItem
+                    {
+                        Key = columnName,
+                        Value = value
+                    });
+                }
+                DateRows.Add(dateRow);
             }
-            DateRows.Add(dateRow);
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Errore", $"Errore durante il caricamento: {ex.Message}", "OK");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 

@@ -1,11 +1,12 @@
 ﻿using PvPmo.View;
 using System.Collections.ObjectModel;
-using System.Text.Json;
 
 namespace PvPmo.ViewModel
 {
     public partial class JsonEditorViewModel : BaseViewModel
     {
+        private readonly DatabaseService _databaseService;
+
         [ObservableProperty]
         private ConfigOption? tipoSelezionato;
 
@@ -21,6 +22,13 @@ namespace PvPmo.ViewModel
                 new ConfigOption { Tipo = JsonConfigType.Finalizza },
                 new ConfigOption { Tipo = JsonConfigType.Utenti }
             };
+
+        public JsonEditorViewModel(DatabaseService databaseService)
+        {
+            _databaseService = databaseService;
+            Title = "Seleziona Configurazione da Modificare.";
+        }
+
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             if (query.TryGetValue("tipo", out var tipoObj) &&
@@ -30,25 +38,20 @@ namespace PvPmo.ViewModel
                 _ = CaricaAsync(tipoParsed);
             }
         }
-        public JsonEditorViewModel()
-        {
-            Title = "Seleziona Configurazione da Modificare.";
-        }
+
         public async Task CaricaAsync(JsonConfigType tipo)
         {
-            string fileName = tipo == JsonConfigType.Utenti ? "utenti.json" : $"{tipo}Config.json";
-
             TipoSelezionato = TipiDisponibili.FirstOrDefault(c => c.Tipo == tipo);
 
             Configurazioni.Clear();
 
             IEnumerable<object>? elementi = tipo switch
             {
-                JsonConfigType.Origine => await EmbeddedJsonLoader.LoadJsonAsync<OrigineConfig>(fileName),
-                JsonConfigType.Normalizza => await EmbeddedJsonLoader.LoadJsonAsync<NormalizzaConfig>(fileName),
-                JsonConfigType.Progress => await EmbeddedJsonLoader.LoadJsonAsync<ProgressConfig>(fileName),
-                JsonConfigType.Finalizza => await EmbeddedJsonLoader.LoadJsonAsync<FinalizzaConfig>(fileName),
-                JsonConfigType.Utenti => await EmbeddedJsonLoader.LoadJsonAsync<Utente>(fileName),
+                JsonConfigType.Origine => await _databaseService.GetOrigineConfigsAsync(),
+                JsonConfigType.Normalizza => await _databaseService.GetNormalizzaConfigsAsync(),
+                JsonConfigType.Progress => await _databaseService.GetProgressConfigsAsync(),
+                JsonConfigType.Finalizza => await _databaseService.GetFinalizzaConfigsAsync(),
+                JsonConfigType.Utenti => await _databaseService.GetUtentiAsync(),
                 _ => Enumerable.Empty<object>()
             };
 
@@ -61,10 +64,36 @@ namespace PvPmo.ViewModel
         {
             if (TipoSelezionato?.Tipo is not JsonConfigType tipo) return;
 
-            string fileName = tipo == JsonConfigType.Utenti ? "utenti.json" : $"{tipo}Config.json";
-            string path = Path.Combine(FileSystem.AppDataDirectory, fileName);
-            var json = JsonSerializer.Serialize(Configurazioni, new JsonSerializerOptions { WriteIndented = true });
-            await File.WriteAllTextAsync(path, json);
+            try
+            {
+                foreach (var item in Configurazioni)
+                {
+                    switch (tipo)
+                    {
+                        case JsonConfigType.Utenti:
+                            await _databaseService.SaveUtenteAsync((Utente)item);
+                            break;
+                        case JsonConfigType.Origine:
+                            await _databaseService.SaveOrigineConfigAsync((OrigineConfig)item);
+                            break;
+                        case JsonConfigType.Normalizza:
+                            await _databaseService.SaveNormalizzaConfigAsync((NormalizzaConfig)item);
+                            break;
+                        case JsonConfigType.Progress:
+                            await _databaseService.SaveProgressConfigAsync((ProgressConfig)item);
+                            break;
+                        case JsonConfigType.Finalizza:
+                            await _databaseService.SaveFinalizzaConfigAsync((FinalizzaConfig)item);
+                            break;
+                    }
+                }
+
+                await Shell.Current.DisplayAlert("Successo", "Modifiche salvate nel database!", "OK");
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Errore", $"Errore durante il salvataggio: {ex.Message}", "OK");
+            }
         }
 
         [RelayCommand]

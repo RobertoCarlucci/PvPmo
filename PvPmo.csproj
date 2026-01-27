@@ -38,11 +38,6 @@
 		<DefineConstants>RELEASE;PROD</DefineConstants>
 	</PropertyGroup>
 
-	<!-- File JSON nella cartella Data -->
-	<ItemGroup>
-		<EmbeddedResource Include="Data\*.json" />
-	</ItemGroup>
-
 	<!-- Icone e splash -->
 	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
@@ -83,6 +78,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.110" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
 		<PackageReference Include="MySqlConnector" Version="2.4.0" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="System.Data.OleDb" Version="9.0.9" />
 	</ItemGroup>
 
@@ -118,6 +114,12 @@
 		<MauiXaml Update="View\ModDataView.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
+	</ItemGroup>
+
+	<!-- Risorse incorporate -->
+	<ItemGroup>
+		<EmbeddedResource Include="Data\appsettings.DEV.json" />
+		<EmbeddedResource Include="Data\appsettings.PROD.json" />
 	</ItemGroup>
 
 	<!-- Cartelle -->

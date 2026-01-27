@@ -11,7 +11,8 @@ public partial class InpAcsToSql()
         string dbProd = "pmo";
 
         var descrizioni = await ProgressHelper.CaricaDescrizioniAsync();
-        var dati = await EmbeddedJsonLoader.LoadJsonAsync<OrigineConfig>("OrigineConfig.json");        
+        var databaseService = ServiceHelper.GetService<DatabaseService>();
+        var dati = await databaseService.GetOrigineConfigsAsync();        
 
         // Aggiunto per evitare che un errore blocchi tutte le tabelle:
 

@@ -36,7 +36,9 @@ namespace PvPmo
 
             //Services
 
-            builder.Services.AddSingleton<SagaService>();            
+            builder.Services.AddSingleton<DatabaseService>();
+            builder.Services.AddSingleton<ServizioAutenticazione>();
+            builder.Services.AddSingleton<SagaService>();
 
             return builder.Build();
         }        

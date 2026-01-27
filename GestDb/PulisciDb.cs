@@ -9,7 +9,8 @@
             //    // Carico il File dall'archivio con la sequenza da svolgere
             //    // e provvedo all'esecuzione.
 
-            var final = await EmbeddedJsonLoader.LoadJsonAsync<FinalizzaConfig>("FinalizzaConfig.json");
+            var databaseService = ServiceHelper.GetService<DatabaseService>();
+            var final = await databaseService.GetFinalizzaConfigsAsync();
 
             bool tuttoOK = true;
             string _connProd = string.Empty;

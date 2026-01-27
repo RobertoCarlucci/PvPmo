@@ -12,7 +12,8 @@ namespace PvPmo.Import
         public static async Task<bool> NormTabImp(string tipoImportazione, string dblavoro)
         {            
             // Carico la tabella con le azioni da svolgere dal Service
-            var dati = await EmbeddedJsonLoader.LoadJsonAsync<NormalizzaConfig>("NormalizzaConfig.json");
+            var databaseService = ServiceHelper.GetService<DatabaseService>();
+            var dati = await databaseService.GetNormalizzaConfigsAsync();
 
             bool esitoGlobale = true;
 

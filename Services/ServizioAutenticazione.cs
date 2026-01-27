@@ -1,23 +1,20 @@
-﻿using System.Reflection;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 
 namespace PvPmo.Services
 {
     public class ServizioAutenticazione
     {
-        private readonly List<Utente> _utenti;
+        private readonly DatabaseService _databaseService;
 
-        public ServizioAutenticazione()
+        public ServizioAutenticazione(DatabaseService databaseService)
         {
-            _utenti = CaricaUtentiDaEmbedded("utenti.json");
+            _databaseService = databaseService;
         }
 
-        public Utente? Autentica(string nomeInserito, string? password)
+        public async Task<Utente?> AutenticaAsync(string nomeInserito, string? password)
         {
-            var utente = _utenti.FirstOrDefault(u =>
-                u.NomeUtente.Equals(nomeInserito, StringComparison.OrdinalIgnoreCase));
+            var utente = await _databaseService.GetUtenteByNameAsync(nomeInserito);
 
             if (utente is null) return null;
 
@@ -36,26 +33,6 @@ namespace PvPmo.Services
             using var sha = SHA256.Create();
             var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(input));
             return Convert.ToHexString(bytes).ToLower();
-        }
-
-        private static List<Utente> CaricaUtentiDaEmbedded(string fileName)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = assembly.GetManifestResourceNames()
-                .FirstOrDefault(r => r.EndsWith(fileName, StringComparison.OrdinalIgnoreCase));
-
-            if (resourceName is null)
-                throw new FileNotFoundException($"Risorsa embedded '{fileName}' non trovata.");
-
-            using var stream = assembly.GetManifestResourceStream(resourceName)!;
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false) }
-            };
-
-            return JsonSerializer.Deserialize<List<Utente>>(stream, options) ?? new();
         }
     }
 }

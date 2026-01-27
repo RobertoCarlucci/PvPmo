@@ -23,7 +23,8 @@
             }
 
             var descrizioni = await ProgressHelper.CaricaDescrizioniAsync();
-            var dati = await EmbeddedJsonLoader.LoadJsonAsync<OrigineConfig>("OrigineConfig.json");
+            var databaseService = ServiceHelper.GetService<DatabaseService>();
+            var dati = await databaseService.GetOrigineConfigsAsync();
 
             var validi = dati.Where(n =>
                 n.InpType == type &&

@@ -17,6 +17,8 @@ public partial class FieldItem : ObservableObject
     private string key = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsValidDate))]
+    [NotifyPropertyChangedFor(nameof(ParsedDate))]
     private string value = string.Empty;
 
     public bool IsValidDate => DateTime.TryParse(Value, out _);
