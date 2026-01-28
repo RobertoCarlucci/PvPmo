@@ -1,49 +1,49 @@
-﻿namespace PvPmo.GestDb
+﻿namespace PvPmo.GestDb;
+
+public class AcsAsync
 {
-    public class AcsAsync
-    {
-        private static OleDbConnection? conn; // Marked as nullable
+    private static OleDbConnection? conn; // Marked as nullable
 
-        public static async Task<bool> TestConnAcs(string strConn)
-        {            
-            await using var connection = new OleDbConnection(strConn);
+    public static async Task<bool> TestConnAcs(string strConn)
+    {            
+        await using var connection = new OleDbConnection(strConn);
 
-            try
-            {
-                // Il principio è identico: tentiamo di aprire la connessione.
-                await connection.OpenAsync();                
-
-                return true;
-            }
-            catch (OleDbException ex)
-            {
-                await DbErrorHandler.ShowOleDbErrorAsync(ex, "Importazione Access");
-                throw;
-            }
-        }
-        public static async Task<DataTable> AcsQryTab(string strConn, string qry, DataTable tabella)
+        try
         {
-            try
+            // Il principio è identico: tentiamo di aprire la connessione.
+            await connection.OpenAsync();                
+
+            return true;
+        }
+        catch (OleDbException ex)
+        {
+            await DbErrorHandler.ShowOleDbErrorAsync(ex, "Importazione Access");
+            throw;
+        }
+    }
+    public static async Task<DataTable> AcsQryTab(string strConn, string qry, DataTable tabella)
+    {
+        try
+        {
+            conn = new OleDbConnection(strConn); // Assigning a value to the static field
+            conn.Open();
+            var cmd = new OleDbCommand(qry, conn);
+            var _adapter = new OleDbDataAdapter(cmd);
+            int ContaRecord = _adapter.Fill(tabella);
+            return tabella;
+        }
+        catch (OleDbException ex)
+        {
+            await DbErrorHandler.ShowOleDbErrorAsync(ex, "Importazione Access");
+            throw;
+        }
+        finally
+        {
+            if (conn != null && conn.State == ConnectionState.Open)
             {
-                conn = new OleDbConnection(strConn); // Assigning a value to the static field
-                conn.Open();
-                var cmd = new OleDbCommand(qry, conn);
-                var _adapter = new OleDbDataAdapter(cmd);
-                int ContaRecord = _adapter.Fill(tabella);
-                return tabella;
-            }
-            catch (OleDbException ex)
-            {
-                await DbErrorHandler.ShowOleDbErrorAsync(ex, "Importazione Access");
-                throw;
-            }
-            finally
-            {
-                if (conn != null && conn.State == ConnectionState.Open)
-                {
-                    await conn.CloseAsync();
-                }
+                await conn.CloseAsync();
             }
         }
     }
-}  
+}
+

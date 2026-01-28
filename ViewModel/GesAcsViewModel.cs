@@ -1,86 +1,85 @@
 ﻿using PvPmo.Import;
 using PvPmo.View;
 
-namespace PvPmo.ViewModel
+namespace PvPmo.ViewModel;
+
+public partial class GesAcsViewModel : BaseViewModel
 {
-    public partial class GesAcsViewModel : BaseViewModel
+    public GesAcsViewModel()
     {
-        public GesAcsViewModel()
-        {
-            Title = "Gestione Db Access.";
-        }      
+        Title = "Gestione Db Access.";
+    }      
 
-        [RelayCommand]
-        async Task BtnImpAcs()
-        {
-            if (IsBusy)
-                return;
-
-            IsBusy = true;
-            StartProgress();
-
-            var progress = new Progress<string>(label =>
-            {
-                TabellaCorrente = label;
-            });
-            try
-            {
-                await InpAcsToSql.NewDb("ACS", progress);
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Errore", ex.Message, "OK");
-            }
-
-            await Task.Delay(500);
-            ResetProgress();
-
-            IsBusy = false;
+    [RelayCommand]
+    async Task BtnImpAcs()
+    {
+        if (IsBusy)
             return;
+
+        IsBusy = true;
+        StartProgress();
+
+        var progress = new Progress<string>(label =>
+        {
+            TabellaCorrente = label;
+        });
+        try
+        {
+            await InpAcsToSql.NewDb("ACS", progress);
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Errore", ex.Message, "OK");
         }
 
-        [RelayCommand]
-        async Task BtnImpSetup()
-        {
-            if (IsBusy)
-                return;
+        await Task.Delay(500);
+        ResetProgress();
 
-            IsBusy = true;
+        IsBusy = false;
+        return;
+    }
 
-            await InpExlSetup.NewSetup();
-
-            IsBusy = false;
+    [RelayCommand]
+    async Task BtnImpSetup()
+    {
+        if (IsBusy)
             return;
-        }
 
-        [RelayCommand]
-        async Task BtnApriLog()
+        IsBusy = true;
+
+        await InpExlSetup.NewSetup();
+
+        IsBusy = false;
+        return;
+    }
+
+    [RelayCommand]
+    async Task BtnApriLog()
+    {
+        try
         {
-            try
-            {
-                var latestLog = LogManager.GetLatestLogFilePath();
+            var latestLog = LogManager.GetLatestLogFilePath();
 
-                if (!string.IsNullOrEmpty(latestLog) && File.Exists(latestLog))
-                {
-                    await Launcher.Default.OpenAsync(new OpenFileRequest("Visualizza Log", new ReadOnlyFile(latestLog)));
-                }
-                else
-                {
-                    await Shell.Current.DisplayAlert("Log", "Nessun file di log trovato.", "OK");
-                }
-            }
-            catch (Exception ex)
+            if (!string.IsNullOrEmpty(latestLog) && File.Exists(latestLog))
             {
-                await Shell.Current.DisplayAlert("Errore apertura log", ex.Message, "OK");
+                await Launcher.Default.OpenAsync(new OpenFileRequest("Visualizza Log", new ReadOnlyFile(latestLog)));
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("Log", "Nessun file di log trovato.", "OK");
             }
         }
-
-        [RelayCommand]
-        async Task BtnAnnullaEsci()
+        catch (Exception ex)
         {
-            if (IsBusy)
-                return;
-            await Shell.Current.GoToAsync(nameof(MainPageView));
+            await Shell.Current.DisplayAlert("Errore apertura log", ex.Message, "OK");
         }
+    }
+
+    [RelayCommand]
+    async Task BtnAnnullaEsci()
+    {
+        if (IsBusy)
+            return;
+        await Shell.Current.GoToAsync(nameof(MainPageView));
     }
 }

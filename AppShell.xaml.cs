@@ -1,18 +1,17 @@
 ﻿using PvPmo.View;
 
-namespace PvPmo
+namespace PvPmo;
+
+public partial class AppShell : Shell
 {
-    public partial class AppShell : Shell
+    public AppShell()
     {
-        public AppShell()
-        {
-            InitializeComponent();
-            Routing.RegisterRoute(nameof(LoginView), typeof(LoginView));
-            Routing.RegisterRoute(nameof(MainPageView), typeof(MainPageView));
-            Routing.RegisterRoute(nameof(ModDataView), typeof(ModDataView));
-            Routing.RegisterRoute(nameof(GesAcsView), typeof(GesAcsView));
-            Routing.RegisterRoute(nameof(JsonEditorView), typeof(JsonEditorView));
-            Routing.RegisterRoute(nameof(EditorConfigView), typeof(EditorConfigView));
-        }
+        InitializeComponent();
+        Routing.RegisterRoute(nameof(LoginView), typeof(LoginView));
+        Routing.RegisterRoute(nameof(MainPageView), typeof(MainPageView));
+        Routing.RegisterRoute(nameof(ModDataView), typeof(ModDataView));
+        Routing.RegisterRoute(nameof(GesAcsView), typeof(GesAcsView));
+        Routing.RegisterRoute(nameof(JsonEditorView), typeof(JsonEditorView));
+        Routing.RegisterRoute(nameof(EditorConfigView), typeof(EditorConfigView));
     }
 }
