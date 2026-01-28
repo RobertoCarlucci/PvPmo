@@ -84,21 +84,6 @@
 
 	<!-- XAML -->
 	<ItemGroup>		
-		<MauiXaml Update="Resources\Templates\FinalizzaTemplate.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</MauiXaml>		
-		<MauiXaml Update="Resources\Templates\NormalizzaTemplate.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</MauiXaml>		
-		<MauiXaml Update="Resources\Templates\OrigineTemplate.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</MauiXaml>		
-		<MauiXaml Update="Resources\Templates\ProgressTemplate.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</MauiXaml>		
-		<MauiXaml Update="Resources\Templates\UtenteTemplate.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</MauiXaml>		
 		<MauiXaml Update="View\EditorConfigView.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>		
