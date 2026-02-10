@@ -71,15 +71,15 @@
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="12.2.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.9" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
+		<PackageReference Include="DocumentFormat.OpenXml" Version="3.4.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.2" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.110" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
-		<PackageReference Include="MySqlConnector" Version="2.4.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.2" />
+		<PackageReference Include="MySqlConnector" Version="2.5.0" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-		<PackageReference Include="System.Data.OleDb" Version="9.0.9" />
+		<PackageReference Include="System.Data.OleDb" Version="10.0.2" />
 	</ItemGroup>
 
 	<!-- XAML -->
@@ -108,9 +108,6 @@
 	</ItemGroup>
 
 	<!-- Cartelle -->
-	<ItemGroup>
-		<Folder Include="Archivio\Setup\" />
-	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="View\GesAcsView.xaml.cs">
 			<DependentUpon>GesAcsView.xaml</DependentUpon>

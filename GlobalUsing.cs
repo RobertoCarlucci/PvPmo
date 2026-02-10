@@ -6,6 +6,7 @@ global using PvPmo.GestDb;
 global using CommunityToolkit.Mvvm.ComponentModel;
 global using CommunityToolkit.Mvvm.Input;
 global using CommunityToolkit.Maui;
+global using SQLite;
 global using System.Data.OleDb;
 global using System.Data;
 global using MySqlConnector;
