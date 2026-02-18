@@ -17,10 +17,7 @@
         Route="ModDataView" />
     <ShellContent        
         ContentTemplate="{DataTemplate view:GesAcsView}"
-        Route="GesAcsView" />
-    <ShellContent        
-        ContentTemplate="{DataTemplate view:JsonEditorView}"
-        Route="JsonEditorView" />
+        Route="GesAcsView" />    
     <ShellContent        
         ContentTemplate="{DataTemplate view:EditorConfigView}"
         Route="EditorConfigView" />

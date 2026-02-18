@@ -127,10 +127,11 @@ namespace PvPmo.Services
         }
 
         // Ottiene il valore di una cella, gestendo stringhe condivise
-        
+
         private static string? GetCellValue(ExcelCell cell, WorkbookPart workbookPart)
         {
-            string? value = cell.InnerText;
+            // Priorità a CellValue.Text per ottenere i risultati delle formule calcolate
+            string? value = cell.CellValue?.Text ?? cell.InnerText;
 
             if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
             {

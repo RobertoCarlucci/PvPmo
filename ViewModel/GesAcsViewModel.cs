@@ -54,6 +54,20 @@ public partial class GesAcsViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    async Task BtnImpSupport()
+    {
+        if (IsBusy)
+            return;
+
+        IsBusy = true;
+
+        await ImpSupportTables.ImportSupportTables();
+
+        IsBusy = false;
+        return;
+    }
+
+    [RelayCommand]
     async Task BtnApriLog()
     {
         try

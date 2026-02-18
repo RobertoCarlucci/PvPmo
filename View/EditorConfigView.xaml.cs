@@ -2,7 +2,7 @@ namespace PvPmo.View;
 
 public partial class EditorConfigView : ContentPage
 {
-	public EditorConfigView(JsonEditorViewModel viewModel)
+	public EditorConfigView(EditorConfigViewModel viewModel)
 	{
 		InitializeComponent();
         BindingContext = viewModel;

@@ -10,8 +10,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(LoginView), typeof(LoginView));
         Routing.RegisterRoute(nameof(MainPageView), typeof(MainPageView));
         Routing.RegisterRoute(nameof(ModDataView), typeof(ModDataView));
-        Routing.RegisterRoute(nameof(GesAcsView), typeof(GesAcsView));
-        Routing.RegisterRoute(nameof(JsonEditorView), typeof(JsonEditorView));
+        Routing.RegisterRoute(nameof(GesAcsView), typeof(GesAcsView));       
         Routing.RegisterRoute(nameof(EditorConfigView), typeof(EditorConfigView));
     }
 }

@@ -41,6 +41,14 @@
                 Grid.Column="0"  
                 Margin="40"/>
 
+        <Button Text="Importa File Supporto."  
+                Style="{StaticResource MyButton}"  
+                Command="{Binding BtnImpSupportCommand}"  
+                IsEnabled="{Binding IsNotBusy}"  
+                Grid.Row="2"  
+                Grid.Column="0"  
+                Margin="40"/>
+
         <Button Text="Apri Log"
                 Style="{StaticResource MyButton}"
                 Command="{Binding BtnApriLogCommand}"

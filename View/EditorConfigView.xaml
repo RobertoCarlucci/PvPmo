@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
     xmlns:models="clr-namespace:PvPmo.Models"
-    x:DataType="viewmodel:JsonEditorViewModel"
+    x:DataType="viewmodel:EditorConfigViewModel"
     x:Class="PvPmo.View.EditorConfigView"
     Title="Modifica Configurazione JSON">
 
@@ -16,15 +16,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="130"/>
         </Grid.RowDefinitions>
-
-        <!--<Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>-->
+        
 
         <!-- Sfondo -->
         <Image Source="wallpaper_dl.png"
@@ -35,38 +27,13 @@
                VerticalOptions="Fill"/>
 
         <!-- Contenuto -->
-        <VerticalStackLayout Spacing="20"
-                             Grid.Row="0">
-            
-            <Label Text="{Binding TipoSelezionato.TitoloConfig}"                   
-                   FontSize="28" 
-                   FontAttributes="Bold" 
-                   HorizontalOptions="Center" />
 
-            <!-- CollectionView con ConfigTemplateSelector -->
-            <CollectionView ItemsSource="{Binding Configurazioni}"
-                            ItemTemplate="{StaticResource ConfigTemplateSelector}"
-                            VerticalScrollBarVisibility="Always"
-                            SelectionMode="None"
-                            Margin="10">               
-
-                <CollectionView.EmptyView>
-                    <Label Text="Nessuna configurazione disponibile"
-                           FontAttributes="Italic"
-                           TextColor="Gray"
-                           HorizontalOptions="Center"
-                           Margin="20"/>
-                </CollectionView.EmptyView>
-            </CollectionView>
-
-
-        </VerticalStackLayout>
         
         <Button Text="Salva modifiche"
                 Command="{Binding SalvaCommand}"
                 Style="{StaticResource MyButton}" 
                 VerticalOptions="Center"  
-                Grid.Row="2"  
+                Grid.Row="1"  
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="40"/>

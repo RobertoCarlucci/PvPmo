@@ -3,11 +3,11 @@ using System.Collections.ObjectModel;
 
 namespace PvPmo.ViewModel;
 
-public partial class JsonEditorViewModel : BaseViewModel
+public partial class EditorConfigViewModel : BaseViewModel
 {
     private readonly DatabaseService _databaseService;        
 
-    public JsonEditorViewModel(DatabaseService databaseService)
+    public EditorConfigViewModel(DatabaseService databaseService)
     {
         _databaseService = databaseService;
         Title = "Seleziona Configurazione da Modificare.";
@@ -30,7 +30,7 @@ public partial class JsonEditorViewModel : BaseViewModel
     [RelayCommand]
     public async Task BtnAnnullaTorna()
     {
-        await Shell.Current.GoToAsync(nameof(JsonEditorView));
+        await Shell.Current.GoToAsync(nameof(MainPageView));
     }
 
     [ObservableProperty]

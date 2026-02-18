@@ -29,10 +29,9 @@ public static class MauiProgram
         builder.Services.AddTransient<GesAcsView>();
         builder.Services.AddTransient<GesAcsViewModel>();
         builder.Services.AddTransient<ModDataView>();
-        builder.Services.AddTransient<ModDataViewModel>();
-        builder.Services.AddTransient<JsonEditorView>();
+        builder.Services.AddTransient<ModDataViewModel>();       
         builder.Services.AddTransient<EditorConfigView>();
-        builder.Services.AddSingleton<JsonEditorViewModel>();
+        builder.Services.AddSingleton<EditorConfigViewModel>();
 
         //Services
 
