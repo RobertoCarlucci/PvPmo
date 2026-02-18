@@ -1,5 +1,4 @@
 ﻿using PvPmo.View;
-using System.Collections.ObjectModel;
 
 namespace PvPmo.ViewModel;
 
@@ -11,9 +10,7 @@ public partial class EditorConfigViewModel : BaseViewModel
     {
         _databaseService = databaseService;
         Title = "Seleziona Configurazione da Modificare.";
-    }
-
-            
+    }            
 
     [RelayCommand]
     public async Task SalvaAsync()
@@ -32,25 +29,5 @@ public partial class EditorConfigViewModel : BaseViewModel
     {
         await Shell.Current.GoToAsync(nameof(MainPageView));
     }
-
-    [ObservableProperty]
-    private ConfigOption? selectedTipo;
-
-    partial void OnSelectedTipoChanged(ConfigOption? value)
-    {
-        if (value is not null)
-            ApriEditorCommand.Execute(value);
-    }
     
-    public void CaricaConfigurazioni(ConfigOption tipo)
-    {
-            
-    }
-
-
-    [RelayCommand]
-    public async Task ApriEditor(ConfigOption opzione)
-    {           
-        
-    }
 }

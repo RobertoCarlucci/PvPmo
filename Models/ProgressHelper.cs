@@ -1,19 +1,20 @@
-﻿namespace PvPmo.Models;
-
-public static class ProgressHelper
+﻿namespace PvPmo.Models
 {
-    public static async Task<Dictionary<string, string>> CaricaDescrizioniAsync()
+    public static class ProgressHelper
     {
-        var databaseService = ServiceHelper.GetService<DatabaseService>();
-        var lista = await databaseService.GetProgressConfigsAsync();
+        public static async Task<Dictionary<string, string>> CaricaDescrizioniAsync()
+        {
+            var databaseService = ServiceHelper.GetService<DatabaseService>();
+            var lista = await databaseService.GetProgressConfigsAsync();
 
-        return lista
-            .Where(p => !string.IsNullOrWhiteSpace(p.TabellaSql) &&
-                        !string.IsNullOrWhiteSpace(p.DbName) &&
-                        !string.IsNullOrWhiteSpace(p.Descrizione))
-            .ToDictionary(
-                p => $"{p.TabellaSql}|{p.DbName}",
-                p => p.Descrizione!
-            );
+            return lista
+                .Where(p => !string.IsNullOrWhiteSpace(p.TabellaSql) &&
+                            !string.IsNullOrWhiteSpace(p.DbName) &&
+                            !string.IsNullOrWhiteSpace(p.Descrizione))
+                .ToDictionary(
+                    p => $"{p.TabellaSql}|{p.DbName}",
+                    p => p.Descrizione!
+                );
+        }
     }
 }

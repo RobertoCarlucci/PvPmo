@@ -1,6 +1,4 @@
-﻿using SQLite;
-
-namespace PvPmo.Models;
+﻿namespace PvPmo.Models;
 
 [Table("FinalizzaConfig")]
 public class FinalizzaConfig
