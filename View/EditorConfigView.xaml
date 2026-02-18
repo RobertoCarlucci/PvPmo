@@ -6,36 +6,76 @@
     xmlns:models="clr-namespace:PvPmo.Models"
     x:DataType="viewmodel:EditorConfigViewModel"
     x:Class="PvPmo.View.EditorConfigView"
-    Title="Modifica Configurazione JSON">
+    Title="{Binding Title}">
 
-    <Grid x:Name="MyGrid"              
-          RowSpacing="0">
+    <Grid
+        ColumnDefinitions="*,*,*"           
+        RowSpacing="0">
 
-        <Grid.RowDefinitions>            
-            <RowDefinition Height="100*" />
+        <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="130"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        
 
-        <!-- Sfondo -->
-        <Image Source="wallpaper_dl.png"
-               Aspect="AspectFill"               
-               Grid.RowSpan="2"  
-               Grid.ColumnSpan="6"  
-               HorizontalOptions="Fill"
-               VerticalOptions="Fill"/>
+
+        <Image  x:Name="backgroundImage"
+                Source="wallpaper_dl.png"
+                Grid.RowSpan="4"
+                Grid.ColumnSpan="3"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Aspect="AspectFill" />
 
         <!-- Contenuto -->
 
-        
-        <Button Text="Salva modifiche"
+        <Button Text="Finalizza"
+                Command="{Binding SalvaCommand}"
+                Style="{StaticResource MyButton}" 
+                VerticalOptions="Center"  
+                Grid.Row="0"  
+                Grid.Column="0"                
+                Margin="40"/>
+
+        <Button Text="Normalizza"
                 Command="{Binding SalvaCommand}"
                 Style="{StaticResource MyButton}" 
                 VerticalOptions="Center"  
                 Grid.Row="1"  
-                Grid.Column="0"
-                Grid.ColumnSpan="3"
+                Grid.Column="0"                
+                Margin="40"/>
+
+        <Button Text="Origine"
+                Command="{Binding SalvaCommand}"
+                Style="{StaticResource MyButton}" 
+                VerticalOptions="Center"  
+                Grid.Row="2"  
+                Grid.Column="0"                
+                Margin="40"/>
+
+        <Button Text="Progress"
+                Command="{Binding SalvaCommand}"
+                Style="{StaticResource MyButton}" 
+                VerticalOptions="Center"  
+                Grid.Row="0"  
+                Grid.Column="1"                
+                Margin="40"/>
+
+        <Button Text="Utente"
+                Command="{Binding SalvaCommand}"
+                Style="{StaticResource MyButton}" 
+                VerticalOptions="Center"  
+                Grid.Row="1"  
+                Grid.Column="1"                
+                Margin="40"/>
+
+        <Button Text="File Setup"
+                Command="{Binding SalvaCommand}"
+                Style="{StaticResource MyButton}" 
+                VerticalOptions="Center"  
+                Grid.Row="2"  
+                Grid.Column="1"                
                 Margin="40"/>
 
         <Button Text="Torna"
@@ -43,8 +83,7 @@
                 Style="{StaticResource MyButton}"
                 VerticalOptions="Center"  
                 Grid.Row="2"  
-                Grid.Column="4"
-                Grid.ColumnSpan="3"
+                Grid.Column="2"                
                 Margin="40"/>
         
     </Grid>
