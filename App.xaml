@@ -10,6 +10,50 @@
         <ResourceDictionary>            
 
             <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+
+            <!-- DataTemplate per FileSetupConfig -->
+            <DataTemplate x:Key="FileSetupConfigTemplate">
+                <Border Style="{StaticResource ConfigBorderStyle}">
+                    <Grid ColumnDefinitions="Auto,*,*,*" 
+                          RowDefinitions="Auto,Auto" 
+                          Padding="10"
+                          ColumnSpacing="10"
+                          RowSpacing="5">
+
+                        <!-- Intestazioni -->
+                        <Label Grid.Row="0" Grid.Column="0" 
+                               Text="Id" 
+                               Style="{StaticResource ConfigIntestazioneCol}"/>
+                        <Label Grid.Row="0" Grid.Column="1" 
+                               Text="File Import" 
+                               Style="{StaticResource ConfigIntestazioneCol}"/>
+                        <Label Grid.Row="0" Grid.Column="2" 
+                               Text="Tab. Destinazione" 
+                               Style="{StaticResource ConfigIntestazioneCol}"/>
+                        <Label Grid.Row="0" Grid.Column="3" 
+                               Text="Descrizione" 
+                               Style="{StaticResource ConfigIntestazioneCol}"/>
+
+                        <!-- Valori -->
+                        <Label Grid.Row="1" Grid.Column="0" 
+                               Text="{Binding Id}" 
+                               Style="{StaticResource ConfigStileCol}"/>
+                        <Entry Grid.Row="1" Grid.Column="1" 
+                               Text="{Binding FileImp}" 
+                               Placeholder="Nome file"/>
+                        <Entry Grid.Row="1" Grid.Column="2" 
+                               Text="{Binding TabDest}" 
+                               Placeholder="Tabella destinazione"/>
+                        <Entry Grid.Row="1" Grid.Column="3" 
+                               Text="{Binding Descrizione}" 
+                               Placeholder="Descrizione"/>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+
+            <!-- ConfigTemplateSelector -->
+            <conv:ConfigTemplateSelector x:Key="ConfigTemplateSelector"
+                                         DefaultTemplate="{StaticResource FileSetupConfigTemplate}"/>
             
             <Color x:Key="Primary">#FFC107</Color>
             <Color x:Key="PrimaryDark">#FFA000</Color>

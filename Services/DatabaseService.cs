@@ -28,6 +28,7 @@ public class DatabaseService
                 await _database.CreateTableAsync<NormalizzaConfig>();
                 await _database.CreateTableAsync<ProgressConfig>();
                 await _database.CreateTableAsync<FinalizzaConfig>();
+                await _database.CreateTableAsync<FileSetupConfig>();
 
                 // Seed degli utenti di default al primo avvio
                 await SeedUtentiIfEmptyAsync();
@@ -189,6 +190,46 @@ public class DatabaseService
         return await _database.DeleteAsync(config);
     }
 
+    // --- FILE SETUP CONFIG ---
+    public async Task<List<FileSetupConfig>> GetFileSetupConfigsAsync()
+    {
+        await EnsureInitializedAsync();
+        return await _database.Table<FileSetupConfig>().ToListAsync();
+    }
+
+    public async Task<FileSetupConfig?> GetFileSetupConfigByIdAsync(int id)
+    {
+        await EnsureInitializedAsync();
+        return await _database.Table<FileSetupConfig>()
+            .Where(c => c.Id == id)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<int> SaveFileSetupConfigAsync(FileSetupConfig config)
+    {
+        await EnsureInitializedAsync();
+        if (config.Id != 0)
+            return await _database.UpdateAsync(config);
+        return await _database.InsertAsync(config);
+    }
+
+    public async Task<int> DeleteFileSetupConfigAsync(FileSetupConfig config)
+    {
+        await EnsureInitializedAsync();
+        return await _database.DeleteAsync(config);
+    }
+
+    public async Task<int> SaveAllFileSetupConfigsAsync(List<FileSetupConfig> configs)
+    {
+        await EnsureInitializedAsync();
+        int count = 0;
+        foreach (var config in configs)
+        {
+            count += await SaveFileSetupConfigAsync(config);
+        }
+        return count;
+    }
+
     // --- UTILITY ---
     public async Task<bool> IsDatabaseEmptyAsync()
     {
@@ -205,6 +246,7 @@ public class DatabaseService
         await _database.DeleteAllAsync<NormalizzaConfig>();
         await _database.DeleteAllAsync<ProgressConfig>();
         await _database.DeleteAllAsync<FinalizzaConfig>();
+        await _database.DeleteAllAsync<FileSetupConfig>();
     }
 
     public string GetDatabasePath() => _dbPath;

@@ -32,6 +32,8 @@ public static class MauiProgram
         builder.Services.AddTransient<ModDataViewModel>();       
         builder.Services.AddTransient<EditorConfigView>();
         builder.Services.AddSingleton<EditorConfigViewModel>();
+        builder.Services.AddTransient<FileSetupConfigView>();
+        builder.Services.AddTransient<FileSetupConfigViewModel>();
 
         //Services
 

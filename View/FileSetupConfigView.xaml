@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodel="clr-namespace:PvPmo.ViewModel"
+    xmlns:models="clr-namespace:PvPmo.Models"
+    x:DataType="viewmodel:FileSetupConfigViewModel"
+    x:Class="PvPmo.View.FileSetupConfigView"
+    Title="{Binding Title}">
+
+    <Grid x:Name="MyGrid" RowSpacing="0">
+        <Grid.RowDefinitions>            
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+
+        <!-- Sfondo -->
+        <Image Source="wallpaper_dl.png"
+               Aspect="AspectFill"               
+               Grid.RowSpan="4"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill"/>
+
+        <!-- Titolo -->
+        <Label Text="Configurazione File Setup"
+               FontSize="28" 
+               FontAttributes="Bold" 
+               HorizontalOptions="Center"
+               Margin="20"
+               Grid.Row="0"/>
+
+        <!-- CollectionView con ConfigTemplateSelector -->
+        <ScrollView Grid.Row="1" Margin="10">
+            <VerticalStackLayout Spacing="10">
+                <CollectionView ItemsSource="{Binding Configurazioni}"
+                                ItemTemplate="{StaticResource ConfigTemplateSelector}"
+                                SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="Nessuna configurazione disponibile"
+                               FontAttributes="Italic"
+                               TextColor="Gray"
+                               HorizontalOptions="Center"
+                               Margin="20"/>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Pulsante Aggiungi -->
+        <Button Text="Aggiungi Nuova Configurazione"
+                Command="{Binding AggiungiNuovaConfigurazioneCommand}"
+                Style="{StaticResource MyButton}" 
+                VerticalOptions="Center"
+                Grid.Row="2"
+                Margin="20"/>
+
+        <!-- Pulsanti Salva e Torna -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,*" Margin="20,10">
+            <Button Text="Salva modifiche"
+                    Command="{Binding SalvaCommand}"
+                    Style="{StaticResource MyButton}" 
+                    Grid.Column="0"
+                    Margin="5"/>
+
+            <Button Text="Annulla"
+                    Command="{Binding BtnAnnullaTornaCommand}"
+                    Style="{StaticResource MyButton}"
+                    Grid.Column="1"
+                    Margin="5"/>
+        </Grid>
+    </Grid>
+</ContentPage>

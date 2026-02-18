@@ -71,7 +71,7 @@
                 Margin="40"/>
 
         <Button Text="File Setup"
-                Command="{Binding SalvaCommand}"
+                Command="{Binding ApriFileSetupConfigCommand}"
                 Style="{StaticResource MyButton}" 
                 VerticalOptions="Center"  
                 Grid.Row="2"  
@@ -79,7 +79,7 @@
                 Margin="40"/>
 
         <Button Text="Torna"
-                Command="{Binding BtnAnnullaTornaCommand}"
+                Command="{Binding BtnAnnullaEsciCommand}"
                 Style="{StaticResource MyButton}"
                 VerticalOptions="Center"  
                 Grid.Row="2"  
