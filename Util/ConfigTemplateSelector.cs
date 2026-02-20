@@ -1,24 +1,22 @@
-using Microsoft.Maui.Controls;
-using PvPmo.Models;
-
-namespace PvPmo.Util;
-
-public class ConfigTemplateSelector : DataTemplateSelector
+namespace PvPmo.Util
 {
-    public DataTemplate? StringTemplate { get; set; }
-    public DataTemplate? DateTemplate { get; set; }
-    public DataTemplate? DefaultTemplate { get; set; }
-
-    protected override DataTemplate? OnSelectTemplate(object item, BindableObject container)
+    public class ConfigTemplateSelector : DataTemplateSelector
     {
-        if (item is FileSetupConfig config)
+        public DataTemplate? StringTemplate { get; set; }
+        public DataTemplate? DateTemplate { get; set; }
+        public DataTemplate? DefaultTemplate { get; set; }
+
+        protected override DataTemplate? OnSelectTemplate(object item, BindableObject container)
         {
-            // Per ora usiamo sempre il DefaultTemplate
-            // Puoi estendere questa logica per selezionare template diversi
-            // basandoti su proprietà specifiche di FileSetupConfig
+            if (item is FileSetupConfig config)
+            {
+                // Per ora usiamo sempre il DefaultTemplate
+                // Puoi estendere questa logica per selezionare template diversi
+                // basandoti su proprietà specifiche di FileSetupConfig
+                return DefaultTemplate;
+            }
+
             return DefaultTemplate;
         }
-
-        return DefaultTemplate;
     }
 }
