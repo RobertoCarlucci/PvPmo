@@ -10,7 +10,7 @@ public partial class PulisciDb
         //    // e provvedo all'esecuzione.
 
         var databaseService = ServiceHelper.GetService<DatabaseService>();
-        var final = await databaseService.GetFinalizzaConfigsAsync();
+        var final = await databaseService.GetAllAsync<FinalizzaConfig>();
 
         bool tuttoOK = true;
         string _connProd = string.Empty;

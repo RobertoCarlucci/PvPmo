@@ -13,7 +13,7 @@ public static class NormTab
     {            
         // Carico la tabella con le azioni da svolgere dal Service
         var databaseService = ServiceHelper.GetService<DatabaseService>();
-        var dati = await databaseService.GetNormalizzaConfigsAsync();
+        var dati = await databaseService.GetAllAsync<NormalizzaConfig>();
 
         bool esitoGlobale = true;
 

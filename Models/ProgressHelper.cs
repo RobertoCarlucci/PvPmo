@@ -5,7 +5,7 @@
         public static async Task<Dictionary<string, string>> CaricaDescrizioniAsync()
         {
             var databaseService = ServiceHelper.GetService<DatabaseService>();
-            var lista = await databaseService.GetProgressConfigsAsync();
+            var lista = await databaseService.GetAllAsync<ProgressConfig>();
 
             return lista
                 .Where(p => !string.IsNullOrWhiteSpace(p.TabellaSql) &&

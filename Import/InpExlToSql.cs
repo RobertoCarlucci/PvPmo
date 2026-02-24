@@ -24,7 +24,7 @@ public partial class InpExlToSql
 
         var descrizioni = await ProgressHelper.CaricaDescrizioniAsync();
         var databaseService = ServiceHelper.GetService<DatabaseService>();
-        var dati = await databaseService.GetOrigineConfigsAsync();
+        var dati = await databaseService.GetAllAsync<OrigineConfig>();
 
         var validi = dati.Where(n =>
             n.InpType == type &&

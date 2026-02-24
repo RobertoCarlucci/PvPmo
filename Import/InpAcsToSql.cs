@@ -12,7 +12,7 @@ public partial class InpAcsToSql()
 
         var descrizioni = await ProgressHelper.CaricaDescrizioniAsync();
         var databaseService = ServiceHelper.GetService<DatabaseService>();
-        var dati = await databaseService.GetOrigineConfigsAsync();        
+        var dati = await databaseService.GetAllAsync<OrigineConfig>();        
 
         // Aggiunto per evitare che un errore blocchi tutte le tabelle:
 

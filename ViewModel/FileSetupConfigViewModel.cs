@@ -24,7 +24,7 @@ public partial class FileSetupConfigViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            var configs = await _databaseService.GetFileSetupConfigsAsync();
+            var configs = await _databaseService.GetAllAsync<FileSetupConfig>();
             
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
@@ -68,7 +68,7 @@ public partial class FileSetupConfigViewModel : BaseViewModel
             // Salva tutte le configurazioni
             foreach (var config in Configurazioni)
             {
-                await _databaseService.SaveFileSetupConfigAsync(config);
+                await _databaseService.SaveAsync(config);
             }
             
             await Shell.Current.DisplayAlert("Successo", "Configurazioni salvate con successo!", "OK");
@@ -114,7 +114,7 @@ public partial class FileSetupConfigViewModel : BaseViewModel
             {
                 if (config.Id > 0)
                 {
-                    await _databaseService.DeleteFileSetupConfigAsync(config);
+                    await _databaseService.DeleteAsync(config);
                 }
                 Configurazioni.Remove(config);
                 

@@ -78,28 +78,25 @@ public class DatabaseService
     }
 
     // --- METODI CRUD GENERICI ---
-
-    /// <summary>
-    /// Recupera tutti gli elementi di un tipo specifico
-    /// </summary>
+    
+    // Recupera tutti gli elementi di un tipo specifico
+   
     public async Task<List<T>> GetAllAsync<T>() where T : new()
     {
         await EnsureInitializedAsync();
         return await _database.Table<T>().ToListAsync();
     }
-
-    /// <summary>
-    /// Recupera un elemento per ID
-    /// </summary>
+    
+    // Recupera un elemento per ID
+    // 
     public async Task<T?> GetByIdAsync<T>(int id) where T : class, new()
     {
         await EnsureInitializedAsync();
         return await _database.FindAsync<T>(id);
     }
 
-    /// <summary>
-    /// Salva un elemento (Insert se nuovo, Update se esistente)
-    /// </summary>
+    // Salva un elemento (Insert se nuovo, Update se esistente)
+    
     public async Task<int> SaveAsync<T>(T entity) where T : class
     {
         await EnsureInitializedAsync();
@@ -115,10 +112,9 @@ public class DatabaseService
 
         return await _database.InsertAsync(entity);
     }
-
-    /// <summary>
+    
     /// Salva una lista di elementi
-    /// </summary>
+   
     public async Task<int> SaveAllAsync<T>(List<T> entities) where T : class
     {
         await EnsureInitializedAsync();
@@ -129,32 +125,23 @@ public class DatabaseService
         }
         return count;
     }
-
-    /// <summary>
+    
     /// Elimina un elemento
-    /// </summary>
+   
     public async Task<int> DeleteAsync<T>(T entity) where T : class
     {
         await EnsureInitializedAsync();
         return await _database.DeleteAsync(entity);
     }
-
-    /// <summary>
+        
     /// Elimina tutti gli elementi di un tipo specifico
-    /// </summary>
+    
     public async Task<int> DeleteAllAsync<T>() where T : new()
     {
         await EnsureInitializedAsync();
         return await _database.DeleteAllAsync<T>();
     }
-
-    // --- METODI LEGACY (per retrocompatibilità) ---
-    // Questi metodi chiamano i metodi generici e possono essere rimossi in futuro
-
-    public async Task<List<Utente>> GetUtentiAsync() => await GetAllAsync<Utente>();
-    public async Task<int> SaveUtenteAsync(Utente utente) => await SaveAsync(utente);
-    public async Task<int> DeleteUtenteAsync(Utente utente) => await DeleteAsync(utente);
-
+        
     public async Task<Utente?> GetUtenteByNameAsync(string nomeUtente)
     {
         await EnsureInitializedAsync();
@@ -162,29 +149,7 @@ public class DatabaseService
             .Where(u => u.NomeUtente == nomeUtente)
             .FirstOrDefaultAsync();
     }
-
-    public async Task<List<OrigineConfig>> GetOrigineConfigsAsync() => await GetAllAsync<OrigineConfig>();
-    public async Task<int> SaveOrigineConfigAsync(OrigineConfig config) => await SaveAsync(config);
-    public async Task<int> DeleteOrigineConfigAsync(OrigineConfig config) => await DeleteAsync(config);
-
-    public async Task<List<NormalizzaConfig>> GetNormalizzaConfigsAsync() => await GetAllAsync<NormalizzaConfig>();
-    public async Task<int> SaveNormalizzaConfigAsync(NormalizzaConfig config) => await SaveAsync(config);
-    public async Task<int> DeleteNormalizzaConfigAsync(NormalizzaConfig config) => await DeleteAsync(config);
-
-    public async Task<List<ProgressConfig>> GetProgressConfigsAsync() => await GetAllAsync<ProgressConfig>();
-    public async Task<int> SaveProgressConfigAsync(ProgressConfig config) => await SaveAsync(config);
-    public async Task<int> DeleteProgressConfigAsync(ProgressConfig config) => await DeleteAsync(config);
-
-    public async Task<List<FinalizzaConfig>> GetFinalizzaConfigsAsync() => await GetAllAsync<FinalizzaConfig>();
-    public async Task<int> SaveFinalizzaConfigAsync(FinalizzaConfig config) => await SaveAsync(config);
-    public async Task<int> DeleteFinalizzaConfigAsync(FinalizzaConfig config) => await DeleteAsync(config);
-
-    public async Task<List<FileSetupConfig>> GetFileSetupConfigsAsync() => await GetAllAsync<FileSetupConfig>();
-    public async Task<FileSetupConfig?> GetFileSetupConfigByIdAsync(int id) => await GetByIdAsync<FileSetupConfig>(id);
-    public async Task<int> SaveFileSetupConfigAsync(FileSetupConfig config) => await SaveAsync(config);
-    public async Task<int> DeleteFileSetupConfigAsync(FileSetupConfig config) => await DeleteAsync(config);
-    public async Task<int> SaveAllFileSetupConfigsAsync(List<FileSetupConfig> configs) => await SaveAllAsync(configs);
-
+    
     // --- UTILITY ---
     public async Task<bool> IsDatabaseEmptyAsync()
     {

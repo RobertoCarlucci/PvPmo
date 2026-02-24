@@ -41,7 +41,7 @@ public partial class UptdProd
         //    // e provvedo all'esecuzione.
 
         var databaseService = ServiceHelper.GetService<DatabaseService>();
-        var final = await databaseService.GetFinalizzaConfigsAsync();
+        var final = await databaseService.GetAllAsync<FinalizzaConfig>();
 
         bool tuttoOk = true;
 

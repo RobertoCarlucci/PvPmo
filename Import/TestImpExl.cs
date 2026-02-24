@@ -15,7 +15,7 @@ public partial class TestDateImpExl
         //    // e provvedo all'esecuzione.
 
         var databaseService = ServiceHelper.GetService<DatabaseService>();
-        var final = await databaseService.GetFinalizzaConfigsAsync();
+        var final = await databaseService.GetAllAsync<FinalizzaConfig>();
 
         bool tuttoOk = true;
 
